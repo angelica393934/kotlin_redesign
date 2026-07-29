@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
@@ -28,12 +27,8 @@ import bsb.dev.bsb_bangking_jp.core.component.AppModalBottomSheet
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PortalPage(
-    navController: NavController,
-    showModalOnOpen: Boolean = false,
-    modalTitle: String? = null,
-    modalDescription: String? = null
+    navController: NavController
 ) {
-
     val login = stringResource(R.string.login_button)
     val loginText = stringResource(R.string.portal_login_text)
     val highlightText = stringResource(R.string.portal_login_highlight)

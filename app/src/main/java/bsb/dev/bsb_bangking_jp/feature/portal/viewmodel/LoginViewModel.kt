@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import bsb.dev.bsb_bangking_jp.core.session.SessionManager
 import bsb.dev.bsb_bangking_jp.core.util.ApiResult
-import bsb.dev.bsb_bangking_jp.data.repository.AuthRepository
+import bsb.dev.bsb_bangking_jp.domain.usecase.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,8 +22,12 @@ data class LoginUiState(
     val isLoginSuccess: Boolean = false,
 )
 
+/**
+ * `loginUseCase` di-inject lewat Koin (lihat core/di/ViewModelModule.kt),
+ * bukan langsung AuthRepository -- ViewModel cukup tahu "jalankan use case".
+ */
 class LoginViewModel(
-    private val repository: AuthRepository = AuthRepository(),
+    private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -40,12 +44,9 @@ class LoginViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
-            when (val result = repository.login(username, password)) {
+            when (val result = loginUseCase(username, password)) {
                 is ApiResult.Success -> {
-                    SessionManager.saveSession(
-                        accessToken = result.data.accessToken,
-                        username = result.data.username,
-                    )
+                    SessionManager.saveSession(result.data)
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         isLoginSuccess = true,
@@ -67,7 +68,7 @@ class LoginViewModel(
         _uiState.value = _uiState.value.copy(isLoginSuccess = false)
     }
 
-    /** Dipanggil sesudah error ditampilkan (mis. lewat Toast). */
+    /** Dipanggil sesudah error ditampilkan (mis. lewat AppToast). */
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }

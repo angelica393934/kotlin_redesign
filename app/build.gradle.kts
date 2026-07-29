@@ -43,6 +43,17 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+
+    // Lifecycle
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
+
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.androidx.datastore.preferences)

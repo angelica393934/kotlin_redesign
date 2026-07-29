@@ -2,16 +2,23 @@ package bsb.dev.bsb_bangking_jp.core.navigation
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
+import bsb.dev.bsb_bangking_jp.core.component.ToastHost
+import bsb.dev.bsb_bangking_jp.core.component.rememberToastState
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
 import bsb.dev.bsb_bangking_jp.feature.lokasi_atm.LokasiAtmPage
 import bsb.dev.bsb_bangking_jp.feature.Navbar.Navbar
@@ -45,322 +52,329 @@ fun AppNavigation(
     onThemeChange: (Boolean) -> Unit,
 ) {
     val navController = rememberNavController()
+    val toastState = rememberToastState()
 
     var pendingTransfer by remember { mutableStateOf<PeriksaKembaliData?>(null) }
     var pendingConfirmResult by remember { mutableStateOf<ConfirmTransferResult?>(null) }
     var pendingSumberKlasifikasi by remember { mutableStateOf("Tabungan Sekarang") }
     var pendingSumberSaldoInt by remember { mutableStateOf(0) }
 
-    NavHost(
-        navController = navController,
-        startDestination = "portal",
-    ) {
-
-        composable("splash") {
-            SplashScreen(navController)
-        }
-
-        composable("intro") {
-            IntroPage(
+    CompositionLocalProvider(LocalToastState provides toastState) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            NavHost(
                 navController = navController,
-                darkTheme = darkTheme,
-                onThemeChange = onThemeChange,
-            )
-        }
+                startDestination = "portal",
+            ) {
 
-        composable("intro4") {
-            IntroPage4(navController)
-        }
-
-        composable("portal") {
-            PortalPage(navController)
-        }
-
-        composable("lokasiatm") {
-            LokasiAtmPage(
-                navController = navController,
-                onBack = {
-                    navController.popBackStack()
-                },
-            )
-        }
-        composable("top_up") {
-            TopUpPage(
-                onNavigateToRoute = { route ->
-                    navController.navigate(route)
-                },
-                onNavigateToUnavailable = {
-                },
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
-        }
-        composable("va") {
-            VaPage(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
-        }
-        composable("bsbcash") {
-            BsbCashHomePage(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
-        }
-
-        composable("pajak_pendidikan") {
-            PajakPendidikanPage(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onNavigateToRoute = { route ->
-                    Log.d("NAVIGATION", "Navigate ke $route")
-                    navController.navigate(route)
+                composable("splash") {
+                    SplashScreen(navController)
                 }
-            )
-        }
 
-        composable("lainnya_pajak") {
-            LainnyaPajakPage(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
-        }
-
-
-        composable("tagihan") {
-            TagihanPage(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
-        }
-
-        composable("cardless") {
-            CardlessPage(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
-        }
-
-        composable("menu_lainnya") {
-            LainnyaPage(
-                navController = navController,
-                onBack = {
-                    navController.popBackStack()
-                },
-                onNavigateToRoute = { route ->
-                    navController.navigate(route)
-                },
-                onNavigateToUnavailable = {
-                },
-            )
-        }
-
-        composable("navbar") {
-            Navbar(
-                navController = navController,
-                darkTheme = darkTheme,
-                onThemeChange = onThemeChange,
-                initialIndex = 0,
-                onNavigateToScanQris = {
-                    navController.navigate("scan_qris")
-                },
-                onLainnyaClick = {
-                    navController.navigate("menu_lainnya")
-                },
-                onTransferClick = {
-                    navController.navigate("transfer_home")
-                },
-                onVirtualAccountClick= {
-                    navController.navigate("va")
-                },
-                onTopUpClick ={
-                    navController.navigate("top_up")
-                },
-                onBsbCashClick={
-                    navController.navigate("bsbcash")
-                },
-                onPajakPendidikanClick = {
-                    navController.navigate("pajak_pendidikan")
-                },
-                onTagihanClick = {
-                    navController.navigate("tagihan")
-                },
-                onCardlessClick ={
-                    navController.navigate("cardless")
+                composable("intro") {
+                    IntroPage(
+                        navController = navController,
+                        darkTheme = darkTheme,
+                        onThemeChange = onThemeChange,
+                    )
                 }
-            )
-        }
 
-        composable("berita_list") {
-            BeritaListPage(
-                navController = navController,
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
-        }
+                composable("intro4") {
+                    IntroPage4(navController)
+                }
 
-        composable("transfer_home") {
-            TransferHomePage(
-                navController = navController,
-                onBackClick = { navController.popBackStack() },
-                onTransferSekarang = {
-                    navController.navigate("transfer_baru")
-                },
-            )
-        }
+                composable("portal") {
+                    PortalPage(navController)
+                }
 
-        composable("transfer_baru") {
-            TransferBaruPage(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onContinueToNextPage = { inquiry ->
-                    // 🔹 Tentukan tujuan berdasarkan bank yang dipilih di TransferBaruPage.
-                    val isTujuanBsb = inquiry.bankName.trim().equals(BSB_BANK_NAME, ignoreCase = true)
-                    val destination = if (isTujuanBsb) "transfer_bsb" else "transfer_umum"
-
-                    // Path argument perlu di-encode (nama bank/nasabah bisa mengandung spasi).
-                    val bank = Uri.encode(inquiry.bankName)
-                    val accountNumber = Uri.encode(inquiry.beneficiaryAccountNo)
-                    val name = Uri.encode(inquiry.beneficiaryName)
-
-                    navController.navigate("$destination/$bank/$accountNumber/$name")
-                },
-            )
-        }
-
-        composable(
-            route = "transfer_bsb/{bank}/{accountNumber}/{name}",
-            arguments = listOf(
-                navArgument("bank") { type = NavType.StringType },
-                navArgument("accountNumber") { type = NavType.StringType },
-                navArgument("name") { type = NavType.StringType },
-            ),
-        ) {
-            backStackEntry ->
-            val bank = backStackEntry.arguments?.getString("bank").orEmpty()
-            val accountNumber = backStackEntry.arguments?.getString("accountNumber").orEmpty()
-            val name = backStackEntry.arguments?.getString("name").orEmpty()
-
-            TransferBSBPage(
-                bank = bank,
-                accountNumber = accountNumber,
-                name = name,
-                onBack = { navController.popBackStack() },
-                onLanjutkan = { result ->
-                    pendingTransfer = PeriksaKembaliData(
-                        penerimaName = name,
-                        penerimaBank = bank,
-                        penerimaAccountNumber = accountNumber,
-                        result = result,
+                composable("lokasiatm") {
+                    LokasiAtmPage(
+                        navController = navController,
+                        onBack = {
+                            navController.popBackStack()
+                        },
                     )
-                    pendingSumberKlasifikasi = "Tabungan Sekarang"
-                    pendingSumberSaldoInt = result.sumber.saldo
-                        .filter { it.isDigit() }
-                        .toIntOrNull() ?: 0
-                    navController.navigate("pin_transfer")
-                },
-            )
-        }
-
-        composable(
-            route = "transfer_umum/{bank}/{accountNumber}/{name}",
-            arguments = listOf(
-                navArgument("bank") { type = NavType.StringType },
-                navArgument("accountNumber") { type = NavType.StringType },
-                navArgument("name") { type = NavType.StringType },
-            ),
-        ) {
-            backStackEntry ->
-            val bank = backStackEntry.arguments?.getString("bank").orEmpty()
-            val accountNumber = backStackEntry.arguments?.getString("accountNumber").orEmpty()
-            val name = backStackEntry.arguments?.getString("name").orEmpty()
-
-            TransferUmumPage(
-                bank = bank,
-                accountNumber = accountNumber,
-                name = name,
-                onBack = { navController.popBackStack() },
-                onLanjutkan = { result ->
-                    pendingTransfer = PeriksaKembaliData(
-                        penerimaName = name,
-                        penerimaBank = bank,
-                        penerimaAccountNumber = accountNumber,
-                        result = result,
+                }
+                composable("top_up") {
+                    TopUpPage(
+                        onNavigateToRoute = { route ->
+                            navController.navigate(route)
+                        },
+                        onNavigateToUnavailable = {
+                        },
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
                     )
-                    pendingSumberKlasifikasi = "Tabungan Sekarang"
-                    pendingSumberSaldoInt = result.sumber.saldo
-                        .filter { it.isDigit() }
-                        .toIntOrNull() ?: 0
-                    navController.navigate("pin_transfer")
-                },
-            )
-        }
+                }
+                composable("va") {
+                    VaPage(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+                composable("bsbcash") {
+                    BsbCashHomePage(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
 
-        composable("pin_transfer") {
-            val transferData = pendingTransfer
-            if (transferData == null) {
-                navController.popBackStack()
-            } else {
-                PinTfPage(
-                    data = transferData,
-                    onBack = { navController.popBackStack() },
-                    onBerhasilSegera = { confirmResult ->
-                        pendingConfirmResult = confirmResult
-                        navController.navigate("transfer_berhasil") {
-                            popUpTo("navbar")
+                composable("pajak_pendidikan") {
+                    PajakPendidikanPage(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onNavigateToRoute = { route ->
+                            Log.d("NAVIGATION", "Navigate ke $route")
+                            navController.navigate(route)
                         }
-                    },
-                    onBerhasilDijadwalkan = { confirmResult ->
-                        pendingConfirmResult = confirmResult
-                        navController.navigate("transfer_berhasil_dijadwalkan") {
-                            popUpTo("navbar")
-                        }
-                    },
-                )
-            }
-        }
+                    )
+                }
 
-        composable("transfer_berhasil") {
-            val confirmResult = pendingConfirmResult
-            if (confirmResult == null) {
-                navController.popBackStack()
-            } else {
-                TransferBerhasilPage(
-                    result = confirmResult,
-                    onClose = {
-                        navController.navigate("navbar") {
-                            popUpTo(0)
-                        }
-                    },
-                )
-            }
-        }
+                composable("lainnya_pajak") {
+                    LainnyaPajakPage(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
 
-        composable("transfer_berhasil_dijadwalkan") {
-            val confirmResult = pendingConfirmResult
-            if (confirmResult == null) {
-                navController.popBackStack()
-            } else {
-                TransferBerhasilDijadwalkanPage(
-                    result = confirmResult,
-                    sumberKlasifikasi = pendingSumberKlasifikasi,
-                    sumberSaldo = pendingSumberSaldoInt,
-                    onSelesai = {
-                        navController.navigate("navbar") {
-                            popUpTo(0)
+
+                composable("tagihan") {
+                    TagihanPage(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+
+                composable("cardless") {
+                    CardlessPage(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+
+                composable("menu_lainnya") {
+                    LainnyaPage(
+                        navController = navController,
+                        onBack = {
+                            navController.popBackStack()
+                        },
+                        onNavigateToRoute = { route ->
+                            navController.navigate(route)
+                        },
+                        onNavigateToUnavailable = {
+                        },
+                    )
+                }
+
+                composable("navbar") {
+                    Navbar(
+                        navController = navController,
+                        darkTheme = darkTheme,
+                        onThemeChange = onThemeChange,
+                        initialIndex = 0,
+                        onNavigateToScanQris = {
+                            navController.navigate("scan_qris")
+                        },
+                        onLainnyaClick = {
+                            navController.navigate("menu_lainnya")
+                        },
+                        onTransferClick = {
+                            navController.navigate("transfer_home")
+                        },
+                        onVirtualAccountClick = {
+                            navController.navigate("va")
+                        },
+                        onTopUpClick = {
+                            navController.navigate("top_up")
+                        },
+                        onBsbCashClick = {
+                            navController.navigate("bsbcash")
+                        },
+                        onPajakPendidikanClick = {
+                            navController.navigate("pajak_pendidikan")
+                        },
+                        onTagihanClick = {
+                            navController.navigate("tagihan")
+                        },
+                        onCardlessClick = {
+                            navController.navigate("cardless")
                         }
-                    },
-                )
+                    )
+                }
+
+                composable("berita_list") {
+                    BeritaListPage(
+                        navController = navController,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+
+                composable("transfer_home") {
+                    TransferHomePage(
+                        navController = navController,
+                        onBackClick = { navController.popBackStack() },
+                        onTransferSekarang = {
+                            navController.navigate("transfer_baru")
+                        },
+                    )
+                }
+
+                composable("transfer_baru") {
+                    TransferBaruPage(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onContinueToNextPage = { inquiry ->
+                            // 🔹 Tentukan tujuan berdasarkan bank yang dipilih di TransferBaruPage.
+                            val isTujuanBsb =
+                                inquiry.bankName.trim().equals(BSB_BANK_NAME, ignoreCase = true)
+                            val destination = if (isTujuanBsb) "transfer_bsb" else "transfer_umum"
+
+                            // Path argument perlu di-encode (nama bank/nasabah bisa mengandung spasi).
+                            val bank = Uri.encode(inquiry.bankName)
+                            val accountNumber = Uri.encode(inquiry.beneficiaryAccountNo)
+                            val name = Uri.encode(inquiry.beneficiaryName)
+
+                            navController.navigate("$destination/$bank/$accountNumber/$name")
+                        },
+                    )
+                }
+
+                composable(
+                    route = "transfer_bsb/{bank}/{accountNumber}/{name}",
+                    arguments = listOf(
+                        navArgument("bank") { type = NavType.StringType },
+                        navArgument("accountNumber") { type = NavType.StringType },
+                        navArgument("name") { type = NavType.StringType },
+                    ),
+                ) { backStackEntry ->
+                    val bank = backStackEntry.arguments?.getString("bank").orEmpty()
+                    val accountNumber =
+                        backStackEntry.arguments?.getString("accountNumber").orEmpty()
+                    val name = backStackEntry.arguments?.getString("name").orEmpty()
+
+                    TransferBSBPage(
+                        bank = bank,
+                        accountNumber = accountNumber,
+                        name = name,
+                        onBack = { navController.popBackStack() },
+                        onLanjutkan = { result ->
+                            pendingTransfer = PeriksaKembaliData(
+                                penerimaName = name,
+                                penerimaBank = bank,
+                                penerimaAccountNumber = accountNumber,
+                                result = result,
+                            )
+                            pendingSumberKlasifikasi = "Tabungan Sekarang"
+                            pendingSumberSaldoInt = result.sumber.saldo
+                                .filter { it.isDigit() }
+                                .toIntOrNull() ?: 0
+                            navController.navigate("pin_transfer")
+                        },
+                    )
+                }
+
+                composable(
+                    route = "transfer_umum/{bank}/{accountNumber}/{name}",
+                    arguments = listOf(
+                        navArgument("bank") { type = NavType.StringType },
+                        navArgument("accountNumber") { type = NavType.StringType },
+                        navArgument("name") { type = NavType.StringType },
+                    ),
+                ) { backStackEntry ->
+                    val bank = backStackEntry.arguments?.getString("bank").orEmpty()
+                    val accountNumber =
+                        backStackEntry.arguments?.getString("accountNumber").orEmpty()
+                    val name = backStackEntry.arguments?.getString("name").orEmpty()
+
+                    TransferUmumPage(
+                        bank = bank,
+                        accountNumber = accountNumber,
+                        name = name,
+                        onBack = { navController.popBackStack() },
+                        onLanjutkan = { result ->
+                            pendingTransfer = PeriksaKembaliData(
+                                penerimaName = name,
+                                penerimaBank = bank,
+                                penerimaAccountNumber = accountNumber,
+                                result = result,
+                            )
+                            pendingSumberKlasifikasi = "Tabungan Sekarang"
+                            pendingSumberSaldoInt = result.sumber.saldo
+                                .filter { it.isDigit() }
+                                .toIntOrNull() ?: 0
+                            navController.navigate("pin_transfer")
+                        },
+                    )
+                }
+
+                composable("pin_transfer") {
+                    val transferData = pendingTransfer
+                    if (transferData == null) {
+                        navController.popBackStack()
+                    } else {
+                        PinTfPage(
+                            data = transferData,
+                            onBack = { navController.popBackStack() },
+                            onBerhasilSegera = { confirmResult ->
+                                pendingConfirmResult = confirmResult
+                                navController.navigate("transfer_berhasil") {
+                                    popUpTo("navbar")
+                                }
+                            },
+                            onBerhasilDijadwalkan = { confirmResult ->
+                                pendingConfirmResult = confirmResult
+                                navController.navigate("transfer_berhasil_dijadwalkan") {
+                                    popUpTo("navbar")
+                                }
+                            },
+                        )
+                    }
+                }
+
+                composable("transfer_berhasil") {
+                    val confirmResult = pendingConfirmResult
+                    if (confirmResult == null) {
+                        navController.popBackStack()
+                    } else {
+                        TransferBerhasilPage(
+                            result = confirmResult,
+                            onClose = {
+                                navController.navigate("navbar") {
+                                    popUpTo(0)
+                                }
+                            },
+                        )
+                    }
+                }
+
+                composable("transfer_berhasil_dijadwalkan") {
+                    val confirmResult = pendingConfirmResult
+                    if (confirmResult == null) {
+                        navController.popBackStack()
+                    } else {
+                        TransferBerhasilDijadwalkanPage(
+                            result = confirmResult,
+                            sumberKlasifikasi = pendingSumberKlasifikasi,
+                            sumberSaldo = pendingSumberSaldoInt,
+                            onSelesai = {
+                                navController.navigate("navbar") {
+                                    popUpTo(0)
+                                }
+                            },
+                        )
+                    }
+                }
             }
+            ToastHost(state = toastState)
         }
     }
 }
