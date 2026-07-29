@@ -1,0 +1,169 @@
+<resources>
+    <string name="app_name">BSB Banking</string>
+    <string name="portal_login_text">
+        Log in now,\ntry our new features that are more\n
+    </string>
+
+    <string name="portal_login_highlight">
+        simple, practical, and convenient.
+    </string>
+
+    <string name="login_button">login</string>
+//
+    <string name="login_title">Log In</string>
+
+    <string name="user_id_label">User ID</string>
+    <string name="user_id_hint">Enter your User ID</string>
+
+    <string name="password_label">Password</string>
+    <string name="password_hint">Enter your password</string>
+
+    <string name="remember_user_id">Remember User ID</string>
+
+    <string name="forgot_userid_password">Forgot User ID/Password?</string>
+
+    <!-- Menu -->
+    <string name="menu_activation">Activation</string>
+    <string name="menu_registration">Registration</string>
+    <string name="menu_atm_location">ATM Locations</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_activity">Activity</string>
+    <string name="nav_request">Request</string>
+    <string name="nav_settings">Settings</string>
+
+    // beranda
+    <string name="halo_user_greeting">Hello, Dear</string>
+    <string name="banner_keamanan_title">Keep Your Data Safe</string>
+    <string name="banner_keamanan_desc">Never share your PIN with anyone.</string>
+    <string name="label_tabungan_utama">Main Savings</string>
+    <string name="label_rekening_lainnya">Other Accounts</string>
+    <string name="title_pilih_rekening_utama">Choose Your Main Account</string>
+    <string name="label_berita">News</string>
+    <string name="label_lihat_semua">See all</string>
+    <string name="cd_notifikasi">Notifications</string>
+    <string name="cd_logout">Log out</string>
+    <string name="cd_tutup_banner">Close banner</string>
+
+    <string name="label_menu_utama">Main Menu</string>
+    <string name="menu_transfer">Transfer</string>
+    <string name="menu_top_up">Top Up</string>
+    <string name="menu_virtual_account">Virtual Account</string>
+    <string name="menu_bsb_cash">BSB Cash</string>
+    <string name="menu_pajak_pendidikan">Tax &amp; Education</string>
+    <string name="menu_tagihan">Bills</string>
+    <string name="menu_cardless">Cardless</string>
+    <string name="menu_lainnya">More</string>
+
+    <string name="label_rekening_dengan_nomor">Account %1$s</string>
+    <string name="label_salin">Copy</string>
+    <string name="label_saldo_sekarang">Current Balance</string>
+    <string name="mask_saldo">Rp •••••••</string>
+    <string name="cd_toggle_saldo">Show/hide balance</string>
+    <string name="msg_rekening_disalin">Account number copied</string>
+
+    <string name="msg_berita_tidak_tersedia">News data is unavailable.</string>
+    <string name="msg_belum_ada_berita">No news is available to show yet.</string>
+    <string name="msg_gagal_memuat_berita">Failed to load news.</string>
+    <string name="msg_periksa_koneksi_berita">Check your connection and try again.</string>
+    <string name="cd_gambar_tidak_tersedia">Image unavailable</string>
+
+    // aktivitas
+    <string name="label_transaksi_bulan_ini">This Month Transactions</string>
+    <string name="label_cari_transaksi">Search Transaction</string>
+    <string name="msg_tidak_ada_aktivitas">No transaction activity.</string>
+    <string name="msg_belum_ada_transaksi">No transaction records found for this period.</string>
+    <string name="label_pilih_rekening">Select an account</string>
+
+    //pesan
+    <string name="label_pesan">Messages</string>
+    <string name="label_semua_pesan">All Messages</string>
+    <string name="label_cari_pesan">Search Message</string>
+    <string name="msg_tidak_ada_pesan">No Messages</string>
+    <string name="msg_belum_ada_pesan">No message records found for this period.</string>
+
+    //pengaturan
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+
+    <string name="section_akun">Account</string>
+    <string name="menu_email">Email</string>
+    <string name="menu_kelola_rekening">Manage Source Account</string>
+    <string name="menu_bahasa">Language</string>
+
+    <string name="section_keamanan">Security</string>
+    <string name="menu_ganti_kata_sandi">Change Password</string>
+    <string name="menu_ganti_mpin">Change M-PIN</string>
+
+    <string name="section_info_bantuan">Information &amp; Help</string>
+    <string name="menu_faq">FAQ</string>
+    <string name="menu_syarat_ketentuan">Terms and Conditions</string>
+    <string name="menu_tentang_app">About BSB Mobile</string>
+    <string name="menu_lokasi_atm">ATM Location</string>
+    <string name="menu_pusat_bantuan">Help Center</string>
+
+    <string name="section_keluar">Log Out</string>
+    <string name="menu_keluar">Log Out</string>
+
+    <string name="app_version_info">Bank Sumsel Babel Mobile Banking\nVersion %1$s</string>
+
+    //menu lainnya
+    <!-- ===== Page ===== -->
+    <string name="lainnya_title">All Services &amp; Products</string>
+    <string name="lainnya_search_hint">Search</string>
+
+    <!-- ===== Section headers ===== -->
+    <string name="lainnya_section_menu_teratas">Top Menu</string>
+    <string name="lainnya_section_top_up">Top Up</string>
+    <string name="lainnya_section_tagihan">Bills</string>
+    <string name="lainnya_section_travel">Travel &amp; Tickets</string>
+    <string name="lainnya_section_pajak_pendidikan">Tax &amp; Education</string>
+    <string name="lainnya_section_ziswaf">Ziswaf</string>
+
+    <!-- ===== Top Up ===== -->
+    <string name="menu_pulsa">Mobile Credit</string>
+    <string name="menu_paket_data">Data Package</string>
+    <string name="menu_gopay">Gopay</string>
+    <string name="menu_ovo">OVO</string>
+    <string name="menu_shopee_pay">Shopee Pay</string>
+
+    <!-- ===== Tagihan ===== -->
+    <string name="menu_pdam">PDAM/SP2J (Water Utility)</string>
+    <string name="menu_bpjs">BPJS</string>
+    <string name="menu_telkom">Telkom</string>
+    <string name="menu_mnc">MNC/ Indovision</string>
+    <string name="menu_tokopedia">Tokopedia</string>
+    <string name="menu_musi">Musi Banyuasin Electric Power</string>
+    <string name="menu_gas_petro">Gas Petro</string>
+    <string name="menu_pusri">Pusri</string>
+
+    <!-- ===== Travel dan Tiket ===== -->
+    <string name="menu_kai">Kereta Api Indonesia (Railways)</string>
+    <string name="menu_garuda">Garuda Indonesia</string>
+    <string name="menu_lion_air">Lion Air</string>
+
+    <!-- ===== Pajak dan Pendidikan ===== -->
+    <string name="menu_samsat">SAMSAT</string>
+    <string name="menu_pbb">Land &amp;\nBuilding Tax</string>
+    <string name="menu_unsri">Universitas Sriwijaya</string>
+    <string name="menu_ump">Universitas Muhammadiyah Palembang</string>
+    <string name="menu_tridinanti">Universitas Tridinanti</string>
+    <string name="menu_uin">UIN Raden Fatah Palembang</string>
+    <string name="menu_pgri">Universitas PGRI Palembang</string>
+    <string name="menu_stikp">STIKP Muhammadiyah Babel</string>
+    <string name="menu_stik">STIK SITI Khadijah Palembang</string>
+    <string name="menu_iain">IAIN SAS BABEL</string>
+    <string name="menu_ub">Universitas Baturaja</string>
+    <string name="menu_ubd">Universitas Bina Darma</string>
+    <string name="menu_ikest">Ikest Muhammadiyah Palembang</string>
+
+    <!-- ===== Ziswaf ===== -->
+    <string name="menu_infaq">Alms &amp; Charity</string>
+    <string name="menu_wakaf">Waqf (Endowment)</string>
+    <string name="menu_zakat">Zakat</string>
+
+    <!-- ===== Empty state ===== -->
+    <string name="empty_state_message">No matching results.</string>
+    <string name="empty_state_submessage">Try a different keyword or filter.</string>
+    <string name="empty_state_action">Try Again</string>
+</resources>

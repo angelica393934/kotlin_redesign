@@ -1,0 +1,160 @@
+package bsb.dev.bsb_bangking_jp.feature.pengaturan
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.HeadsetMic
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PermDeviceInformation
+import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import bsb.dev.bsb_bangking_jp.R
+import bsb.dev.bsb_bangking_jp.core.component.AppHeader
+import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
+import bsb.dev.bsb_bangking_jp.core.util.getAppVersion
+import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.AccountProfileCard
+import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingItemData
+import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingSection
+private val HeaderHeight = 100.dp
+
+private val ProfileCardHalfHeight = 44.dp
+
+@Composable
+fun PengaturanPage(
+    darkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit
+) {
+    val context = LocalContext.current
+    val appVersion = remember { getAppVersion(context) }
+
+    Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            // 🔹 Header + konten. AppHeader dipindah ke sini (bukan topBar Scaffold) supaya
+            // kartu profil di bawah bisa "mengambang" menimpa batas bawahnya.
+            Column(modifier = Modifier.fillMaxSize()) {
+                AppHeader(
+                    title = "",
+                    showBackButton = false,
+                    height = HeaderHeight,
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp)
+                ) {
+                    // Ruang kosong biar konten tidak ketutupan separuh-bawah kartu profil
+                    Spacer(modifier = Modifier.height(ProfileCardHalfHeight + 16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (darkTheme) stringResource(R.string.theme_dark)
+                            else stringResource(R.string.theme_light),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Switch(
+                            checked = darkTheme,
+                            onCheckedChange = onThemeChange
+                        )
+                    }
+
+                    SettingSection(
+                        title = stringResource(R.string.section_akun),
+                        items = listOf(
+                            SettingItemData(Icons.Default.Email, stringResource(R.string.menu_email)),
+                            SettingItemData(Icons.Default.AccountBalance, stringResource(R.string.menu_kelola_rekening)),
+                            SettingItemData(Icons.Default.Language, stringResource(R.string.menu_bahasa)),
+                        )
+                    )
+                    SettingSection(
+                        title = stringResource(R.string.section_keamanan),
+                        items = listOf(
+                            SettingItemData(Icons.Default.VpnKey, stringResource(R.string.menu_ganti_kata_sandi)),
+                            SettingItemData(Icons.Default.VpnKey, stringResource(R.string.menu_ganti_mpin)),
+                        )
+                    )
+                    SettingSection(
+                        title = stringResource(R.string.section_info_bantuan),
+                        items = listOf(
+                            SettingItemData(Icons.Default.Help, stringResource(R.string.menu_faq)),
+                            SettingItemData(Icons.Default.PermDeviceInformation, stringResource(R.string.menu_syarat_ketentuan)),
+                            SettingItemData(Icons.Default.PermDeviceInformation, stringResource(R.string.menu_tentang_app)),
+                            SettingItemData(Icons.Default.LocationOn, stringResource(R.string.menu_lokasi_atm)),
+                            SettingItemData(Icons.Default.HeadsetMic, stringResource(R.string.menu_pusat_bantuan)),
+                        )
+                    )
+                    SettingSection(
+                        title = stringResource(R.string.section_keluar),
+                        items = listOf(
+                            SettingItemData(Icons.Default.ExitToApp, stringResource(R.string.menu_keluar)),
+                        )
+                    )
+
+                    Text(
+                        stringResource(R.string.app_version_info, "$appVersion"),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(130.dp))
+                }
+            }
+            AccountProfileCard(
+                nama = DummyData.profile.nama,
+                phoneNumber = DummyData.profile.noHp,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(horizontal = 16.dp)
+                    .offset(y = HeaderHeight - ProfileCardHalfHeight),
+            )
+        }
+    }
+}
+
+private fun Int.sp() = androidx.compose.ui.unit.TextUnit(this.toFloat(), androidx.compose.ui.unit.TextUnitType.Sp)

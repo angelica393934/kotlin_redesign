@@ -1,0 +1,78 @@
+# ==========================================================
+# Gradle
+# ==========================================================
+*.iml
+.gradle/
+build/
+/captures
+.externalNativeBuild/
+.cxx/
+out/
+
+# ==========================================================
+# Android Studio / IntelliJ
+# ==========================================================
+.idea/
+*.hprof
+local.properties
+.navigation/
+captures/
+.DS_Store
+
+# ==========================================================
+# File SENSITIF -- jangan pernah di-commit
+# ==========================================================
+# Berisi path SDK lokal & bisa juga API key kalau kamu taruh di sini
+local.properties
+
+# Keystore untuk signing APK/AAB rilis
+*.jks
+*.keystore
+keystore.properties
+
+# Konfigurasi Firebase / Google Services (berisi API key project)
+google-services.json
+GoogleService-Info.plist
+
+# File environment / secrets kalau kamu simpan config API di sini
+*.env
+.env
+secrets.properties
+apikey.properties
+
+# Kalau nanti kamu simpan token/credential di file terpisah untuk testing
+**/credentials.json
+**/*secret*
+**/*Secret*
+
+# ==========================================================
+# Build output
+# ==========================================================
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# ==========================================================
+# Log & cache
+# ==========================================================
+*.log
+.cache/
+
+# ==========================================================
+# Kotlin / Compose
+# ==========================================================
+.kotlin/
+
+# ==========================================================
+# macOS / Windows sampah sistem
+# ==========================================================
+Thumbs.db
+desktop.ini
+
+# ==========================================================
+# Room / database lokal (kalau ada file db yang ke-generate saat testing)
+# ==========================================================
+*.db
+*.sqlite
