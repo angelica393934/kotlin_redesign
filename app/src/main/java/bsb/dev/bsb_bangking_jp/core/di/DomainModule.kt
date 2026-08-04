@@ -1,6 +1,8 @@
 package bsb.dev.bsb_bangking_jp.core.di
 
+import bsb.dev.bsb_bangking_jp.domain.usecase.GetMeUseCase
 import bsb.dev.bsb_bangking_jp.domain.usecase.LoginUseCase
+import bsb.dev.bsb_bangking_jp.domain.usecase.RefreshTokenUseCase
 import org.koin.dsl.module
 
 /**
@@ -9,4 +11,6 @@ import org.koin.dsl.module
  */
 val domainModule = module {
     factory { LoginUseCase(get()) }
+    factory { GetMeUseCase(get()) }
+    factory { RefreshTokenUseCase(get()) }
 }

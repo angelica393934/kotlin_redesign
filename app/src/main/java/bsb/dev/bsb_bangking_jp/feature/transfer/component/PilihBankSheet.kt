@@ -27,7 +27,7 @@ import bsb.dev.bsb_bangking_jp.core.component.SearchTextField
 import bsb.dev.bsb_bangking_jp.core.dummy.DummyBank
 import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
 import bsb.dev.bsb_bangking_jp.core.util.InitialName
-import bsb.dev.bsb_bangking_jp.core.widgets.InitialAvatar
+import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
 
 
 @Composable

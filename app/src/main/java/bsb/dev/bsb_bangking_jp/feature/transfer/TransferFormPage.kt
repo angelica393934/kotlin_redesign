@@ -42,7 +42,7 @@ import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
 import bsb.dev.bsb_bangking_jp.core.dummy.DummyRekening
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.core.util.InitialName
-import bsb.dev.bsb_bangking_jp.core.widgets.InitialAvatar
+import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.JumlahTransferField
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.OptionItem
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.OptionListSheet

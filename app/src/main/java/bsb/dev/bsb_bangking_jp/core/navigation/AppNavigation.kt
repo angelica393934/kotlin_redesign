@@ -63,7 +63,7 @@ fun AppNavigation(
         Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
-                startDestination = "portal",
+                startDestination = "splash",
             ) {
 
                 composable("splash") {

@@ -21,11 +21,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.R
+import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
 
 @Composable
 fun HaloUserSection(
     nama: String,
     photoBytes: ByteArray? = null,
+    photoUrl: String? = null,
     onNotificationClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -43,7 +45,8 @@ fun HaloUserSection(
             InitialAvatar(
                 initials = getInitials(nama),
                 photoBytes = photoBytes,
-                radius = 22,
+                imagePath = photoUrl,
+                radius = 22.0,
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(

@@ -1,5 +1,6 @@
 package bsb.dev.bsb_bangking_jp.feature.Navbar
 
+import BerandaPage
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,7 +54,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.pages.aktivitas.AktivitasPage
-import bsb.dev.bsb_bangking_jp.pages.beranda.BerandaPage
 import bsb.dev.bsb_bangking_jp.pages.pesan.PesanPage
 import kotlin.Unit
 

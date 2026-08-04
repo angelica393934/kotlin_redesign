@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.widgets
+package bsb.dev.bsb_bangking_jp.core.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,9 +18,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.util.InitialName
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
-//import coil3.compose.AsyncImage
-
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun InitialAvatar(
     initials: String,
@@ -44,50 +45,41 @@ fun InitialAvatar(
     }
 
     val diameter = (radius * 2).dp
+    val borderModifier = if (showBorder) {
+        Modifier.border(width = 1.8.dp, color = borderColor, shape = CircleShape)
+    } else {
+        Modifier
+    }
 
     Box(
         modifier = Modifier
             .size(diameter)
             .clip(CircleShape)
-            .background(backgroundColor),
-        contentAlignment = Alignment.Center
+            .background(backgroundColor)
+            .then(borderModifier),
+        contentAlignment = Alignment.Center,
     ) {
-//        if (imageModel != null) {
-//            AsyncImage(
-//                model = imageModel,
-//                contentDescription = null,
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier
-//                    .size(diameter)
-//                    .clip(CircleShape)
-//            )
-//        } else {
-            Box(
+        // Lapisan dasar: inisial. Ini SENGAJA selalu digambar (bukan di dalam
+        // else-branch) supaya otomatis jadi fallback kalau GlideImage di atasnya
+        // masih loading atau gagal (mis. tidak ada internet) -- foto yang
+        // berhasil load akan menutupinya sepenuhnya begitu selesai.
+        Text(
+            text = initials.InitialName(),
+            color = textColor,
+            fontWeight = FontWeight.Bold,
+            fontSize = TextUnit((radius * 0.8).toFloat(), TextUnitType.Sp),
+            textAlign = TextAlign.Center,
+        )
+
+        if (imageModel != null) {
+            GlideImage(
+                model = imageModel,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(diameter)
-                    .clip(CircleShape)
-                    .then(
-                        if (showBorder) {
-                            Modifier.border(
-                                width = 1.8.dp,
-                                color = borderColor,
-                                shape = CircleShape
-                            )
-                        } else Modifier
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = initials.InitialName(),
-                    color = textColor,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = TextUnit(
-                        (radius * 0.8).toFloat(),
-                        TextUnitType.Sp
-                    ),
-                    textAlign = TextAlign.Center
-                )
-            }
+                    .clip(CircleShape),
+            )
         }
     }
-//}
+}

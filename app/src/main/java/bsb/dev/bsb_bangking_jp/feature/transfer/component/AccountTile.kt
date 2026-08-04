@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.components.AppCheckBox
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.core.widgets.InitialAvatar
+import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
 
 @Composable
 fun AccountTile(

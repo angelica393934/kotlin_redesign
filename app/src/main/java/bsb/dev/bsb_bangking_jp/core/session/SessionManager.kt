@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import bsb.dev.bsb_bangking_jp.core.network.dto.LoginResponse
+import bsb.dev.bsb_bangking_jp.core.network.dto.MeResponse
 
 /**
  * Data profil user yang sudah login, diambil dari SessionManager.
@@ -65,7 +66,36 @@ object SessionManager {
         }
     }
 
+    /**
+     * Perbarui data profil SAJA dari hasil GET /auth/me (dipakai
+     * pull-to-refresh), token TIDAK disentuh sama sekali.
+     */
+    fun updateProfile(me: MeResponse) {
+        prefs.edit {
+            putInt(KEY_ID, me.id)
+            putString(KEY_USERNAME, me.username)
+            putString(KEY_EMAIL, me.email)
+            putString(KEY_FIRST_NAME, me.firstName)
+            putString(KEY_LAST_NAME, me.lastName)
+            putString(KEY_GENDER, me.gender)
+            putString(KEY_IMAGE, me.image)
+        }
+    }
+
+    /**
+     * Perbarui accessToken & refreshToken SAJA dari hasil POST /auth/refresh,
+     * data profil TIDAK disentuh sama sekali.
+     */
+    fun updateTokens(accessToken: String, refreshToken: String) {
+        prefs.edit {
+            putString(KEY_ACCESS_TOKEN, accessToken)
+            putString(KEY_REFRESH_TOKEN, refreshToken)
+        }
+    }
+
     fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
+
+    fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
 
     fun getUserProfile(): UserProfile? {
         val username = prefs.getString(KEY_USERNAME, null) ?: return null

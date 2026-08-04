@@ -43,7 +43,7 @@ import bsb.dev.bsb_bangking_jp.core.component.formatRupiah
 import bsb.dev.bsb_bangking_jp.core.component.maskAccountNumber
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.core.widgets.InitialAvatar
+import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
 import java.text.SimpleDateFormat
 import java.util.Locale
 
