@@ -14,31 +14,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.AppTextField
-import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.res.stringResource
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.components.AppCheckBox
 import bsb.dev.bsb_bangking_jp.core.components.AppMenu
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.feature.portal.viewmodel.LoginViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginSheet(
     navController: NavController,
     onDismiss: () -> Unit = {},
-    viewModel: LoginViewModel = koinViewModel(),
 ) {
-    // ToastState global, sama seperti yang sudah dipakai di halaman lain
-    // (AppToast.kt + LocalToastState + ToastHost yang di-provide di AppNavigation).
-    val toastState = LocalToastState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val loginTitle = stringResource(R.string.login_title)
     val userIdLabel = stringResource(R.string.user_id_label)
     val userIdHint = stringResource(R.string.user_id_hint)
@@ -51,40 +41,27 @@ fun LoginSheet(
     val registration = stringResource(R.string.menu_registration)
     val atmLocation = stringResource(R.string.menu_atm_location)
 
-    // TODO: sementara pakai kredensial dummyjson untuk testing:
-    // username = "emilys", password = "emilyspass"
-    var userId by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var rememberMe by remember { mutableStateOf(false) }
-
-    // Navigasi ke navbar begitu login sukses (hasil hit API).
-    LaunchedEffect(uiState.isLoginSuccess) {
-        if (uiState.isLoginSuccess) {
-            viewModel.onNavigated()
-            navController.navigate("navbar") {
-                popUpTo("portal") { inclusive = true }
-            }
-        }
+    var userId by remember {
+        mutableStateOf("")
     }
 
-    // Tampilkan error dari API (mis. "Invalid credentials" / tidak ada koneksi)
-    // pakai AppToast bawaan, bukan Toast.makeText default Android lagi.
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { message ->
-            toastState.showError(message)
-            viewModel.clearError()
-        }
+    var password by remember {
+        mutableStateOf("")
+    }
+
+    var rememberMe by remember {
+        mutableStateOf(false)
     }
 
     Column {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 6.dp),
+                .padding( top=6.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = loginTitle,
+                text = loginTitle ,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
@@ -98,29 +75,31 @@ fun LoginSheet(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Tutup",
-                    tint = MaterialTheme.extendedColors.textPrimary,
+                    tint = MaterialTheme.extendedColors.textPrimary, // padanan gray950
                 )
             }
         }
 
         AppTextField(
             value = userId,
-            onValueChange = { userId = it },
+            onValueChange = {
+                userId = it
+            },
             labelText = userIdLabel,
             hintText = userIdHint,
-            icon = Icons.Default.Person,
-            readOnly = uiState.isLoading,
+            icon = Icons.Default.Person
         )
         Spacer(modifier = Modifier.height(10.dp))
 
         AppTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+            },
             labelText = passwordLabel,
             hintText = passwordHint,
             icon = Icons.Default.Lock,
-            obscureText = true,
-            readOnly = uiState.isLoading,
+            obscureText = true
         )
 
         Spacer(modifier = Modifier.height(15.dp))
@@ -129,11 +108,13 @@ fun LoginSheet(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.toggleable(
                 value = rememberMe,
-                onValueChange = { rememberMe = it }
+                onValueChange = {
+                    rememberMe = it
+                }
             )
         ) {
             AppCheckBox(
-                modifier = Modifier.padding(start = 16.dp, end = 12.dp),
+                modifier = Modifier.padding(start = 16.dp,end = 12.dp),
                 value = rememberMe,
                 onChanged = { rememberMe = it },
             )
@@ -148,11 +129,9 @@ fun LoginSheet(
         Spacer(modifier = Modifier.height(15.dp))
 
         AppButton(
-            text = if (uiState.isLoading) "Memproses..." else login,
-            enabled = !uiState.isLoading,
+            text = login ,
             onClick = {
-                // Hit API POST /auth/login lewat ViewModel -> LoginUseCase -> Repository.
-                viewModel.login(userId, password)
+                navController.navigate("navbar")
             }
         )
 
@@ -165,10 +144,11 @@ fun LoginSheet(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text(
-                forgotPassword,
-                style = MaterialTheme.typography.titleMedium,
+                forgotPassword ,
+                style =MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.extendedColors.divider,
-            )
+
+                )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -190,7 +170,7 @@ fun LoginSheet(
 
             AppMenu(
                 icon = Icons.Outlined.LocationOn,
-                label = atmLocation,
+                label =atmLocation,
                 onTap = {
                     navController.navigate("lokasiatm")
                 }

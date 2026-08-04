@@ -1,21 +1,23 @@
 package bsb.dev.bsb_bangking_jp.feature.beranda.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import bsb.dev.bsb_bangking_jp.core.session.SessionManager
 import bsb.dev.bsb_bangking_jp.core.session.UserProfile
-import bsb.dev.bsb_bangking_jp.core.util.ApiResult
-import bsb.dev.bsb_bangking_jp.domain.usecase.GetMeUseCase
-import bsb.dev.bsb_bangking_jp.domain.usecase.RefreshTokenUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
-class BerandaViewModel(
-    private val getMeUseCase: GetMeUseCase,
-    private val refreshTokenUseCase: RefreshTokenUseCase,
-) : ViewModel() {
+/**
+ * TODO: dulu ViewModel ini refresh profile lewat GET /auth/me (dummyjson) dan
+ * refresh token lewat POST /auth/refresh. Endpoint itu sudah dihapus karena
+ * ganti base URL & struktur API baru (lihat core/network/header/ApiHeaders.kt).
+ *
+ * Untuk sementara ViewModel ini HANYA baca dari SessionManager (data lokal),
+ * tanpa hit API apapun. Begitu endpoint profile & refresh-token versi baru
+ * sudah tersedia, tinggal suntik use case-nya lagi ke constructor & panggil
+ * di refresh()/refreshAccessToken() seperti pola InitViewModel/InitDeviceUseCase.
+ */
+class BerandaViewModel : ViewModel() {
 
     private val _profile = MutableStateFlow(SessionManager.getUserProfile())
     val profile: StateFlow<UserProfile?> = _profile.asStateFlow()
@@ -23,54 +25,17 @@ class BerandaViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-    fun refresh() {
-        val token = SessionManager.getAccessToken()
-        if (token.isNullOrBlank() || _isRefreshing.value) return
-
-        viewModelScope.launch {
-            _isRefreshing.value = true
-
-            when (val result = getMeUseCase(token)) {
-                is ApiResult.Success -> {
-                    SessionManager.updateProfile(result.data)
-                    _profile.value = SessionManager.getUserProfile()
-                }
-                is ApiResult.Error -> {
-                }
-                ApiResult.Loading -> Unit
-            }
-
-            _isRefreshing.value = false
-        }
-    }
-
     /**
-     * Proses refresh accessToken pakai refreshToken tersimpan (POST /auth/refresh).
-     *
-     * BELUM dipanggil dari UI manapun -- disiapkan dulu sesuai permintaan,
-     * tinggal panggil `BerandaViewModel.refreshAccessToken { berhasil -> ... }`
-     * dari tombol/trigger apapun nanti kalau sudah dibutuhkan.
+     * Pull-to-refresh sementara cuma baca ulang data lokal dari SessionManager
+     * (tidak ada network call). `isRefreshing` tetap di-toggle supaya
+     * PullToRefreshBox di BerandaPage tidak perlu ubah UI logic sama sekali.
      */
-    fun refreshAccessToken(onResult: (success: Boolean) -> Unit = {}) {
-        val refreshToken = SessionManager.getRefreshToken()
-        if (refreshToken.isNullOrBlank()) {
-            onResult(false)
-            return
-        }
+    fun refresh() {
+        if (_isRefreshing.value) return
 
-        viewModelScope.launch {
-            when (val result = refreshTokenUseCase(refreshToken)) {
-                is ApiResult.Success -> {
-                    SessionManager.updateTokens(
-                        accessToken = result.data.accessToken,
-                        refreshToken = result.data.refreshToken,
-                    )
-                    onResult(true)
-                }
-                is ApiResult.Error -> onResult(false)
-                ApiResult.Loading -> Unit
-            }
-        }
+        _isRefreshing.value = true
+        _profile.value = SessionManager.getUserProfile()
+        _isRefreshing.value = false
     }
 
     fun logout() {
