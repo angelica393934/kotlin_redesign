@@ -96,8 +96,7 @@ fun MasukPage(
             Spacer(modifier = Modifier.height(30.dp))
 
             AppButton(
-                text = if (uiState.isLoading) "Memproses..." else "Lanjutkan",
-                enabled = !uiState.isLoading,
+                text ="Lanjutkan",
                 onClick = { viewModel.loginInit(phoneInput) },
             )
         }

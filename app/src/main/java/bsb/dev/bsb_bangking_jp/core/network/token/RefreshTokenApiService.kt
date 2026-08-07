@@ -11,6 +11,11 @@ interface RefreshTokenApiService {
     suspend fun refreshInitToken(
         @HeaderMap headers: Map<String, String>,
     ): Response<RefreshTokenResponse>
+
+    @GET("v1/refresh-token/login")
+    suspend fun refreshLoginToken(
+        @HeaderMap headers: Map<String, String>,
+    ): Response<RefreshTokenResponse>
 }
 
 data class RefreshTokenResponse(

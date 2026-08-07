@@ -31,7 +31,7 @@ import bsb.dev.bsb_bangking_jp.feature.intro.IntroPage4
 import bsb.dev.bsb_bangking_jp.feature.lainnya.LainnyaPage
 import bsb.dev.bsb_bangking_jp.feature.pajak_pendidikan.LainnyaPajakPage
 import bsb.dev.bsb_bangking_jp.feature.pajak_pendidikan.PajakPendidikanPage
-import bsb.dev.bsb_bangking_jp.feature.portal.PortalPage
+import bsb.dev.bsb_bangking_jp.feature.login.PortalPage
 import bsb.dev.bsb_bangking_jp.feature.splash.SplashScreen
 import bsb.dev.bsb_bangking_jp.feature.tagihan.TagihanPage
 import bsb.dev.bsb_bangking_jp.feature.transfer.PinTfPage
@@ -74,7 +74,7 @@ fun AppNavigation(
         Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
-                startDestination = "login_existing",
+                startDestination = "splash",
             ) {
 
                 composable("splash") {

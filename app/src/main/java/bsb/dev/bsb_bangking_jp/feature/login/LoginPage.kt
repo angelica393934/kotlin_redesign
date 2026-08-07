@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.portal
+package bsb.dev.bsb_bangking_jp.feature.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

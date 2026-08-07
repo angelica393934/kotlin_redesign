@@ -1,3 +1,4 @@
+// core/device/AppPreferences.kt
 package bsb.dev.bsb_bangking_jp.core.device
 
 import android.content.Context
@@ -21,11 +22,31 @@ class AppPreferences(context: Context) {
     fun isLoginAllowed(): Boolean = prefs.getBoolean(KEY_LOGIN_ALLOWED, false)
     fun saveLoginAllowed(value: Boolean) = prefs.edit { putBoolean(KEY_LOGIN_ALLOWED, value) }
 
+    // 🔹 "Ingat ID Pengguna" -- cuma userid, bukan passcode, jadi aman di plain prefs
+    fun isRememberMeEnabled(): Boolean = prefs.getBoolean(KEY_REMEMBER_ME, false)
+    fun getRememberedUserId(): String? = prefs.getString(KEY_REMEMBERED_USERID, null)
+
+    fun saveRememberedLogin(userId: String) {
+        prefs.edit {
+            putBoolean(KEY_REMEMBER_ME, true)
+            putString(KEY_REMEMBERED_USERID, userId)
+        }
+    }
+
+    fun clearRememberedLogin() {
+        prefs.edit {
+            putBoolean(KEY_REMEMBER_ME, false)
+            remove(KEY_REMEMBERED_USERID)
+        }
+    }
+
     companion object {
         private const val PREFS_NAME = "app_prefs"
         private const val KEY_INIT_SUCCESS = "init_success"
         private const val KEY_CONFIRM_MPIN = "confirm_mpin_status"
         private const val KEY_REGIST = "regist_status"
         private const val KEY_LOGIN_ALLOWED = "login_allowed"
+        private const val KEY_REMEMBER_ME = "remember_me"
+        private const val KEY_REMEMBERED_USERID = "remembered_userid"
     }
 }

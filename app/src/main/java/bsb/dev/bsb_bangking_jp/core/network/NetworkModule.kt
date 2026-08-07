@@ -13,6 +13,8 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import bsb.dev.bsb_bangking_jp.feature.login.data.LoginApiService as LoginDirectApiService
+import bsb.dev.bsb_bangking_jp.feature.login_existing.data.LoginApiService as LoginExistingApiService
 
 val networkModule = module {
 
@@ -42,6 +44,9 @@ val networkModule = module {
     }
 
     single { get<Retrofit>(named("refreshRetrofit")).create(RefreshTokenApiService::class.java) }
+
+    single { get<Retrofit>().create(LoginDirectApiService::class.java) }
+    single { get<Retrofit>().create(LoginExistingApiService::class.java) }
 
     single {
         TokenRefreshInterceptor(

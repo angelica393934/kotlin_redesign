@@ -43,7 +43,7 @@ fun HaloUserSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             InitialAvatar(
-                initials = getInitials(nama),
+                initials = nama,
                 photoBytes = photoBytes,
                 imagePath = photoUrl,
                 radius = 22.0,

@@ -6,6 +6,7 @@ import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.device.deviceModule
 import bsb.dev.bsb_bangking_jp.core.network.networkModule
 import bsb.dev.bsb_bangking_jp.feature.init.initModule
+import bsb.dev.bsb_bangking_jp.feature.login.loginModule
 import bsb.dev.bsb_bangking_jp.feature.login_existing.loginExistingModule
 import bsb.dev.bsb_bangking_jp.feature.splash.splashModule
 import org.koin.android.ext.android.get
@@ -24,6 +25,7 @@ class BsbApplication : Application() {
                 initModule,
                 splashModule,
                 loginExistingModule,
+                loginModule,
                 // tambahkan module fitur lain di sini
             )
         }

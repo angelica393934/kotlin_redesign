@@ -29,6 +29,8 @@ class SecureStorageService(context: Context) {
     fun getPrivateKey(): String? = prefs.getString(KEY_PRIVATE_KEY, null)
     fun savePrivateKey(base64Key: String) = prefs.edit { putString(KEY_PRIVATE_KEY, base64Key) }
 
+    //Token untuk phase "Init" -- dipakai untuk membuatx-signature untuk membuat m-pin
+
     fun getInitAccessToken(): String? = prefs.getString(KEY_INIT_ACCESS_TOKEN, null)
     fun saveInitAccessToken(token: String) = prefs.edit { putString(KEY_INIT_ACCESS_TOKEN, token) }
 
@@ -42,10 +44,25 @@ class SecureStorageService(context: Context) {
         }
     }
 
+    //Token untuk phase "login" -- dipakai untuk semua endpoint setelah user login
+    fun getLoginAccessToken(): String? = prefs.getString(KEY_LOGIN_ACCESS_TOKEN, null)
+    fun saveLoginAccessToken(token: String) = prefs.edit { putString(KEY_LOGIN_ACCESS_TOKEN, token) }
+
+    fun getLoginRefreshToken(): String? = prefs.getString(KEY_LOGIN_REFRESH_TOKEN, null)
+    fun saveLoginRefreshToken(token: String) = prefs.edit { putString(KEY_LOGIN_REFRESH_TOKEN, token) }
+
+    fun clearLoginTokens() {
+        prefs.edit {
+            remove(KEY_LOGIN_ACCESS_TOKEN)
+            remove(KEY_LOGIN_REFRESH_TOKEN)
+        }
+    }
     companion object {
         private const val KEY_DEVICE_ID = "device_id"
         private const val KEY_PRIVATE_KEY = "ed25519_private_key"
         private const val KEY_INIT_ACCESS_TOKEN = "init_access_token"
         private const val KEY_INIT_REFRESH_TOKEN = "init_refresh_token"
+        private const val KEY_LOGIN_ACCESS_TOKEN = "login_access_token"
+        private const val KEY_LOGIN_REFRESH_TOKEN = "login_refresh_token"
     }
 }

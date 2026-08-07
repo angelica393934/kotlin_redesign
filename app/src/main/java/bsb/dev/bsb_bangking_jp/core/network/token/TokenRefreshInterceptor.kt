@@ -12,11 +12,6 @@ import okhttp3.Response
 
 private const val EXPIRED_RESP_CODE = "0465"
 
-/**
- * Padanan `onRequest`/`onError` refresh-token di dio_interceptor.dart, tapi
- * di-scope hanya untuk request yang di-tag TokenPhaseTag (lewat @Tag di Retrofit).
- * Request tanpa tag lewat begitu saja tanpa campur tangan interceptor ini.
- */
 class TokenRefreshInterceptor(
     private val secureStorage: SecureStorageService,
     private val refreshApiService: () -> RefreshTokenApiService,
@@ -30,7 +25,7 @@ class TokenRefreshInterceptor(
             ?: return chain.proceed(originalRequest)
 
         val requestWithAuth = attachAuthorization(originalRequest, phaseTag.phase)
-        var response = chain.proceed(requestWithAuth)
+        val response = chain.proceed(requestWithAuth)
 
         if (peekRespCode(response) != EXPIRED_RESP_CODE) return response
 
@@ -55,11 +50,13 @@ class TokenRefreshInterceptor(
 
     private fun getStoredAccessToken(phase: TokenPhase): String? = when (phase) {
         TokenPhase.INIT -> secureStorage.getInitAccessToken()
+        TokenPhase.LOGIN -> secureStorage.getLoginAccessToken()
     }
 
     private suspend fun tryRefresh(phase: TokenPhase): String? = try {
         when (phase) {
             TokenPhase.INIT -> refreshInitToken()
+            TokenPhase.LOGIN -> refreshLoginToken()
         }
     } catch (e: Exception) {
         null
@@ -83,6 +80,27 @@ class TokenRefreshInterceptor(
 
         secureStorage.saveInitAccessToken(newAccess)
         data.refreshToken?.let { secureStorage.saveInitRefreshToken(it) }
+        return newAccess
+    }
+
+    private suspend fun refreshLoginToken(): String? {
+        val refreshToken = secureStorage.getLoginRefreshToken() ?: return null
+        val privateKey = secureStorage.getPrivateKey() ?: return null
+
+        val timestamp = ApiHeaders.currentTimestamp()
+        val baseHeaders = ApiHeaders.full(timestamp)
+        val signature = SignatureUtils.sign(emptyMap<String, String>(), timestamp, privateKey)
+        val headers = ApiHeaders.withSignature(signature, baseHeaders) +
+                ("Authorization" to "Bearer $refreshToken")
+
+        val response = refreshApiService().refreshLoginToken(headers = headers)
+        if (!response.isSuccessful) return null
+
+        val data = response.body()?.data ?: return null
+        val newAccess = data.accessToken ?: return null
+
+        secureStorage.saveLoginAccessToken(newAccess)
+        data.refreshToken?.let { secureStorage.saveLoginRefreshToken(it) }
         return newAccess
     }
 
