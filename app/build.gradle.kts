@@ -1,8 +1,22 @@
+// app/build.gradle.kts
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(FileInputStream(localPropertiesFile))
+    }
+}
+val baseUrl: String = localProperties.getProperty("BASE_URL")
+    ?: throw GradleException(
+        "BASE_URL belum diset. Copy local.properties.example -> local.properties lalu isi BASE_URL."
+    )
 
 android {
     namespace = "bsb.dev.bsb_bangking_jp"
@@ -11,11 +25,13 @@ android {
     defaultConfig {
         applicationId = "bsb.dev.bsb_bangking_jp"
         minSdk = 26
-        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 🔹 Digabung di sini, bukan defaultConfig terpisah
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 
     buildTypes {
@@ -27,19 +43,31 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
+        buildConfig = true
         compose = true
+    }
+
+    packaging {
+        resources {
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+        }
     }
 }
 
 dependencies {
+    implementation(libs.bouncycastle)
+    implementation(libs.security.crypto)
     implementation(libs.glide)
     implementation(libs.glide.compose)
     implementation(libs.retrofit)

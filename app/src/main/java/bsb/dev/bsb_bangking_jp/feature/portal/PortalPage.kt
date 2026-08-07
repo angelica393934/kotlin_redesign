@@ -90,7 +90,7 @@ fun PortalPage(
                     .size(130.dp)
                 )
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
                 Image(
                     painter = painterResource(R.drawable.portal),
@@ -100,7 +100,7 @@ fun PortalPage(
                         .fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
                 Box(
                     modifier = Modifier
@@ -138,7 +138,7 @@ fun PortalPage(
             Column(
                 modifier = Modifier.padding(
                     horizontal = 24.dp,
-                    vertical = 30.dp
+                    vertical = 20.dp
                 )
             ) {
                 AppButton(

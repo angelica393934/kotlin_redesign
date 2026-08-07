@@ -43,7 +43,16 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.TransferHomePage
 import bsb.dev.bsb_bangking_jp.feature.transfer.TransferUmumPage
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PeriksaKembaliData
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.berita.BeritaListPage
-
+import androidx.navigation.compose.navigation
+import androidx.compose.ui.Alignment
+import bsb.dev.bsb_bangking_jp.core.component.LoadingOverlayHost
+import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
+import bsb.dev.bsb_bangking_jp.core.component.rememberLoadingOverlayState
+import org.koin.androidx.compose.koinViewModel
+import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPage
+import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPinFlow
+import bsb.dev.bsb_bangking_jp.feature.login_existing.OtpMasukAkunPage
+import bsb.dev.bsb_bangking_jp.feature.login_existing.presentation.LoginExistingViewModel
 private const val BSB_BANK_NAME = "Bank Sumsel Babel"
 
 @Composable
@@ -53,17 +62,19 @@ fun AppNavigation(
 ) {
     val navController = rememberNavController()
     val toastState = rememberToastState()
-
+    val loadingOverlayState = rememberLoadingOverlayState()
     var pendingTransfer by remember { mutableStateOf<PeriksaKembaliData?>(null) }
     var pendingConfirmResult by remember { mutableStateOf<ConfirmTransferResult?>(null) }
     var pendingSumberKlasifikasi by remember { mutableStateOf("Tabungan Sekarang") }
     var pendingSumberSaldoInt by remember { mutableStateOf(0) }
 
-    CompositionLocalProvider(LocalToastState provides toastState) {
+    CompositionLocalProvider(LocalToastState provides toastState,
+        LocalLoadingOverlay provides loadingOverlayState,
+        ) {
         Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
-                startDestination = "splash",
+                startDestination = "login_existing",
             ) {
 
                 composable("splash") {
@@ -80,6 +91,46 @@ fun AppNavigation(
 
                 composable("intro4") {
                     IntroPage4(navController)
+                }
+
+                navigation(startDestination = "login_masuk", route = "login_existing") {
+
+                    composable("login_masuk") { backStackEntry ->
+                        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("login_existing") }
+                        val viewModel: LoginExistingViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+
+                        MasukPage(
+                            viewModel = viewModel,
+                            onBackClick = { navController.popBackStack() },
+                            onNavigateToOtp = { navController.navigate("login_otp") },
+                        )
+                    }
+
+                    composable("login_otp") { backStackEntry ->
+                        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("login_existing") }
+                        val viewModel: LoginExistingViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+
+                        OtpMasukAkunPage(
+                            viewModel = viewModel,
+                            onBackClick = { navController.popBackStack() },
+                            onVerified = { navController.navigate("login_pin") },
+                        )
+                    }
+
+                    composable("login_pin") { backStackEntry ->
+                        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("login_existing") }
+                        val viewModel: LoginExistingViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+
+                        MasukPinFlow(
+                            viewModel = viewModel,
+                            onBackClick = { navController.popBackStack() },
+                            onCompleted = {
+                                navController.navigate("navbar") {
+                                    popUpTo("login_existing") { inclusive = true }
+                                }
+                            },
+                        )
+                    }
                 }
 
                 composable("portal") {
@@ -374,7 +425,8 @@ fun AppNavigation(
                     }
                 }
             }
-            ToastHost(state = toastState)
+            ToastHost(state = toastState, modifier = Modifier.align(Alignment.TopCenter))
+            LoadingOverlayHost(state = loadingOverlayState)
         }
     }
 }

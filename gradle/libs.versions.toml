@@ -17,8 +17,12 @@ lifecycle = "2.8.4"
 koin = "3.5.6"
 glide = "4.16.0"
 glideCompose = "1.0.0-beta01"
+bouncycastle = "1.78"
+securityCrypto = "1.1.0-alpha06"
 
 [libraries]
+bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glideCompose" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }

@@ -1,0 +1,45 @@
+// core/network/header/ApiHeaders.kt
+package bsb.dev.bsb_bangking_jp.core.network.header
+
+import bsb.dev.bsb_bangking_jp.core.device.DeviceContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+object ApiHeaders {
+
+    private object Keys {
+        const val TIMESTAMP = "X-TIMESTAMP"
+        const val DEVICE_ID = "Device-ID"
+        const val CONTENT_TYPE = "Content-Type"
+        const val DEVICE_NAME = "Device-Name"
+        const val OS = "Os"
+        const val OS_VERSION = "Os-Version"
+        const val APP_VERSION = "App-Version"
+        const val SIGNATURE = "X-Signature"
+    }
+
+    private val timestampFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'+07:00'")
+
+    fun currentTimestamp(): String = LocalDateTime.now().format(timestampFormatter)
+
+    fun full(timestamp: String = currentTimestamp()): Map<String, String> = linkedMapOf(
+        Keys.TIMESTAMP to timestamp,
+        Keys.DEVICE_ID to DeviceContext.deviceId,
+        Keys.CONTENT_TYPE to "application/json",
+        Keys.DEVICE_NAME to DeviceContext.deviceName,
+        Keys.OS to DeviceContext.os,
+        Keys.OS_VERSION to DeviceContext.osVersion,
+        Keys.APP_VERSION to DeviceContext.appVersion,
+    )
+
+    fun withoutAppVersionAndOs(): Map<String, String> = full() - Keys.APP_VERSION - Keys.OS
+
+    fun withSignature(signature: String, base: Map<String, String> = full()): Map<String, String> =
+        base + (Keys.SIGNATURE to signature)
+
+    fun minimal(): Map<String, String> = linkedMapOf(
+        Keys.CONTENT_TYPE to "application/json",
+        Keys.DEVICE_ID to DeviceContext.deviceId,
+    )
+}

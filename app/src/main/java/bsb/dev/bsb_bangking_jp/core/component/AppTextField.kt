@@ -97,10 +97,10 @@ fun AppTextField(
 
     val backgroundColor: Color = when {
         !enableFocusBackground -> Color.Transparent
-        readOnly && !isDropdown -> MaterialTheme.extendedColors.inputBackground
+        readOnly && !isDropdown -> MaterialTheme.colorScheme.onPrimary
         isFocused -> Color.White
         value.isNotEmpty() -> Color.White
-        else -> MaterialTheme.extendedColors.inputBackground
+        else -> MaterialTheme.colorScheme.onPrimary
     }
 
     val resolvedLeftDisplayText = leftDisplayText

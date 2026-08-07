@@ -112,6 +112,15 @@ fun InputPinPage(
 
         Scaffold(
             containerColor = Color.Transparent,
+            topBar = {// ---- Header ----
+                if (usePolaHeader) {
+                    customHeader?.invoke()
+                } else if (centerTitleWithBackButton) {
+                    CenteredPinHeader(title = title, showBack = showBack, onBackClick = onBackClick)
+                } else {
+                    DefaultPinHeader(showBack = showBack, onBackClick = onBackClick)
+                }
+                     },
             bottomBar = {
                 Column {
                     BannerKeamanan(
@@ -143,14 +152,7 @@ fun InputPinPage(
                     .fillMaxSize()
                     .padding(innerPadding),
             ) {
-                // ---- Header ----
-                if (usePolaHeader) {
-                    customHeader?.invoke()
-                } else if (centerTitleWithBackButton) {
-                    CenteredPinHeader(title = title, showBack = showBack, onBackClick = onBackClick)
-                } else {
-                    DefaultPinHeader(showBack = showBack, onBackClick = onBackClick)
-                }
+
 
                 // ---- Konten scrollable ----
                 Column(

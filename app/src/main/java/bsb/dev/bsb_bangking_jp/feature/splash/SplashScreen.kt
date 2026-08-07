@@ -4,34 +4,46 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
 import bsb.dev.bsb_bangking_jp.R
-import bsb.dev.bsb_bangking_jp.core.util.getAppVersion
+import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SplashScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: SplashViewModel = koinViewModel(),
 ) {
-    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val toastState = LocalToastState.current
 
-    val appVersion = remember {
-        getAppVersion(context)
+    // Navigasi one-shot: begitu event muncul, pindah halaman & bersihkan back stack "splash".
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            val destination = when (event) {
+                SplashNavigationEvent.ToIntro -> "intro"
+                SplashNavigationEvent.ToPortal -> "portal"
+            }
+            navController.navigate(destination) {
+                popUpTo("splash") { inclusive = true }
+            }
+        }
     }
 
-    LaunchedEffect(Unit) {
-        delay(3000)
-        navController.navigate("intro") {
-            popUpTo("splash") {
-                inclusive = true
-            }
+    // Toast error, padanan showErrorToast(context, message) di listener Bloc Flutter.
+    LaunchedEffect(uiState) {
+        val state = uiState
+        if (state is SplashUiState.Error) {
+            toastState.showError(state.message)
         }
     }
 
@@ -40,12 +52,10 @@ fun SplashScreen(
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Spacer(modifier = Modifier.weight(1f))
 
             Image(
@@ -65,7 +75,7 @@ fun SplashScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Bank Sumsel Babel Mobile Banking\nVersi $appVersion",
+                text = "Bank Sumsel Babel Mobile Banking\nVersi ${viewModel.appVersion}",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleSmall
             )
