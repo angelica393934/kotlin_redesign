@@ -1,3 +1,4 @@
+// feature/beranda/section/SaldoCardDashboard.kt
 package bsb.dev.bsb_bangking_jp.feature.beranda.section
 
 import androidx.compose.foundation.clickable
@@ -5,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -26,23 +26,27 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
 import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyRekening
+import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.cashBalanceValue
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.SaldoCardBase
 
 @Composable
 fun SaldoCardDashboard(
-    rekeningList: List<DummyRekening>,
+    rekeningList: List<RekeningItem>,
+    onSelectPrimaryAccount: (accountNumber: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var daftarRekening by remember { mutableStateOf(rekeningList) }
+    if (rekeningList.isEmpty()) return
+
     var showSheet by remember { mutableStateOf(false) }
 
-    val primary = daftarRekening.firstOrNull { it.isPrimary } ?: daftarRekening.first()
+    val primary = rekeningList.firstOrNull { it.isPrimary } ?: rekeningList.first()
 
     SaldoCardBase(
         nama = primary.name,
         rekening = primary.number,
-        saldo = primary.saldo,
+        saldo = CurrencyUtils.formatRupiah(primary.cashBalanceValue().toInt()),
         modifier = modifier,
     ) {
         Row(
@@ -50,7 +54,6 @@ fun SaldoCardDashboard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-
             Text(
                 text = stringResource(R.string.label_tabungan_utama),
                 style = MaterialTheme.typography.titleMedium,
@@ -81,16 +84,19 @@ fun SaldoCardDashboard(
     }
 
     if (showSheet) {
+        val sortedForSheet = rekeningList
+            .filter { it.visible }
+            .sortedByDescending { it.isPrimary }
+
         RekeningLainnyaSheet(
-            daftarRekening = daftarRekening.sortedByDescending { it.isPrimary },
+            daftarRekening = sortedForSheet,
             mode = RekeningSheetMode.PILIH_REKENING_UTAMA,
             rekeningAktif = primary.number,
             title = stringResource(R.string.title_pilih_rekening_utama),
             onDismiss = { showSheet = false },
             onSelected = { selected ->
-                daftarRekening = daftarRekening.map {
-                    it.copy(isPrimary = it.number == selected.number)
-                }
+                showSheet = false
+                onSelectPrimaryAccount(selected.number)
             },
         )
     }

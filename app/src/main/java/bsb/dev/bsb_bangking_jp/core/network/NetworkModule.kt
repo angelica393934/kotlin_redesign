@@ -1,4 +1,3 @@
-// core/network/NetworkModule.kt
 package bsb.dev.bsb_bangking_jp.core.network
 
 import bsb.dev.bsb_bangking_jp.BuildConfig
@@ -74,4 +73,5 @@ val networkModule = module {
 
     single { get<Retrofit>().create(InitApiService::class.java) }
     single { get<Retrofit>().create(LoginApiService::class.java) }
+
 }

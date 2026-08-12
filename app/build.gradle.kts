@@ -1,4 +1,3 @@
-// app/build.gradle.kts
 import java.util.Properties
 import java.io.FileInputStream
 

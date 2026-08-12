@@ -1,3 +1,4 @@
+// core/component/RekeningLainnyaSheet.kt
 package bsb.dev.bsb_bangking_jp.core.component
 
 import android.widget.Toast
@@ -21,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -31,8 +31,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.R
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyRekening
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
+import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.cashBalanceValue
 
 enum class RekeningSheetMode {
     PILIH_REKENING_UTAMA,
@@ -43,22 +45,22 @@ enum class RekeningSheetMode {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RekeningLainnyaSheet(
-    daftarRekening: List<DummyRekening>,
+    daftarRekening: List<RekeningItem>,
     mode: RekeningSheetMode,
     onDismiss: () -> Unit,
-    onSelected: (DummyRekening) -> Unit,
+    onSelected: (RekeningItem) -> Unit,
     modifier: Modifier = Modifier,
     rekeningAktif: String? = null,
     title: String? = null,
     buttonText: String? = null,
     showCopy: Boolean = true,
 ) {
-    var selectedRekening by remember { mutableStateOf<DummyRekening?>(null) }
+    var selectedRekening by remember { mutableStateOf<RekeningItem?>(null) }
 
     val useButton = mode == RekeningSheetMode.PILIH_REKENING_UTAMA
     val isButtonEnabled = selectedRekening != null
 
-    fun isActive(item: DummyRekening): Boolean {
+    fun isActive(item: RekeningItem): Boolean {
         return if (useButton) {
             val current = selectedRekening
             if (current == null) item.number == rekeningAktif else current.number == item.number
@@ -67,7 +69,7 @@ fun RekeningLainnyaSheet(
         }
     }
 
-    fun onItemTap(item: DummyRekening) {
+    fun onItemTap(item: RekeningItem) {
         if (useButton) {
             selectedRekening = item
         } else {
@@ -128,7 +130,7 @@ fun RekeningLainnyaSheet(
 
 @Composable
 private fun RekeningItemCard(
-    rekening: DummyRekening,
+    rekening: RekeningItem,
     isActive: Boolean,
     showCopy: Boolean,
     onTap: () -> Unit,
@@ -139,6 +141,8 @@ private fun RekeningItemCard(
 
     val borderColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.extendedColors.textDisabled
     val backgroundColor = if (isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background
+
+    val saldoFormatted = CurrencyUtils.formatRupiah(rekening.cashBalanceValue().toInt())
 
     Box(
         modifier = modifier
@@ -177,7 +181,7 @@ private fun RekeningItemCard(
                     color = MaterialTheme.extendedColors.textSecondary,
                 )
                 Text(
-                    text = "Tabungan",
+                    text = rekening.accountTypeName.ifEmpty { "Tabungan" },
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.extendedColors.textPrimary,
@@ -192,7 +196,7 @@ private fun RekeningItemCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = rekening.saldo,
+                    text = saldoFormatted,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,

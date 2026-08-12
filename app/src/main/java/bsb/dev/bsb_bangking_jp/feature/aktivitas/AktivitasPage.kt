@@ -219,20 +219,23 @@ fun AktivitasPage(
         }
 
         if (showRekeningSheet && rekeningList.isNotEmpty()) {
-            RekeningLainnyaSheet(
-                daftarRekening = rekeningList,
-                mode = RekeningSheetMode.LIHAT_REKENING_LAIN,
-                rekeningAktif = accountNo,
-                title = "Pilih Rekening",
-                onDismiss = { showRekeningSheet = false },
-                onSelected = { selected ->
-                    if (accountNo != selected.number) {
-                        accountNo = selected.number
-                        // TODO: trigger ActivityHistoryEvent.refresh(accountNumber)
-                        // saat ActivityHistoryBloc/ViewModel sudah ada.
-                    }
-                },
-            )
+            val sortedForSheet = rekeningList
+                .sortedByDescending { it.isPrimary }
+
+//            RekeningLainnyaSheet(
+//                daftarRekening = sortedForSheet,
+//                mode = RekeningSheetMode.LIHAT_REKENING_LAIN,
+//                rekeningAktif = accountNo,
+//                title = "Pilih Rekening",
+//                onDismiss = { showRekeningSheet = false },
+//                onSelected = { selected ->
+//                    if (accountNo != selected.number) {
+//                        accountNo = selected.number
+//                        // TODO: trigger ActivityHistoryEvent.refresh(accountNumber)
+//                        // saat ActivityHistoryBloc/ViewModel sudah ada.
+//                    }
+//                },
+//            )
         }
     }
 }

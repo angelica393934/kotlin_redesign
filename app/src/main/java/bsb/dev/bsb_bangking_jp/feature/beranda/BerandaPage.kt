@@ -1,5 +1,7 @@
+// pages/beranda/BerandaPage.kt
 package bsb.dev.bsb_bangking_jp.pages.beranda
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,20 +15,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import bsb.dev.bsb_bangking_jp.feature.beranda.section.MenuUtama
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
-import bsb.dev.bsb_bangking_jp.core.component.BannerKeamanan
-import bsb.dev.bsb_bangking_jp.feature.beranda.section.HaloUserSection
-import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
-import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
-import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.R
+import bsb.dev.bsb_bangking_jp.core.component.BannerKeamanan
+import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
+import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
+import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.HaloUserSection
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.MenuUtama
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
+import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
+import org.koin.compose.koinInject
 
 @Composable
 fun BerandaPage(
@@ -42,7 +49,29 @@ fun BerandaPage(
     onTagihanClick: () -> Unit = {},
     onCardlessClick: () -> Unit = {},
     onLainnyaClick: () -> Unit = {},
+    berandaViewModel: BerandaViewModel = koinInject(),
 ) {
+    val uiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
+    val toastState = LocalToastState.current
+
+    // 🔹 Padanan addPostFrameCallback -- load rekening saat halaman pertama kali muncul.
+    LaunchedEffect(Unit) {
+        berandaViewModel.loadRekeningLainnya()
+    }
+
+    // 🔹 Toast error, padanan BlocListener error di Flutter-mu.
+    LaunchedEffect(uiState.profileError) {
+        uiState.profileError?.let { toastState.showError(it) }
+    }
+    LaunchedEffect(uiState.rekeningError) {
+        uiState.rekeningError?.let { toastState.showError(it) }
+    }
+
+    // BerandaPage.kt
+    val namaUser = uiState.profile?.user?.customerName?.takeIf { it.isNotBlank() }
+        ?: uiState.profile?.external?.data?.name?.takeIf { it.isNotBlank() }
+        ?: DummyData.profile.nama
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -59,20 +88,23 @@ fun BerandaPage(
             painter = painterResource(id = R.drawable.bgfull),
             contentDescription = null,
             modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 60.dp,),
+                .padding(horizontal = 24.dp, vertical = 60.dp),
         ) {
             HaloUserSection(
-                nama = DummyData.profile.nama,
-                photoBytes = DummyData.profile.photoBytes,
+                nama = namaUser,
+                photoBytes = null, // TODO: sambungkan photoprofile (uiState.profile?.photoProfile) begitu ada endpoint/loader foto
                 onNotificationClick = onNotificationClick,
-                onLogoutClick = onLogoutClick,
+                onLogoutClick = {
+                    berandaViewModel.logout()
+                    onLogoutClick()
+                },
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -83,7 +115,14 @@ fun BerandaPage(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            SaldoCardDashboard(rekeningList = DummyData.rekeningList)
+            uiState.rekeningList?.let { rekeningList ->
+                SaldoCardDashboard(
+                    rekeningList = rekeningList,
+                    onSelectPrimaryAccount = { accountNumber ->
+                        berandaViewModel.setPrimaryAccount(accountNumber)
+                    },
+                )
+            }
 
             Spacer(modifier = Modifier.height(15.dp))
 
