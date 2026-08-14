@@ -49,6 +49,7 @@ import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.AccountProfileCard
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingItemData
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingSection
 import org.koin.compose.koinInject
+import bsb.dev.bsb_bangking_jp.core.components.skeleton.ProfileSettingSkeleton
 
 private val HeaderHeight = 100.dp
 private val ProfileCardHalfHeight = 44.dp
@@ -152,14 +153,23 @@ fun PengaturanPage(
                     Spacer(modifier = Modifier.height(130.dp))
                 }
             }
-            AccountProfileCard(
-                nama = namaUser,
-                phoneNumber = phoneNumber,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(horizontal = 16.dp)
-                    .offset(y = HeaderHeight - ProfileCardHalfHeight),
-            )
+            if (uiState.isProfileLoading) {
+                ProfileSettingSkeleton(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = 16.dp)
+                        .offset(y = HeaderHeight - ProfileCardHalfHeight),
+                )
+            } else {
+                AccountProfileCard(
+                    nama = namaUser,
+                    phoneNumber = phoneNumber,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = 16.dp)
+                        .offset(y = HeaderHeight - ProfileCardHalfHeight),
+                )
+            }
         }
     }
 }

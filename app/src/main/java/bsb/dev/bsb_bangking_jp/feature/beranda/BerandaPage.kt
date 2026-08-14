@@ -43,6 +43,8 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
 import org.koin.compose.koinInject
 import kotlin.math.roundToInt
+import bsb.dev.bsb_bangking_jp.core.components.skeleton.HaloUserSkeleton
+import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonSaldoCard
 
 private val PULL_REFRESH_MAX_PUSH = 64.dp // 🔹 seberapa jauh konten terdorong turun saat full refresh
 
@@ -116,15 +118,19 @@ fun BerandaPage(
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 60.dp),
         ) {
-            HaloUserSection(
-                nama = namaUser,
-                photoBytes = null,
-                onNotificationClick = onNotificationClick,
-                onLogoutClick = {
-                    berandaViewModel.logout()
-                    onLogoutClick()
-                },
-            )
+            if (uiState.isProfileLoading) {
+                HaloUserSkeleton()
+            } else {
+                HaloUserSection(
+                    nama = namaUser, // sudah fallback "-" dari elvis chain yang ada
+                    photoBytes = null,
+                    onNotificationClick = onNotificationClick,
+                    onLogoutClick = {
+                        berandaViewModel.logout()
+                        onLogoutClick()
+                    },
+                )
+            }
 
             Spacer(modifier = Modifier.height(15.dp))
 
@@ -158,13 +164,20 @@ fun BerandaPage(
 
                     Spacer(modifier = Modifier.height(15.dp))
 
-                    uiState.rekeningList?.let { rekeningList ->
-                        SaldoCardDashboard(
-                            rekeningList = rekeningList,
-                            onSelectPrimaryAccount = { accountNumber ->
-                                berandaViewModel.setPrimaryAccount(accountNumber)
-                            },
-                        )
+                    if (uiState.isRekeningLoading && uiState.rekeningList == null) {
+                        // Loading pertama kali, belum ada data sama sekali -> skeleton
+                        SkeletonSaldoCard()
+                    } else {
+                        // Sudah pernah ada data -> tetap tampilkan data lama walau sedang refresh
+                        // (uiState.isRekeningRefreshing true tidak mengubah kondisi ini)
+                        uiState.rekeningList?.let { rekeningList ->
+                            SaldoCardDashboard(
+                                rekeningList = rekeningList,
+                                onSelectPrimaryAccount = { accountNumber ->
+                                    berandaViewModel.setPrimaryAccount(accountNumber)
+                                },
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(15.dp))

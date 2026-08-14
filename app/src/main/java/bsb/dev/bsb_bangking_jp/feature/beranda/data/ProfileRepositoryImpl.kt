@@ -5,6 +5,7 @@ import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.network.ApiErrorParser
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
+import bsb.dev.bsb_bangking_jp.core.network.NetworkErrorMapper
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
@@ -34,31 +35,39 @@ class ProfileRepositoryImpl(
     }
 
     private suspend fun fetchProfile(): ProfileData { // 🔹 ProfileData
-        val privateKey = secureStorage.getPrivateKey()
-            ?: throw IllegalStateException("Private key tidak ditemukan, device belum ter-init.")
+        try {
+            val privateKey = secureStorage.getPrivateKey()
+                ?: throw IllegalStateException("Private key tidak ditemukan, device belum ter-init.")
 
-        val timestamp = ApiHeaders.currentTimestamp()
-        val signature = SignatureUtils.sign(emptyMap<String, String>(), timestamp, privateKey)
-        val headers = ApiHeaders.withSignature(signature, ApiHeaders.full(timestamp))
+            val timestamp = ApiHeaders.currentTimestamp()
+            val signature = SignatureUtils.sign(emptyMap<String, String>(), timestamp, privateKey)
+            val headers = ApiHeaders.withSignature(signature, ApiHeaders.full(timestamp))
 
-        val response = api.getProfile(
-            headers = headers,
-            tokenPhase = TokenPhaseTag(TokenPhase.LOGIN),
-        )
-
-        if (!response.isSuccessful) {
-            throw ApiErrorParser.parse(response)
-        }
-
-        val body = response.body()
-        if (body?.respCode != SUCCESS_CODE) {
-            throw ApiException(
-                body?.respCode,
-                body?.respMessage ?: "Terjadi kendala saat menampilkan profil Anda."
+            val response = api.getProfile(
+                headers = headers,
+                tokenPhase = TokenPhaseTag(TokenPhase.LOGIN),
             )
-        }
 
-        return body.data // 🔹 langsung return ProfileData penuh, BUKAN body.data.external.data
+            if (!response.isSuccessful) {
+                throw ApiErrorParser.parse(response)
+            }
+
+            val body = response.body()
+            if (body?.respCode != SUCCESS_CODE) {
+                throw ApiException(
+                    body?.respCode,
+                    body?.respMessage ?: "Terjadi kendala saat menampilkan profil Anda."
+                )
+            }
+
+            return body.data // 🔹 langsung return ProfileData penuh, BUKAN body.data.external.data
+        } catch (e: ApiException) {
+            // sudah pesan resmi dari server (respMessage) atau dari ApiErrorParser -- teruskan apa adanya
+            throw e
+        } catch (e: Exception) {
+            // exception mentah (jaringan/parsing/dll) -- ubah dulu jadi pesan ramah sebelum naik ke ViewModel
+            throw ApiException(null, NetworkErrorMapper.toUserMessage(e))
+        }
     }
 
     override fun clear() {

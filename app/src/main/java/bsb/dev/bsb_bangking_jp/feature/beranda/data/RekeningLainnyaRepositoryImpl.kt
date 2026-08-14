@@ -5,6 +5,7 @@ import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.network.ApiErrorParser
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
+import bsb.dev.bsb_bangking_jp.core.network.NetworkErrorMapper
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
@@ -68,28 +69,34 @@ class RekeningLainnyaRepositoryImpl(
     }
 
     private suspend fun fetchAccountSourceProfile(): List<RekeningItem> {
-        val privateKey = secureStorage.getPrivateKey()
-            ?: throw IllegalStateException("Private key tidak ditemukan, device belum ter-init.")
+        try {
+            val privateKey = secureStorage.getPrivateKey()
+                ?: throw IllegalStateException("Private key tidak ditemukan, device belum ter-init.")
 
-        val timestamp = ApiHeaders.currentTimestamp()
-        val signature = SignatureUtils.sign(emptyMap<String, String>(), timestamp, privateKey)
-        val headers = ApiHeaders.withSignature(signature, ApiHeaders.full(timestamp))
+            val timestamp = ApiHeaders.currentTimestamp()
+            val signature = SignatureUtils.sign(emptyMap<String, String>(), timestamp, privateKey)
+            val headers = ApiHeaders.withSignature(signature, ApiHeaders.full(timestamp))
 
-        val response = api.getAccountSourceProfile(
-            headers = headers,
-            tokenPhase = TokenPhaseTag(TokenPhase.LOGIN),
-        )
+            val response = api.getAccountSourceProfile(
+                headers = headers,
+                tokenPhase = TokenPhaseTag(TokenPhase.LOGIN),
+            )
 
-        if (!response.isSuccessful) {
-            throw ApiErrorParser.parse(response)
+            if (!response.isSuccessful) {
+                throw ApiErrorParser.parse(response)
+            }
+
+            val body = response.body()
+            if (body?.respCode != SUCCESS_CODE) {
+                throw ApiException(body?.respCode ?: "-", body?.respMessage ?: "Gagal load rekening lainnya Periksa koneksi internet Anda dan coba lagi.")
+            }
+
+            return body.data
+        } catch (e: ApiException) {
+            throw e
+        } catch (e: Exception) {
+            throw ApiException(null, NetworkErrorMapper.toUserMessage(e))
         }
-
-        val body = response.body()
-        if (body?.respCode != SUCCESS_CODE) {
-            throw ApiException(body?.respCode ?: "-", body?.respMessage ?: "Gagal load rekening lainnya Periksa koneksi internet Anda dan coba lagi.")
-        }
-
-        return body.data
     }
 
     override fun clear() {
