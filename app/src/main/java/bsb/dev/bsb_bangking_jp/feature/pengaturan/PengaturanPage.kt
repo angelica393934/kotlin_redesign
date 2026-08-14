@@ -1,3 +1,4 @@
+
 package bsb.dev.bsb_bangking_jp.feature.pengaturan
 
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,24 +40,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
 import bsb.dev.bsb_bangking_jp.core.util.getAppVersion
+import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.AccountProfileCard
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingItemData
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingSection
-private val HeaderHeight = 100.dp
+import org.koin.compose.koinInject
 
+private val HeaderHeight = 100.dp
 private val ProfileCardHalfHeight = 44.dp
 
 @Composable
 fun PengaturanPage(
     darkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit
+    onThemeChange: (Boolean) -> Unit,
+    berandaViewModel: BerandaViewModel = koinInject(), // 🔹 sumber data profile yang sama dengan Beranda
 ) {
     val context = LocalContext.current
     val appVersion = remember { getAppVersion(context) }
+    val uiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
+
+    // 🔹 Ambil dari response API, fallback ke DummyData kalau belum ada data (mis. belum sempat loadProfile()).
+    val namaUser = uiState.profile?.user?.customerName ?: "-"
+    val phoneNumber = uiState.profile?.user?.maskPhone ?: "-"
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -65,8 +75,6 @@ fun PengaturanPage(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // 🔹 Header + konten. AppHeader dipindah ke sini (bukan topBar Scaffold) supaya
-            // kartu profil di bawah bisa "mengambang" menimpa batas bawahnya.
             Column(modifier = Modifier.fillMaxSize()) {
                 AppHeader(
                     title = "",
@@ -80,7 +88,6 @@ fun PengaturanPage(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 24.dp)
                 ) {
-                    // Ruang kosong biar konten tidak ketutupan separuh-bawah kartu profil
                     Spacer(modifier = Modifier.height(ProfileCardHalfHeight + 16.dp))
 
                     Row(
@@ -146,8 +153,8 @@ fun PengaturanPage(
                 }
             }
             AccountProfileCard(
-                nama = DummyData.profile.nama,
-                phoneNumber = DummyData.profile.noHp,
+                nama = namaUser,
+                phoneNumber = phoneNumber,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .padding(horizontal = 16.dp)

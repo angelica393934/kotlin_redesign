@@ -7,6 +7,7 @@ import bsb.dev.bsb_bangking_jp.core.device.AppPreferences
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.network.ApiErrorParser
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
+import bsb.dev.bsb_bangking_jp.core.network.NetworkErrorMapper
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
@@ -35,7 +36,7 @@ class LoginRepositoryImpl(
             }
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiException(null, NetworkErrorMapper.toUserMessage(e)))
         }
     }
 
@@ -58,7 +59,7 @@ class LoginRepositoryImpl(
 
             Result.success(challengeToken)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiException(null, NetworkErrorMapper.toUserMessage(e)))
         }
     }
 
@@ -77,7 +78,7 @@ class LoginRepositoryImpl(
             }
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiException(null, NetworkErrorMapper.toUserMessage(e)))
         }
     }
 
@@ -111,7 +112,7 @@ class LoginRepositoryImpl(
 
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiException(null, NetworkErrorMapper.toUserMessage(e)))
         }
     }
 
@@ -147,7 +148,7 @@ class LoginRepositoryImpl(
 
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiException(null, NetworkErrorMapper.toUserMessage(e)))
         }
     }
 }

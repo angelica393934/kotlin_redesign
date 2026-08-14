@@ -71,7 +71,6 @@ dependencies {
     implementation(libs.glide.compose)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 

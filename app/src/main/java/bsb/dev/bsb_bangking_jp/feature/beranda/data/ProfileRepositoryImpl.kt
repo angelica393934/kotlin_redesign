@@ -3,6 +3,7 @@ package bsb.dev.bsb_bangking_jp.feature.beranda.data
 
 import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
+import bsb.dev.bsb_bangking_jp.core.network.ApiErrorParser
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
@@ -46,8 +47,7 @@ class ProfileRepositoryImpl(
         )
 
         if (!response.isSuccessful) {
-            val message = response.errorBody()?.string()
-            throw ApiException(null, message ?: "Terjadi kendala saat menampilkan profil Anda.")
+            throw ApiErrorParser.parse(response)
         }
 
         val body = response.body()

@@ -1,4 +1,3 @@
-// core/component/LoadingOverlay.kt
 package bsb.dev.bsb_bangking_jp.core.component
 
 import androidx.compose.foundation.background
@@ -28,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 class LoadingOverlayState {
     var isVisible by mutableStateOf(false)
@@ -57,44 +58,55 @@ val LocalLoadingOverlay = compositionLocalOf<LoadingOverlayState> {
 fun LoadingOverlayHost(state: LoadingOverlayState) {
     if (!state.isVisible) return
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.3f))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = {}, // 🔹 konsumsi tap, blokir interaksi ke layar di belakangnya
-            ),
-        contentAlignment = Alignment.Center,
+    // 🔹 Dialog = window Android terpisah, sama seperti ModalBottomSheet.
+    // Ini yang bikin overlay muncul DI ATAS ModalBottomSheet, bukan tertutup olehnya.
+    Dialog(
+        onDismissRequest = { /* no-op -- tidak bisa ditutup manual oleh user */ },
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = false, // supaya bisa fillMaxSize, bukan dibatasi lebar default dialog
+        ),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier.size(90.dp),
-                contentAlignment = Alignment.Center,
-            ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Gray.copy(alpha = 0.3f))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {}, // konsumsi tap, blokir interaksi ke layar di belakangnya
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                )
-                CircularProgressIndicator(
-                    modifier = Modifier.size(40.dp),
-                    strokeWidth = 6.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
+                    modifier = Modifier.size(90.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(70.dp)
+                            .clip(CircleShape)
+                            .background(Color.White),
+                    )
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        strokeWidth = 6.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
 
-            state.message?.let {
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = it,
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                )
+                state.message?.let {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        text = it,
+                        color = Color.White,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
     }

@@ -4,6 +4,8 @@ import bsb.dev.bsb_bangking_jp.core.crypto.Ed25519KeyUtils
 import bsb.dev.bsb_bangking_jp.core.device.AppPreferences
 import bsb.dev.bsb_bangking_jp.core.device.DeviceContext
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
+import bsb.dev.bsb_bangking_jp.core.network.ApiException
+import bsb.dev.bsb_bangking_jp.core.network.NetworkErrorMapper
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.feature.init.domain.InitRepository
 
@@ -36,7 +38,7 @@ class InitRepositoryImpl(
                 Result.failure(Exception("Init gagal: HTTP ${response.code()}"))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(ApiException(null, NetworkErrorMapper.toUserMessage(e)))
         }
     }
 }

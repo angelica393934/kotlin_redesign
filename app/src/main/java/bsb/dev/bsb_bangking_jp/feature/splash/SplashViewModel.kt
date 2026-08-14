@@ -66,10 +66,10 @@ class SplashViewModel(
             val isRegistDone = appPreferences.getRegistStatus()
 
             if (isConfirmMpinDone || isRegistDone) {
-                delay(2000)
+                delay(500)
                 navigateToPortal()
             } else {
-                delay(2000)
+                delay(500)
                 navigateToIntro()
             }
         } catch (e: Exception) {

@@ -16,6 +16,7 @@ class ApiException(
     val respMessage: String,
 ) : Exception(respMessage)
 
+// ini untuk mengirim response saja ke depan
 object ApiErrorParser {
     private val gson = Gson()
 

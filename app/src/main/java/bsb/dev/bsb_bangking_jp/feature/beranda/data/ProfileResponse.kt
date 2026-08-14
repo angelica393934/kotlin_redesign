@@ -54,6 +54,6 @@ data class UserData(
     @SerializedName("customername") val customerName: String = "",
     @SerializedName("photoprofile") val photoProfile: String = "",
     @SerializedName("atmcardno") val atmCardNo: String = "",
-    @SerializedName("maskphone") val maskPhone: String = "",
+    @SerializedName("maskphone") val maskPhone: String = "-",
     @SerializedName("userid") val userId: String = "",
 )

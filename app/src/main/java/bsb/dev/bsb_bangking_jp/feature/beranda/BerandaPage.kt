@@ -1,4 +1,4 @@
-// pages/beranda/BerandaPage.kt
+
 package bsb.dev.bsb_bangking_jp.pages.beranda
 
 import androidx.compose.foundation.Image
@@ -9,23 +9,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.BannerKeamanan
+import bsb.dev.bsb_bangking_jp.core.component.CustomRefreshIndicator
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
@@ -34,7 +42,11 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.section.MenuUtama
 import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
 import org.koin.compose.koinInject
+import kotlin.math.roundToInt
 
+private val PULL_REFRESH_MAX_PUSH = 64.dp // 🔹 seberapa jauh konten terdorong turun saat full refresh
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BerandaPage(
     navController: NavController,
@@ -53,13 +65,13 @@ fun BerandaPage(
 ) {
     val uiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
     val toastState = LocalToastState.current
+    val pullToRefreshState = rememberPullToRefreshState()
+    val density = LocalDensity.current
 
-    // 🔹 Padanan addPostFrameCallback -- load rekening saat halaman pertama kali muncul.
     LaunchedEffect(Unit) {
         berandaViewModel.loadRekeningLainnya()
     }
 
-    // 🔹 Toast error, padanan BlocListener error di Flutter-mu.
     LaunchedEffect(uiState.profileError) {
         uiState.profileError?.let { toastState.showError(it) }
     }
@@ -67,10 +79,18 @@ fun BerandaPage(
         uiState.rekeningError?.let { toastState.showError(it) }
     }
 
-    // BerandaPage.kt
     val namaUser = uiState.profile?.user?.customerName?.takeIf { it.isNotBlank() }
         ?: uiState.profile?.external?.data?.name?.takeIf { it.isNotBlank() }
-        ?: DummyData.profile.nama
+        ?: "-"
+
+    val isRefreshing = uiState.isProfileLoading || uiState.isRekeningRefreshing
+
+    val maxPushPx = with(density) { PULL_REFRESH_MAX_PUSH.toPx() }
+    val pushOffsetPx = if (isRefreshing) {
+        maxPushPx
+    } else {
+        (pullToRefreshState.distanceFraction.coerceIn(0f, 1f) * maxPushPx)
+    }
 
     Box(
         modifier = Modifier
@@ -94,12 +114,11 @@ fun BerandaPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 60.dp),
         ) {
             HaloUserSection(
                 nama = namaUser,
-                photoBytes = null, // TODO: sambungkan photoprofile (uiState.profile?.photoProfile) begitu ada endpoint/loader foto
+                photoBytes = null,
                 onNotificationClick = onNotificationClick,
                 onLogoutClick = {
                     berandaViewModel.logout()
@@ -109,42 +128,68 @@ fun BerandaPage(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            DummyData.bannerList.firstOrNull()?.let { banner ->
-                BannerKeamanan(desc = banner.message)
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { berandaViewModel.refreshAll() },
+                state = pullToRefreshState,
+                indicator = {
+                    CustomRefreshIndicator(
+                        state = pullToRefreshState,
+                        isRefreshing = isRefreshing,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        // 🔹 KONTEN IKUT TERDORONG TURUN sesuai jarak tarikan / status refreshing
+                        .offset {
+                            IntOffset(x = 0, y = pushOffsetPx.roundToInt())
+                        }
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    DummyData.bannerList.firstOrNull()?.let { banner ->
+                        BannerKeamanan(desc = banner.message)
+                    }
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    uiState.rekeningList?.let { rekeningList ->
+                        SaldoCardDashboard(
+                            rekeningList = rekeningList,
+                            onSelectPrimaryAccount = { accountNumber ->
+                                berandaViewModel.setPrimaryAccount(accountNumber)
+                            },
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    MenuUtama(
+                        onTransferClick = onTransferClick,
+                        onTopUpClick = onTopUpClick,
+                        onVirtualAccountClick = onVirtualAccountClick,
+                        onBsbCashClick = onBsbCashClick,
+                        onPajakPendidikanClick = onPajakPendidikanClick,
+                        onTagihanClick = onTagihanClick,
+                        onCardlessClick = onCardlessClick,
+                        onLainnyaClick = onLainnyaClick,
+                    )
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    BeritaSection(
+                        berita = DummyData.beritaList,
+                        onLihatSemuaClick = onLihatSemuaBeritaClick,
+                        navController = navController,
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
             }
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            uiState.rekeningList?.let { rekeningList ->
-                SaldoCardDashboard(
-                    rekeningList = rekeningList,
-                    onSelectPrimaryAccount = { accountNumber ->
-                        berandaViewModel.setPrimaryAccount(accountNumber)
-                    },
-                )
-            }
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            MenuUtama(
-                onTransferClick = onTransferClick,
-                onTopUpClick = onTopUpClick,
-                onVirtualAccountClick = onVirtualAccountClick,
-                onBsbCashClick = onBsbCashClick,
-                onPajakPendidikanClick = onPajakPendidikanClick,
-                onTagihanClick = onTagihanClick,
-                onCardlessClick = onCardlessClick,
-                onLainnyaClick = onLainnyaClick,
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            BeritaSection(
-                berita = DummyData.beritaList,
-                onLihatSemuaClick = onLihatSemuaBeritaClick,
-                navController = navController,
-            )
-            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }

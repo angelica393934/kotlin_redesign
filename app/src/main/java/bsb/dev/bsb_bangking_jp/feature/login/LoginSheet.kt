@@ -175,7 +175,6 @@ fun LoginSheet(
 
         AppButton(
             text = loginText,
-            enabled = !uiState.isLoading,
             onClick = { viewModel.login(useridInput, passcodeInput) },
         )
 

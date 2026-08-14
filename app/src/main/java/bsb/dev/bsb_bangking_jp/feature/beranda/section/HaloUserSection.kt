@@ -55,7 +55,7 @@ fun HaloUserSection(
             ) {
                 Text(
                     text = stringResource(R.string.halo_user_greeting),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
                 )
                 Text(
