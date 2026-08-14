@@ -2,19 +2,15 @@ package bsb.dev.bsb_bangking_jp.feature.aktivitas.section
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,23 +19,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import bsb.dev.bsb_bangking_jp.R
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyRekening
+import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
+import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
+import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.cashBalanceValue
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.SaldoCardBase
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Padanan SaldoCardSelector.dart -- BEDA dengan SaldoCardDashboard (di Beranda):
+ * memilih rekening di sini HANYA mengganti rekening yang sedang "dilihat" histori
+ * transaksinya (accountNo lokal di AktivitasPage), TIDAK memanggil API setprimaryaccount.
+ */
 @Composable
 fun SaldoCardSelector(
-    rekeningList: List<DummyRekening>,
+    rekeningList: List<RekeningItem>,
     activeAccountNumber: String?,
-    onRekeningSelected: (DummyRekening) -> Unit,
+    onRekeningSelected: (RekeningItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showSheet by remember { mutableStateOf(false) }
-
     if (rekeningList.isEmpty()) return
+
+    var showSheet by remember { mutableStateOf(false) }
 
     val rekeningAktif = rekeningList.firstOrNull { it.number == activeAccountNumber }
         ?: rekeningList.firstOrNull { it.isPrimary }
@@ -48,7 +50,7 @@ fun SaldoCardSelector(
     SaldoCardBase(
         nama = rekeningAktif.name,
         rekening = rekeningAktif.number,
-        saldo = rekeningAktif.saldo,
+        saldo = CurrencyUtils.formatRupiah(rekeningAktif.cashBalanceValue().toInt()),
         modifier = modifier,
     ) {
         Row(
@@ -57,18 +59,17 @@ fun SaldoCardSelector(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.label_pilih_rekening),
+                text = "Rekening Aktif",
                 style = MaterialTheme.typography.titleMedium,
-                // TODO: sesuaikan dengan token AppTheme.gray300
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Row(
-                modifier = Modifier.clickable { showSheet = true },
+                modifier = Modifier.clickable(enabled = rekeningList.size > 1) { showSheet = true },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.label_rekening_lainnya),
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "Ganti Rekening",
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -83,33 +84,20 @@ fun SaldoCardSelector(
     }
 
     if (showSheet) {
-        // TODO: ganti dengan padanan RekeningLainnyaSheet
-        // (mode = RekeningSheetMode.lihatRekeningLain) kalau butuh tampilan
-        // yang lebih kaya (badge klasifikasi rekening, dst). Versi ini list
-        // sederhana dulu supaya alurnya tetap bisa dicoba dgn data dummy.
-        // Catatan: field `rek.visible` di Dart belum ada padanannya di
-        // DummyRekening -- tambahkan kalau perlu memfilter rekening tersembunyi.
-        ModalBottomSheet(onDismissRequest = { showSheet = false }) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                rekeningList.forEach { rekening ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onRekeningSelected(rekening)
-                                showSheet = false
-                            }
-                            .padding(vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Column {
-                            Text(text = rekening.name, style = MaterialTheme.typography.bodyMedium)
-                            Text(text = rekening.number, style = MaterialTheme.typography.bodySmall)
-                        }
-                        Text(text = rekening.saldo, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
-        }
+        val sortedForSheet = rekeningList
+            .filter { it.visible }
+            .sortedByDescending { it.isPrimary }
+
+        RekeningLainnyaSheet(
+            daftarRekening = sortedForSheet,
+            mode = RekeningSheetMode.LIHAT_REKENING_LAIN,
+            rekeningAktif = rekeningAktif.number,
+            title = "Pilih Rekening",
+            onDismiss = { showSheet = false },
+            onSelected = { selected ->
+                showSheet = false
+                onRekeningSelected(selected)
+            },
+        )
     }
 }

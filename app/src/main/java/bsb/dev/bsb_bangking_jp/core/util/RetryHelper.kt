@@ -6,8 +6,8 @@ import kotlinx.coroutines.delay
  * Delay bisa disesuaikan per pemanggilan.
  */
 suspend fun <T> retry(
-    maxAttempt: Int = 3,
-    delayMillis: Long = 2000,
+    maxAttempt: Int = 1,
+    delayMillis: Long = 5000,
     task: suspend () -> T,
 ): T {
     var lastError: Throwable? = null

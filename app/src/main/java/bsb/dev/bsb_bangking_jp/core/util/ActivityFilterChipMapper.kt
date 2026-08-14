@@ -1,0 +1,59 @@
+package bsb.dev.bsb_bangking_jp.core.util
+
+import bsb.dev.bsb_bangking_jp.core.component.FilterChipItem
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
+
+object ActivityFilterChipMapper {
+
+    fun fromPayload(filter: ActivityFilterPayload?): List<FilterChipItem> {
+        if (filter == null) return emptyList()
+
+        // Default sistem -- jangan tampilkan chip apapun.
+        if (filter.isDefaultDate && filter.isAllJenis && filter.isAllCategory && filter.quickRange == null) {
+            return emptyList()
+        }
+
+        val chips = mutableListOf<FilterChipItem>()
+
+        if (!filter.isDefaultDate && filter.quickRange == null &&
+            filter.fromDate != null && filter.toDate != null
+        ) {
+            chips += FilterChipItem(key = "date", label = "${filter.fromDate} - ${filter.toDate}")
+        }
+
+        filter.quickRange?.let { range ->
+            chips += FilterChipItem(key = "range", label = "$range Hari Terakhir")
+        }
+
+        if (!filter.isAllJenis) {
+            filter.jenis?.forEach { j -> chips += FilterChipItem(key = "jenis:$j", label = pretty(j)) }
+        }
+
+        if (!filter.isAllCategory) {
+            filter.category?.forEach { c -> chips += FilterChipItem(key = "category:$c", label = pretty(c)) }
+        }
+
+        return chips
+    }
+
+    fun removeChip(filter: ActivityFilterPayload, key: String): ActivityFilterPayload = when {
+        key.startsWith("jenis:") -> {
+            val value = key.substringAfter("jenis:")
+            val updated = filter.jenis?.filterNot { it == value }
+            filter.copy(jenis = updated, isAllJenis = updated.isNullOrEmpty())
+        }
+        key.startsWith("category:") -> {
+            val value = key.substringAfter("category:")
+            val updated = filter.category?.filterNot { it == value }
+            filter.copy(category = updated, isAllCategory = updated.isNullOrEmpty())
+        }
+        key == "date" -> filter.copy(fromDate = null, toDate = null, isDefaultDate = true)
+        key == "range" -> filter.copy(quickRange = null, isDefaultDate = true)
+        else -> filter
+    }
+
+    private fun pretty(value: String): String =
+        value.replace("_", " ")
+            .split(" ")
+            .joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
+}

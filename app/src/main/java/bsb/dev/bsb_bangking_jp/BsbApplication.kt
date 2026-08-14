@@ -5,6 +5,7 @@ import bsb.dev.bsb_bangking_jp.core.device.DeviceContext
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.device.deviceModule
 import bsb.dev.bsb_bangking_jp.core.network.networkModule
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.aktivitasModule
 import bsb.dev.bsb_bangking_jp.feature.beranda.BerandaModule
 import bsb.dev.bsb_bangking_jp.feature.init.initModule
 import bsb.dev.bsb_bangking_jp.feature.login.loginModule
@@ -28,6 +29,7 @@ class BsbApplication : Application() {
                 loginExistingModule,
                 loginModule,
                 BerandaModule,
+                aktivitasModule,
                 // tambahkan module fitur lain di sini
             )
         }

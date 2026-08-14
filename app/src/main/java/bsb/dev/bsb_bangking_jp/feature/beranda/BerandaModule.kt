@@ -3,6 +3,7 @@ package bsb.dev.bsb_bangking_jp.feature.beranda
 
 import bsb.dev.bsb_bangking_jp.core.session.ClearableRepository
 import bsb.dev.bsb_bangking_jp.core.session.SessionClearer
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityHistoryRepository
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.BerandaApiService
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.ProfileRepositoryImpl
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningLainnyaRepositoryImpl
@@ -23,7 +24,7 @@ val BerandaModule = module {
             repositories = listOf(
                 get<ProfileRepository>() as ClearableRepository,
                 get<RekeningLainnyaRepository>() as ClearableRepository,
-            )
+                get<ActivityHistoryRepository>() as ClearableRepository,)
         )
     }
 
