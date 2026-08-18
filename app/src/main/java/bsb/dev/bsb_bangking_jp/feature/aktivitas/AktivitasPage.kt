@@ -50,13 +50,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.component.FilterChipBar
+import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
 import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonList
 import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonSaldoCard
 import bsb.dev.bsb_bangking_jp.core.util.ActivityFilterChipMapper
 import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
 import bsb.dev.bsb_bangking_jp.core.util.DateFormatterUtil
 import bsb.dev.bsb_bangking_jp.core.util.groupByDateSortedDesc
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.component.FilterTransaksiModal
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.data.HistoryItem
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation.ActivityHistoryViewModel
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.section.SaldoCardSelector
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
@@ -66,7 +69,6 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AktivitasPage(
-    onCariTransaksiClick: (() -> Unit)? = null,
     berandaViewModel: BerandaViewModel = koinInject(),
     activityViewModel: ActivityHistoryViewModel = koinViewModel(),
 ) {
@@ -76,13 +78,12 @@ fun AktivitasPage(
     val pullToRefreshState = rememberPullToRefreshState()
 
     var accountNo by remember { mutableStateOf<String?>(null) }
+    var showFilterModal by remember { mutableStateOf(false) }
 
-    // 🔹 Muat daftar rekening kalau belum ada (BerandaViewModel single instance, cache dishare dgn Beranda).
     LaunchedEffect(Unit) {
         if (berandaState.rekeningList == null) berandaViewModel.loadRekeningLainnya()
     }
 
-    // 🔹 Set akun aktif default begitu daftar rekening tersedia, lalu load histori pertama kali.
     LaunchedEffect(berandaState.rekeningList) {
         val list = berandaState.rekeningList
         if (accountNo == null && !list.isNullOrEmpty()) {
@@ -92,7 +93,6 @@ fun AktivitasPage(
         }
     }
 
-    // 🔹 Infinite scroll -- load more saat 3 item terakhir mulai terlihat (padanan _onScroll threshold 200px).
     val shouldLoadMore by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
@@ -125,15 +125,13 @@ fun AktivitasPage(
                     .padding(horizontal = 16.dp)
                     .offset(y = 65.dp),
             ) {
-                if (berandaState.isRekeningLoading && berandaState.rekeningList == null) {
-                    // Loading pertama kali, belum ada data sama sekali -> skeleton
-                    SkeletonSaldoCard()
-                } else {
-                    // Sudah pernah ada data -> tetap tampilkan data lama walau sedang refresh
-                    // (isRekeningRefreshing true tidak mengubah kondisi ini)
-                    berandaState.rekeningList?.let { rekeningList ->
+                when {
+                    berandaState.isRekeningLoading && berandaState.rekeningList == null -> {
+                        SkeletonSaldoCard()
+                    }
+                    berandaState.rekeningList != null -> {
                         SaldoCardSelector(
-                            rekeningList = rekeningList,
+                            rekeningList = berandaState.rekeningList!!,
                             activeAccountNumber = accountNo,
                             onRekeningSelected = { selected ->
                                 if (accountNo != selected.number) {
@@ -141,6 +139,11 @@ fun AktivitasPage(
                                     activityViewModel.getInitial(selected.number)
                                 }
                             },
+                        )
+                    }
+                    else -> {
+                        SaldoCardEmpty(
+                            onRetry = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
                         )
                     }
                 }
@@ -162,7 +165,7 @@ fun AktivitasPage(
                 modifier = Modifier.weight(1f),
             )
             Row(
-                modifier = Modifier.clickable { onCariTransaksiClick?.invoke() },
+                modifier = Modifier.clickable { showFilterModal = true },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -230,7 +233,7 @@ fun AktivitasPage(
                                 }
                                 itemsIndexed(
                                     items = itemsForDate,
-                                    key = { index, it -> "${tanggal}_${index}_${it.deskripsiTransaksi}" },
+                                    key = { index, it -> it.transactionId.ifEmpty { "$tanggal-$index" } },
                                 ) { _, transaksi ->
                                     TransaksiItem(transaksi = transaksi)
                                 }
@@ -255,6 +258,14 @@ fun AktivitasPage(
         }
         Spacer(modifier = Modifier.height(80.dp))
     }
+
+    if (showFilterModal) {
+        FilterTransaksiModal(
+            currentFilter = activityState.activeFilter ?: ActivityFilterPayload.initial(),
+            onDismiss = { showFilterModal = false },
+            onApply = { updated -> accountNo?.let { activityViewModel.applyFilter(it, updated) } },
+        )
+    }
 }
 
 @Composable
@@ -273,14 +284,22 @@ private fun TanggalHeader(tanggal: String, modifier: Modifier = Modifier) {
 private fun TransaksiItem(transaksi: HistoryItem, modifier: Modifier = Modifier) {
     val warnaNominal = if (transaksi.isMasuk) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurface
 
-    val icon: ImageVector = when (transaksi.jenisTransaksi) {
-        "Transfer" -> Icons.Filled.CompareArrows
-        "Tagihan" -> Icons.AutoMirrored.Filled.ReceiptLong
-        "Top Up" -> Icons.Filled.AccountBalanceWallet
+    val jenisLower = transaksi.jenisTransaksi.lowercase()
+    val icon: ImageVector = when {
+        "transfer" in jenisLower -> Icons.Filled.CompareArrows
+        "tagihan" in jenisLower -> Icons.AutoMirrored.Filled.ReceiptLong
+        "top" in jenisLower -> Icons.Filled.AccountBalanceWallet
         else -> Icons.AutoMirrored.Filled.HelpOutline
     }
 
-    val nominalFormatted = CurrencyUtils.formatRupiah(transaksi.amount.toInt())
+    // deskripsiTransaksi = "Jenis arah\nrekeningTujuan" -- baris 1 jadi title, baris 2 jadi subtitle
+    val descLines = transaksi.deskripsiTransaksi.split("\n")
+    val title = descLines.getOrNull(0)?.takeIf { it.isNotBlank() }
+        ?: transaksi.jenisTransaksi.ifBlank { "Transaksi" }
+    val subtitle = descLines.getOrNull(1).orEmpty()
+
+    val nominalInt = transaksi.amount.toDoubleOrNull()?.toInt() ?: 0
+    val nominalFormatted = CurrencyUtils.formatRupiah(nominalInt)
     val nominalDisplay = if (transaksi.isMasuk) "+ $nominalFormatted" else "- $nominalFormatted"
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -310,17 +329,15 @@ private fun TransaksiItem(transaksi: HistoryItem, modifier: Modifier = Modifier)
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = transaksi.jenisTransaksi,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = transaksi.deskripsiTransaksi,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Text(text = title, style = MaterialTheme.typography.titleMedium, maxLines = 1)
+                    if (subtitle.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = subtitle,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(

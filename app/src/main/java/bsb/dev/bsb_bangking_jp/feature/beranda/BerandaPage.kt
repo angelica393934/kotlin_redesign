@@ -35,6 +35,7 @@ import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.BannerKeamanan
 import bsb.dev.bsb_bangking_jp.core.component.CustomRefreshIndicator
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
+import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
 import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.feature.beranda.section.HaloUserSection
@@ -170,13 +171,27 @@ fun BerandaPage(
                     } else {
                         // Sudah pernah ada data -> tetap tampilkan data lama walau sedang refresh
                         // (uiState.isRekeningRefreshing true tidak mengubah kondisi ini)
-                        uiState.rekeningList?.let { rekeningList ->
-                            SaldoCardDashboard(
-                                rekeningList = rekeningList,
-                                onSelectPrimaryAccount = { accountNumber ->
-                                    berandaViewModel.setPrimaryAccount(accountNumber)
-                                },
-                            )
+                        when {
+                            uiState.isRekeningLoading && uiState.rekeningList == null -> {
+                                // Loading pertama kali, belum ada data sama sekali -> skeleton
+                                SkeletonSaldoCard()
+                            }
+                            uiState.rekeningList != null -> {
+                                // Sudah pernah ada data -> tetap tampilkan data lama walau sedang refresh
+                                // (uiState.isRekeningRefreshing true tidak mengubah kondisi ini)
+                                SaldoCardDashboard(
+                                    rekeningList = uiState.rekeningList!!,
+                                    onSelectPrimaryAccount = { accountNumber ->
+                                        berandaViewModel.setPrimaryAccount(accountNumber)
+                                    },
+                                )
+                            }
+                            else -> {
+                                // Gagal & belum pernah ada data -> card tetap ada, isinya "-"
+                                SaldoCardEmpty(
+                                    onRetry = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
+                                )
+                            }
                         }
                     }
 

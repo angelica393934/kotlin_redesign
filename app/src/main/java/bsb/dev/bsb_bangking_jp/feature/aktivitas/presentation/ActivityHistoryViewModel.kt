@@ -21,19 +21,7 @@ class ActivityHistoryViewModel(
 
     /** Padanan ActivityHistoryEvent.getInitial -- dipanggil begitu accountNumber pertama kali diketahui / berganti. */
     fun getInitial(accountNumber: String) {
-        val range = DefaultRangeDate.getCurrentMonth()
-        val filter = ActivityFilterPayload(
-            fromDate = range.from,
-            toDate = range.to,
-            quickRange = null,
-            jenis = null,
-            category = null,
-            isAllJenis = true,
-            isAllCategory = true,
-            isDefaultDate = true,
-            label = "",
-        )
-        load(accountNumber, filter)
+        load(accountNumber, ActivityFilterPayload.initial())
     }
 
     /** Padanan ActivityHistoryEvent.applyFilter. */
@@ -84,17 +72,12 @@ class ActivityHistoryViewModel(
     /** Padanan _normalizeFilter -- quickRange dan manual date saling eksklusif. */
     private fun normalizeFilter(filter: ActivityFilterPayload): ActivityFilterPayload {
         if (filter.quickRange != null) {
-            return filter.copy(fromDate = null, toDate = null, isDefaultDate = false)
+            return filter.with(resetFromDate = true, resetToDate = true)
         }
         if (filter.fromDate != null && filter.toDate != null) {
-            return filter.copy(quickRange = null, isDefaultDate = false)
+            return filter.with(resetQuickRange = true)
         }
-        val range = DefaultRangeDate.getCurrentMonth()
-        return filter.copy(
-            fromDate = range.from,
-            toDate = range.to,
-            quickRange = null,
-            isDefaultDate = true,
-        )
+        val def = DefaultRangeDate.getCurrentMonth()
+        return filter.with(fromDate = def.from, toDate = def.to, resetQuickRange = true)
     }
 }

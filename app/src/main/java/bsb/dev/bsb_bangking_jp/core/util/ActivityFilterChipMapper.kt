@@ -40,15 +40,15 @@ object ActivityFilterChipMapper {
         key.startsWith("jenis:") -> {
             val value = key.substringAfter("jenis:")
             val updated = filter.jenis?.filterNot { it == value }
-            filter.copy(jenis = updated, isAllJenis = updated.isNullOrEmpty())
+            filter.with(jenis = updated, resetJenis = updated.isNullOrEmpty(), isAllJenis = updated.isNullOrEmpty())
         }
         key.startsWith("category:") -> {
             val value = key.substringAfter("category:")
             val updated = filter.category?.filterNot { it == value }
-            filter.copy(category = updated, isAllCategory = updated.isNullOrEmpty())
+            filter.with(category = updated, resetCategory = updated.isNullOrEmpty(), isAllCategory = updated.isNullOrEmpty())
         }
-        key == "date" -> filter.copy(fromDate = null, toDate = null, isDefaultDate = true)
-        key == "range" -> filter.copy(quickRange = null, isDefaultDate = true)
+        key == "date" -> filter.with(resetFromDate = true, resetToDate = true, isDefaultDate = true)
+        key == "range" -> filter.with(resetQuickRange = true, isDefaultDate = true)
         else -> filter
     }
 
