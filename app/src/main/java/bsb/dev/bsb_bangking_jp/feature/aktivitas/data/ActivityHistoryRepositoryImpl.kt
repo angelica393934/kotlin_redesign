@@ -1,13 +1,9 @@
 package bsb.dev.bsb_bangking_jp.feature.aktivitas.data
 
-import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
-import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
-import bsb.dev.bsb_bangking_jp.core.network.ApiErrorParser
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
-import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
-import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
-import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
+import bsb.dev.bsb_bangking_jp.core.network.GetWithBodyApiHelper
 import bsb.dev.bsb_bangking_jp.core.session.ClearableRepository
+import bsb.dev.bsb_bangking_jp.core.util.BackendDateTimeUtil
 import bsb.dev.bsb_bangking_jp.core.util.retry
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityHistoryRepository
@@ -16,8 +12,7 @@ private const val SUCCESS_CODE = "0000"
 private const val LIMIT = 10
 
 class ActivityHistoryRepositoryImpl(
-    private val api: ActivityHistoryApiService,
-    private val secureStorage: SecureStorageService,
+    private val apiHelper: GetWithBodyApiHelper,
 ) : ActivityHistoryRepository, ClearableRepository {
 
     private val _items = mutableListOf<HistoryItem>()
@@ -44,7 +39,6 @@ class ActivityHistoryRepositoryImpl(
         filter: ActivityFilterPayload,
     ): List<HistoryItem> {
         if (!_hasMore) return items
-
         val fresh = fetchHistory(accountNumber, filter)
         _items.addAll(fresh)
         _hasMore = fresh.size == LIMIT
@@ -56,45 +50,32 @@ class ActivityHistoryRepositoryImpl(
         accountNumber: String,
         filter: ActivityFilterPayload,
     ): List<HistoryItem> {
-        val privateKey = secureStorage.getPrivateKey()
-            ?: throw IllegalStateException("Private key tidak ditemukan, device belum ter-init.")
-
         val body = GetHistoryRequest(
             accountNumber = accountNumber,
             limit = LIMIT,
             offset = offset,
-            fromDateTime = filter.fromDate,
-            toDateTime = filter.toDate,
+            fromDateTime = filter.fromDate?.let { BackendDateTimeUtil.startOfDay(it) },
+            toDateTime = filter.toDate?.let {
+                if (filter.isDefaultDate) BackendDateTimeUtil.now() else BackendDateTimeUtil.endOfDay(it)
+            },
             quickRange = filter.quickRange,
             jenis = filter.jenis?.takeIf { it.isNotEmpty() },
             category = filter.category?.takeIf { it.isNotEmpty() },
         )
 
-        val timestamp = ApiHeaders.currentTimestamp()
-        val signature = SignatureUtils.sign(body, timestamp, privateKey)
-        val headers = ApiHeaders.withSignature(signature, ApiHeaders.full(timestamp))
-
-        val response = api.getHistory(
-            headers = headers,
+        val response = apiHelper.execute(
+            path = "v1/dashboard/gethistory",
             body = body,
-            tokenPhase = TokenPhaseTag(TokenPhase.LOGIN),
+            responseType = ActivityHistoryResponse::class.java,
         )
 
-        if (!response.isSuccessful) {
-            throw ApiErrorParser.parse(response)
+        if (response.respCode != SUCCESS_CODE) {
+            throw ApiException(response.respCode, "Gagal memuat riwayat aktivitas.")
         }
 
-        val respBody = response.body()
-        if (respBody?.respCode != SUCCESS_CODE) {
-            throw ApiException(
-                respBody?.respCode,
-                respBody?.respMessage ?: "Gagal memuat riwayat aktivitas.",
-            )
-        }
-
-        // 🔹 data.history, BUKAN data langsung (data juga bawa "number")
-        return respBody.data.history
+        return response.data.history
     }
+
     override fun clear() = reset()
 
     private fun reset() {

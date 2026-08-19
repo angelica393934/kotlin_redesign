@@ -3,6 +3,9 @@ package bsb.dev.bsb_bangking_jp.core.network
 import bsb.dev.bsb_bangking_jp.BuildConfig
 import bsb.dev.bsb_bangking_jp.core.network.token.RefreshTokenApiService
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenRefreshInterceptor
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.data.ActivityHistoryRepositoryImpl
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityHistoryRepository
+import bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation.ActivityHistoryViewModel
 import bsb.dev.bsb_bangking_jp.feature.init.data.InitApiService
 import bsb.dev.bsb_bangking_jp.feature.login_existing.data.LoginApiService
 import okhttp3.OkHttpClient
@@ -15,7 +18,13 @@ import java.util.concurrent.TimeUnit
 import bsb.dev.bsb_bangking_jp.feature.login.data.LoginApiService as LoginDirectApiService
 import bsb.dev.bsb_bangking_jp.feature.login_existing.data.LoginApiService as LoginExistingApiService
 
+val aktivitasModule = module {
+    single<ActivityHistoryRepository> { ActivityHistoryRepositoryImpl(get()) }
+    single { ActivityHistoryViewModel(get(), get()) }
+}
+
 val networkModule = module {
+    single { GetWithBodyApiHelper(get(), get()) }
 
     single {
         HttpLoggingInterceptor().apply {
@@ -73,5 +82,6 @@ val networkModule = module {
 
     single { get<Retrofit>().create(InitApiService::class.java) }
     single { get<Retrofit>().create(LoginApiService::class.java) }
+
 
 }

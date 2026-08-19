@@ -12,12 +12,11 @@ data class GetHistoryRequest(
     @SerializedName("jenis") val jenis: List<String>? = null,
     @SerializedName("category") val category: List<String>? = null,
 )
-
 data class ActivityHistoryResponse(
-    @SerializedName("respCode") val respCode: String? = null,
+    @SerializedName("respCode") override val respCode: String? = null,
     @SerializedName("respMessage") val respMessage: String? = null,
     @SerializedName("data") val data: ActivityHistoryData = ActivityHistoryData(),
-)
+) : bsb.dev.bsb_bangking_jp.core.network.BaseRespCodeResponse
 
 /** Padanan bagian `data` di ActivityHistoryModel.fromJson -- berisi nomor rekening + list histori. */
 data class ActivityHistoryData(

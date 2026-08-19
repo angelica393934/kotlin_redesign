@@ -63,35 +63,33 @@ import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation.ActivityHistoryViewModel
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.section.SaldoCardSelector
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
-import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AktivitasPage(
     berandaViewModel: BerandaViewModel = koinInject(),
-    activityViewModel: ActivityHistoryViewModel = koinViewModel(),
+    activityViewModel: ActivityHistoryViewModel = koinInject(), // 🔹 koinInject, bukan koinViewModel
 ) {
     val berandaState by berandaViewModel.uiState.collectAsStateWithLifecycle()
     val activityState by activityViewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val pullToRefreshState = rememberPullToRefreshState()
 
-    var accountNo by remember { mutableStateOf<String?>(null) }
     var showFilterModal by remember { mutableStateOf(false) }
 
+    // 🔹 Auto-load rekening tetap perlu dipicu dari suatu tempat -- Beranda sudah
+    // melakukannya di halamannya sendiri, tapi kalau user buka app dan langsung ke tab
+    // lain, ini jaga-jaga supaya tetap ke-trigger.
     LaunchedEffect(Unit) {
         if (berandaState.rekeningList == null) berandaViewModel.loadRekeningLainnya()
     }
 
-    LaunchedEffect(berandaState.rekeningList) {
-        val list = berandaState.rekeningList
-        if (accountNo == null && !list.isNullOrEmpty()) {
-            val primary = list.firstOrNull { it.isPrimary } ?: list.first()
-            accountNo = primary.number
-            activityViewModel.getInitial(primary.number)
-        }
-    }
+    // accountNo & pemicu fetch histori SEKARANG sepenuhnya dikelola di dalam
+    // ActivityHistoryViewModel (lihat observeRekeningUntukAutoLoad()) -- tidak perlu
+    // LaunchedEffect kedua di sini lagi.
+
+    val accountNo = activityState.accountNumber
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -103,7 +101,7 @@ fun AktivitasPage(
     }
     LaunchedEffect(shouldLoadMore, activityState.hasMore, activityState.isLoadMore, activityState.isLoading) {
         if (shouldLoadMore && activityState.hasMore && !activityState.isLoadMore && !activityState.isLoading) {
-            accountNo?.let { activityViewModel.loadMore(it) }
+            activityViewModel.loadMore()
         }
     }
 
@@ -134,10 +132,7 @@ fun AktivitasPage(
                             rekeningList = berandaState.rekeningList!!,
                             activeAccountNumber = accountNo,
                             onRekeningSelected = { selected ->
-                                if (accountNo != selected.number) {
-                                    accountNo = selected.number
-                                    activityViewModel.getInitial(selected.number)
-                                }
+                                activityViewModel.switchAccount(selected.number)
                             },
                         )
                     }
@@ -150,7 +145,7 @@ fun AktivitasPage(
             }
         }
 
-        // ===== "Transaksi Bulan Ini" + "Cari Transaksi" =====
+        // ===== "Transaksi Bulan Ini" + "Cari Transaksi" ===== (tidak berubah)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -183,7 +178,6 @@ fun AktivitasPage(
             }
         }
 
-        // ===== FILTER CHIP BAR =====
         FilterChipBar(
             items = chips,
             onClearAll = if (chips.isEmpty()) null else {
@@ -192,13 +186,25 @@ fun AktivitasPage(
             onRemove = { chip ->
                 val current = activityState.activeFilter ?: return@FilterChipBar
                 val updated = ActivityFilterChipMapper.removeChip(current, chip.key)
-                accountNo?.let { activityViewModel.applyFilter(it, updated) }
+                activityViewModel.applyFilter(updated)
             },
         )
 
         // ===== LIST TRANSAKSI =====
         Box(modifier = Modifier.weight(1f)) {
             when {
+                accountNo == null && berandaState.rekeningError != null -> {
+                    EmptyState(
+                        modifier = Modifier.fillMaxSize(),
+                        message = "Data rekening tidak dapat dimuat.",
+                        subMessage = "Riwayat transaksi butuh data rekening terlebih dahulu.\nPeriksa koneksi Anda dan coba lagi.",
+                        actionText = "Coba Lagi",
+                        onAction = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
+                    )
+                }
+                accountNo == null -> {
+                    SkeletonList()
+                }
                 activityState.isLoading && activityState.items.isEmpty() -> {
                     SkeletonList()
                 }
@@ -208,7 +214,7 @@ fun AktivitasPage(
                         message = "Data aktivitas tidak dapat dimuat.",
                         subMessage = "Terjadi kesalahan saat mengambil data.\nPeriksa koneksi anda dan coba lagi.",
                         actionText = "Coba Lagi",
-                        onAction = { accountNo?.let { activityViewModel.getInitial(it) } },
+                        onAction = { activityViewModel.getInitial(accountNo) },
                     )
                 }
                 activityState.items.isEmpty() -> {
@@ -222,7 +228,7 @@ fun AktivitasPage(
                 else -> {
                     PullToRefreshBox(
                         isRefreshing = activityState.isLoading,
-                        onRefresh = { accountNo?.let { activityViewModel.refresh(it) } },
+                        onRefresh = { activityViewModel.refresh() },
                         state = pullToRefreshState,
                         modifier = Modifier.fillMaxSize(),
                     ) {
@@ -263,7 +269,7 @@ fun AktivitasPage(
         FilterTransaksiModal(
             currentFilter = activityState.activeFilter ?: ActivityFilterPayload.initial(),
             onDismiss = { showFilterModal = false },
-            onApply = { updated -> accountNo?.let { activityViewModel.applyFilter(it, updated) } },
+            onApply = { updated -> activityViewModel.applyFilter(updated) },
         )
     }
 }
