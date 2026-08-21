@@ -249,7 +249,7 @@ private fun CenteredPinHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .padding(horizontal = 10.dp, vertical = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
         if (showBack) {

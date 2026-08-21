@@ -3,7 +3,6 @@ package bsb.dev.bsb_bangking_jp.feature.transfer.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,13 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,12 +31,17 @@ import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
 import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyRekening
+import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
+import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonRekeningCard
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
+import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.cashBalanceValue
 
+/** Padanan RekeningLainnyaState (initial/loading/refreshing/success/error) di Flutter. */
 sealed interface RekeningSumberUiState {
     data object Loading : RekeningSumberUiState
-    data class Success(val data: List<DummyRekening>) : RekeningSumberUiState
+    data class Success(val data: List<RekeningItem>) : RekeningSumberUiState
     data class Error(val message: String) : RekeningSumberUiState
 }
 
@@ -52,7 +49,7 @@ sealed interface RekeningSumberUiState {
 fun RekeningSumberCard(
     state: RekeningSumberUiState,
     activeAccountNumber: String?,
-    onAccountChanged: (DummyRekening) -> Unit,
+    onAccountChanged: (RekeningItem) -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,22 +59,11 @@ fun RekeningSumberCard(
 
         when (state) {
             is RekeningSumberUiState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(90.dp)
-                        .clip(RoundedCornerShape(25.dp))
-                        .background(MaterialTheme.colorScheme.background),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    // TODO: ganti dengan SkeletonRekeningCard (shimmer) begitu padanan
-                    // widgets/skeletons/section/skeleton_rekening_card.dart dikonversi.
-                    CircularProgressIndicator(modifier = Modifier.size(28.dp))
-                }
+                SkeletonRekeningCard()
             }
 
             is RekeningSumberUiState.Error -> {
-                RekeningErrorCard(message = state.message, onRetry = onRetry)
+                SaldoCardEmpty(onRetry = onRetry)
             }
 
             is RekeningSumberUiState.Success -> {
@@ -93,9 +79,9 @@ fun RekeningSumberCard(
 
 @Composable
 private fun RekeningSumberContent(
-    daftarRekening: List<DummyRekening>,
+    daftarRekening: List<RekeningItem>,
     activeAccountNumber: String?,
-    onAccountChanged: (DummyRekening) -> Unit,
+    onAccountChanged: (RekeningItem) -> Unit,
 ) {
     if (daftarRekening.isEmpty()) return
 
@@ -105,8 +91,6 @@ private fun RekeningSumberContent(
         ?: daftarRekening.firstOrNull { it.isPrimary }
         ?: daftarRekening.first()
 
-    // Padanan WidgetsBinding.instance.addPostFrameCallback di Flutter: beri tahu parent
-    // rekening aktif default begitu tersedia / berubah.
     LaunchedEffect(aktif.number) {
         if (activeAccountNumber != aktif.number) onAccountChanged(aktif)
     }
@@ -118,13 +102,11 @@ private fun RekeningSumberContent(
             .background(MaterialTheme.colorScheme.background)
             .border(1.dp, MaterialTheme.extendedColors.textDisabled, RoundedCornerShape(25.dp)),
     ) {
-        // Watermark logo transparan, padanan Positioned.fill + Transform.scale(4) di Flutter.
         Image(
             painter = painterResource(id = R.drawable.bg_card),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .matchParentSize()
+            modifier = Modifier.matchParentSize()
         )
 
         Row(
@@ -135,12 +117,13 @@ private fun RekeningSumberContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
-                // NOTE: field "classification" belum ada di DummyRekening -- lihat catatan
-                // yang sama di RekeningLainnyaSheet.kt.
-                Text(text = "Tabungan Sekarang", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = aktif.accountTypeName.ifEmpty { "Tabungan Sekarang" },
+                    style = MaterialTheme.typography.bodyMedium,
+                )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = aktif.saldo,
+                    text = CurrencyUtils.formatRupiah(aktif.cashBalanceValue().toInt()),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
@@ -156,21 +139,28 @@ private fun RekeningSumberContent(
                 text = "Ubah",
                 onClick = { showSheet = true },
                 backgroundColor = MaterialTheme.colorScheme.inverseSurface,
-                textColor= MaterialTheme.colorScheme.inverseOnSurface,
+                textColor = MaterialTheme.colorScheme.inverseOnSurface,
                 smallWidth = true,
-                textStyle = MaterialTheme.typography.titleSmall
+                textStyle = MaterialTheme.typography.titleSmall,
             )
         }
     }
 
     if (showSheet) {
-//        RekeningLainnyaSheet(
-//            daftarRekening = daftarRekening,
-//            mode = RekeningSheetMode.REKENING_SUMBER,
-//            rekeningAktif = aktif.number,
-//            title = "Pilih Rekening Sumber",
-//            onDismiss = { showSheet = false },
-//            onSelected = { selected -> onAccountChanged(selected) },
-//        )
+        val sortedForSheet = daftarRekening
+            .filter { it.visible }
+            .sortedByDescending { it.isPrimary }
+
+        RekeningLainnyaSheet(
+            daftarRekening = sortedForSheet,
+            mode = RekeningSheetMode.REKENING_SUMBER,
+            rekeningAktif = aktif.number,
+            title = "Pilih Rekening Sumber",
+            onDismiss = { showSheet = false },
+            onSelected = { selected ->
+                showSheet = false
+                onAccountChanged(selected)
+            },
+        )
     }
 }

@@ -1,12 +1,16 @@
 package bsb.dev.bsb_bangking_jp.feature.transfer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.InputPinPage
+import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PeriksaKembaliData
-import java.util.Date
-
-private const val DUMMY_CORRECT_PIN = "123456"
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun PinTfPage(
@@ -14,53 +18,37 @@ fun PinTfPage(
     onBack: () -> Unit,
     onBerhasilSegera: (ConfirmTransferResult) -> Unit,
     onBerhasilDijadwalkan: (ConfirmTransferResult) -> Unit,
+    viewModel: TransferViewModel = koinInject(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val loadingOverlay = LocalLoadingOverlay.current
+
+    // 🔹 Loading overlay mengikuti proses confirmTransfer (bukan transfer biasa).
+    LaunchedEffect(uiState.isConfirming) {
+        if (uiState.isConfirming) loadingOverlay.show() else loadingOverlay.hide()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navEvent.collect { event ->
+            if (event is TransferNavEvent.ConfirmSuccess) {
+                val result = event.result
+                if (result.scheduleType == "SCHEDULED") {
+                    onBerhasilDijadwalkan(result)
+                } else {
+                    onBerhasilSegera(result)
+                }
+            }
+        }
+    }
+
     InputPinPage(
         title = "Masukkan M-PIN",
         onBackClick = onBack,
         centerTitleWithBackButton = true,
-        validator = { enteredPin ->
-            // TODO: ganti dengan validasi PIN dari backend (mis. lewat
-            // TransferEvent.confirmTransfer) begitu use case asli tersedia.
-            if (enteredPin != DUMMY_CORRECT_PIN) {
-                "PIN yang Anda masukkan salah"
-            } else {
-                null
-            }
-        },
-        onPinComplete = { _ ->
-            val result = data.result
-            val isScheduled = result.isScheduled
-            val biayaLayananInt = result.biayaLayanan.filter { it.isDigit() }.toIntOrNull() ?: 0
-
-            val confirmResult = ConfirmTransferResult(
-                reffNum = "TRX${System.currentTimeMillis()}",
-                transactionDate = Date(),
-                beneficiaryName = data.penerimaName,
-                beneficiaryBankName = data.penerimaBank,
-                beneficiaryAccountNo = data.penerimaAccountNumber,
-                senderName = result.sumber.name,
-                senderAccountNo = result.sumber.number,
-                amount = result.jumlah,
-                adminFee = biayaLayananInt,
-                totalDebit = result.jumlah + biayaLayananInt,
-                remark = result.keterangan.ifEmpty { null },
-                scheduleType = if (isScheduled) "SCHEDULED" else "IMMEDIATE",
-                frequency = if (isScheduled) {
-                    if (result.frekuensi.equals("Sekali", ignoreCase = true)) "ONCE" else "MONTHLY"
-                } else {
-                    null
-                },
-                scheduleDate = if (isScheduled) result.tanggal.ifEmpty { null } else null,
-                startMonth = if (isScheduled) result.mulai.ifEmpty { null } else null,
-                endMonth = if (isScheduled) result.sampai.ifEmpty { null } else null,
-            )
-
-            if (isScheduled) {
-                onBerhasilDijadwalkan(confirmResult)
-            } else {
-                onBerhasilSegera(confirmResult)
-            }
+        validator = null,
+        externalError = uiState.confirmError,
+        onPinComplete = { pin ->
+            viewModel.confirmTransfer(pin) // 🔥 HIT ENDPOINT 4
         },
     )
 }

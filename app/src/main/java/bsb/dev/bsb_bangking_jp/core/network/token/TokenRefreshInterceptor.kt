@@ -51,12 +51,14 @@ class TokenRefreshInterceptor(
     private fun getStoredAccessToken(phase: TokenPhase): String? = when (phase) {
         TokenPhase.INIT -> secureStorage.getInitAccessToken()
         TokenPhase.LOGIN -> secureStorage.getLoginAccessToken()
+        TokenPhase.TRANSFER -> secureStorage.getTransferAccessToken()
     }
 
     private suspend fun tryRefresh(phase: TokenPhase): String? = try {
         when (phase) {
             TokenPhase.INIT -> refreshInitToken()
             TokenPhase.LOGIN -> refreshLoginToken()
+            TokenPhase.TRANSFER -> null
         }
     } catch (e: Exception) {
         null

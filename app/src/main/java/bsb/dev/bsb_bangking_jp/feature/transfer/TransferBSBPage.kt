@@ -14,24 +14,15 @@ fun TransferBSBPage(
     accountNumber: String,
     name: String,
     modifier: Modifier = Modifier,
-    rekeningList: List<DummyRekening> = DummyData.rekeningList,
     onBack: () -> Unit = {},
     onLanjutkan: (TransferFormResult) -> Unit = {},
 ) {
-    val rekeningSumberState: RekeningSumberUiState = remember(rekeningList) {
-        RekeningSumberUiState.Success(rekeningList)
-    }
-
     TransferFormPage(
         jenis = TransferJenis.SESAMA_BSB,
         bank = bank,
         accountNumber = accountNumber,
         name = name,
         modifier = modifier,
-        rekeningSumberState = rekeningSumberState,
-        onRetryRekeningSumber = {
-            // TODO: trigger ulang load rekening dari ViewModel di sini.
-        },
         onBack = onBack,
         onLanjutkan = onLanjutkan,
     )

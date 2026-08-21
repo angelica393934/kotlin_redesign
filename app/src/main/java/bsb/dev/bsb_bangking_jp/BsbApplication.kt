@@ -5,12 +5,14 @@ import bsb.dev.bsb_bangking_jp.core.device.DeviceContext
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.device.deviceModule
 import bsb.dev.bsb_bangking_jp.core.network.networkModule
+import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.aktivitasModule
 import bsb.dev.bsb_bangking_jp.feature.beranda.BerandaModule
 import bsb.dev.bsb_bangking_jp.feature.init.initModule
 import bsb.dev.bsb_bangking_jp.feature.login.loginModule
 import bsb.dev.bsb_bangking_jp.feature.login_existing.loginExistingModule
 import bsb.dev.bsb_bangking_jp.feature.splash.splashModule
+import bsb.dev.bsb_bangking_jp.feature.transfer.transferModule
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -30,11 +32,13 @@ class BsbApplication : Application() {
                 loginModule,
                 BerandaModule,
                 aktivitasModule,
+                transferModule,
                 // tambahkan module fitur lain di sini
             )
         }
 
         // DeviceContext perlu SecureStorageService dari Koin, jadi diinit setelah startKoin
         DeviceContext.init(this, get<SecureStorageService>())
+        NotificationHelper.createNotificationChannel(this) //untuk notif
     }
 }

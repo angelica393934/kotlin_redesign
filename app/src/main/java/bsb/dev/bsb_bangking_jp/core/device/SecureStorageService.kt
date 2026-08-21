@@ -57,6 +57,12 @@ class SecureStorageService(context: Context) {
             remove(KEY_LOGIN_REFRESH_TOKEN)
         }
     }
+
+    // token phase transfer
+    fun getTransferAccessToken(): String? = prefs.getString(KEY_TRANSFER_ACCESS_TOKEN, null)
+    fun saveTransferAccessToken(token: String) = prefs.edit { putString(KEY_TRANSFER_ACCESS_TOKEN, token) }
+    fun clearTransferToken() = prefs.edit { remove(KEY_TRANSFER_ACCESS_TOKEN) }
+
     companion object {
         private const val KEY_DEVICE_ID = "device_id"
         private const val KEY_PRIVATE_KEY = "ed25519_private_key"
@@ -64,5 +70,6 @@ class SecureStorageService(context: Context) {
         private const val KEY_INIT_REFRESH_TOKEN = "init_refresh_token"
         private const val KEY_LOGIN_ACCESS_TOKEN = "login_access_token"
         private const val KEY_LOGIN_REFRESH_TOKEN = "login_refresh_token"
+        private const val KEY_TRANSFER_ACCESS_TOKEN = "transfer_access_token"
     }
 }

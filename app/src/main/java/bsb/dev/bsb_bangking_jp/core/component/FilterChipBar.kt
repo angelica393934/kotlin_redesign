@@ -25,14 +25,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 
-/** Padanan FilterChipItem di Flutter. */
+
 data class FilterChipItem(
     val key: String,
     val label: String,
     val removable: Boolean = true,
 )
 
-/** Padanan FilterChipBar di Flutter. */
 @Composable
 fun FilterChipBar(
     items: List<FilterChipItem>,

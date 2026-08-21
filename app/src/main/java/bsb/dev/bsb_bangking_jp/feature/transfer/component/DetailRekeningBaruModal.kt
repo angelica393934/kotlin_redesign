@@ -1,55 +1,60 @@
-package bsb.dev.bsb_bangking_jp.feature.transfer
+package bsb.dev.bsb_bangking_jp.feature.transfer.component
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import bsb.dev.bsb_bangking_jp.core.component.AccountTile
-import bsb.dev.bsb_bangking_jp.core.component.AppButton
-import bsb.dev.bsb_bangking_jp.core.component.AppSwitch
-import bsb.dev.bsb_bangking_jp.core.component.AppTextField
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyTransferInquiry
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import bsb.dev.bsb_bangking_jp.core.component.*
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferInquiry
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 
 @Composable
 fun DetailRekeningBaruModal(
-    inquiry: DummyTransferInquiry,
+    inquiry: TransferInquiry,
+    viewModel: TransferViewModel,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit = {},
-    onContinue: (DummyTransferInquiry) -> Unit,
-    onSaveRecipient: (alias: String) -> Unit = {},
+    onContinue: (TransferInquiry) -> Unit,
 ) {
     var isSaveReceiver by remember { mutableStateOf(false) }
     var alias by remember { mutableStateOf("") }
-    var aliasError by remember { mutableStateOf<String?>(null) }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = "Detail Rekening",
-                style = MaterialTheme.typography.titleLarge
-            )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val toastState = LocalToastState.current
+    val loadingOverlay = LocalLoadingOverlay.current
+
+    LaunchedEffect(uiState.isSavingRecipient) {
+        if (uiState.isSavingRecipient) loadingOverlay.show() else loadingOverlay.hide()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navEvent.collect { event ->
+            if (event is TransferNavEvent.RecipientSaved) {
+                onDismiss()
+                onContinue(inquiry)
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferUiEvent.ShowToastError) {
+                toastState.showError(event.message)
+            }
+        }
+    }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Detail Rekening", style = MaterialTheme.typography.titleLarge)
         }
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -59,9 +64,7 @@ fun DetailRekeningBaruModal(
         )
 
         Spacer(modifier = Modifier.height(20.dp))
-        HorizontalDivider(
-            color = MaterialTheme.extendedColors.inputBackground
-        )
+        HorizontalDivider(color = MaterialTheme.extendedColors.inputBackground)
         Spacer(modifier = Modifier.height(10.dp))
 
         AccountTile(
@@ -71,40 +74,28 @@ fun DetailRekeningBaruModal(
             accountNumber = inquiry.beneficiaryAccountNo,
         )
         Spacer(modifier = Modifier.height(10.dp))
-
-        HorizontalDivider(
-            color = MaterialTheme.extendedColors.inputBackground
-        )
+        HorizontalDivider(color = MaterialTheme.extendedColors.inputBackground)
         Spacer(modifier = Modifier.height(20.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically, // <-- ini kuncinya
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = "Simpan Penerima",
-                style = MaterialTheme.typography.titleLarge,
-            )
-            AppSwitch(
-                checked = isSaveReceiver,
-                onCheckedChange = { isSaveReceiver = it },
-            )
+            Text(text = "Simpan Penerima", style = MaterialTheme.typography.titleLarge)
+            AppSwitch(checked = isSaveReceiver, onCheckedChange = { isSaveReceiver = it })
         }
 
         if (isSaveReceiver) {
             Spacer(modifier = Modifier.height(10.dp))
             AppTextField(
                 value = alias,
-                onValueChange = {
-                    alias = it
-                    aliasError = null
-                },
+                onValueChange = { alias = it; viewModel.clearSaveRecipientError() },
                 labelText = "Simpan Sebagai",
                 hintText = "Nama Inisial",
                 icon = Icons.Default.Person,
-                errorText = aliasError,
-                showError = aliasError != null,
+                errorText = uiState.saveRecipientError,
+                showError = uiState.saveRecipientError != null,
             )
         }
 
@@ -114,14 +105,15 @@ fun DetailRekeningBaruModal(
             text = "Lanjutkan",
             onClick = {
                 if (!isSaveReceiver) {
+                    onDismiss()
                     onContinue(inquiry)
                 } else {
-                    val trimmedAlias = alias.trim()
-                    if (trimmedAlias.isEmpty()) {
-                        aliasError = "Nama inisial tidak boleh kosong"
+                    val trimmed = alias.trim()
+                    if (trimmed.isEmpty()) {
+                        // set error lokal cukup lewat state saveRecipientError manual jika perlu,
+                        // atau tambahkan validasi lokal sebelum call API
                     } else {
-                        onSaveRecipient(trimmedAlias)
-                        onContinue(inquiry)
+                        viewModel.saveRecipient(trimmed) // 🔥 HIT ENDPOINT 2
                     }
                 }
             },

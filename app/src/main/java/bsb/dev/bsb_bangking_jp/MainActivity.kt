@@ -1,10 +1,14 @@
 package bsb.dev.bsb_bangking_jp
 
+import android.Manifest
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -13,10 +17,13 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import bsb.dev.bsb_bangking_jp.core.navigation.AppNavigation
 import bsb.dev.bsb_bangking_jp.core.theme.BSBBangkingJPTheme
@@ -32,6 +39,23 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val settings by settingsViewModel.settings.collectAsState()
+            val context = LocalContext.current
+
+            // 🔹 Minta permission notifikasi (Android 13+ / API 33+).
+            val notificationPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { /* hasil ditangani secara pasif -- jika ditolak, notif tidak akan muncul */ }
+
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val granted = ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.POST_NOTIFICATIONS
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                    if (!granted) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            }
 
             val insetsController = WindowCompat.getInsetsController(window, window.decorView)
             SideEffect {
@@ -40,9 +64,7 @@ class MainActivity : ComponentActivity() {
                 insetsController.isAppearanceLightNavigationBars = !settings.darkTheme
             }
 
-            BSBBangkingJPTheme(
-                darkTheme = settings.darkTheme
-            ) {
+            BSBBangkingJPTheme(darkTheme = settings.darkTheme) {
                 Surface(
                     modifier = Modifier.windowInsetsPadding(
                         WindowInsets.systemBars.only(WindowInsetsSides.Bottom)
@@ -51,9 +73,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavigation(
                         darkTheme = settings.darkTheme,
-                        onThemeChange = { isDark ->
-                            settingsViewModel.saveTheme(isDark)
-                        }
+                        onThemeChange = { isDark -> settingsViewModel.saveTheme(isDark) }
                     )
                 }
             }

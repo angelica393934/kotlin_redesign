@@ -13,21 +13,15 @@ fun TransferUmumPage(
     accountNumber: String,
     name: String,
     modifier: Modifier = Modifier,
-    rekeningList: List<DummyRekening> = DummyData.rekeningList,
     onBack: () -> Unit = {},
     onLanjutkan: (TransferFormResult) -> Unit = {},
 ) {
-    val rekeningSumberState: RekeningSumberUiState = remember(rekeningList) {
-        RekeningSumberUiState.Success(rekeningList)
-    }
-
     TransferFormPage(
         jenis = TransferJenis.ANTAR_BANK,
         bank = bank,
         accountNumber = accountNumber,
         name = name,
         modifier = modifier,
-        rekeningSumberState = rekeningSumberState,
         onBack = onBack,
         onLanjutkan = onLanjutkan,
     )

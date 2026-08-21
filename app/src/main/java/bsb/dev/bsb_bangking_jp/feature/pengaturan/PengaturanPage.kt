@@ -65,7 +65,10 @@ fun PengaturanPage(
     val uiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
 
     // 🔹 Ambil dari response API, fallback ke DummyData kalau belum ada data (mis. belum sempat loadProfile()).
-    val namaUser = uiState.profile?.user?.customerName ?: "-"
+    val namaUser = uiState.profile?.user?.customerName?.takeIf { it.isNotBlank() }
+        ?: uiState.profile?.external?.data?.name?.takeIf { it.isNotBlank() }
+        ?: "-"
+
     val phoneNumber = uiState.profile?.user?.maskPhone ?: "-"
 
     Scaffold(

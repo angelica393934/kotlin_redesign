@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,15 +35,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.AppModalBottomSheet
 import bsb.dev.bsb_bangking_jp.core.component.AppTextField
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyRekening
-import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.core.util.InitialName
 import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
+import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
+import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
+import bsb.dev.bsb_bangking_jp.core.component.PilihTanggalSheet
+import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.JumlahTransferField
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.OptionItem
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.OptionListSheet
@@ -52,10 +56,15 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.component.PilihBulanTahunSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PilihHariSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.RekeningSumberCard
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.RekeningSumberUiState
-import java.util.Calendar
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferRequestPayload
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.util.TransferMapper
 import kotlinx.coroutines.launch
-import bsb.dev.bsb_bangking_jp.core.component.PilihTanggalSheet
+import org.koin.compose.koinInject
 import java.time.LocalDate
+import java.util.Calendar
 
 enum class TransferJenis {
     ANTAR_BANK,
@@ -73,7 +82,7 @@ data class TransferFormResult(
     val layananTransfer: String,
     val biayaLayanan: String,
     val tujuanTransfer: String,
-    val sumber: DummyRekening,
+    val sumber: RekeningItem,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,10 +93,10 @@ fun TransferFormPage(
     accountNumber: String,
     name: String,
     modifier: Modifier = Modifier,
-    rekeningSumberState: RekeningSumberUiState = RekeningSumberUiState.Success(DummyData.rekeningList),
-    onRetryRekeningSumber: () -> Unit = {},
     onBack: () -> Unit = {},
     onLanjutkan: (TransferFormResult) -> Unit = {},
+    transferViewModel: TransferViewModel = koinInject(),
+    berandaViewModel: BerandaViewModel = koinInject(),
 ) {
     var jumlah by remember { mutableStateOf(0) }
     var keterangan by remember { mutableStateOf("") }
@@ -100,7 +109,7 @@ fun TransferFormPage(
     var mulai by remember { mutableStateOf("") }
     var sampai by remember { mutableStateOf("") }
     var activeAccountNumber by remember { mutableStateOf<String?>(null) }
-    var sumberAktif by remember { mutableStateOf<DummyRekening?>(null) }
+    var sumberAktif by remember { mutableStateOf<RekeningItem?>(null) }
 
     var showLayananSheet by remember { mutableStateOf(false) }
     var showTujuanSheet by remember { mutableStateOf(false) }
@@ -112,13 +121,30 @@ fun TransferFormPage(
 
     var showPeriksaSheet by remember { mutableStateOf(false) }
     var pendingResult by remember { mutableStateOf<TransferFormResult?>(null) }
-    var isSubmitting by remember { mutableStateOf(false) }
-    var submitError by remember { mutableStateOf<String?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
     val periksaSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val kalenderSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val transferUiState by transferViewModel.uiState.collectAsStateWithLifecycle()
+    val berandaUiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
+
+    val toastState = LocalToastState.current
+    val loadingOverlay = LocalLoadingOverlay.current
+
+    // 🔹 Loading overlay mengikuti proses submit transfer.
+    LaunchedEffect(transferUiState.isSubmittingTransfer) {
+        if (transferUiState.isSubmittingTransfer) loadingOverlay.show() else loadingOverlay.hide()
+    }
+
+    // 🔹 Toast untuk error non-inline (mis. sesi transfer berakhir, dsb).
+    LaunchedEffect(Unit) {
+        transferViewModel.uiEvent.collect { event ->
+            if (event is TransferUiEvent.ShowToastError) {
+                toastState.showError(event.message)
+            }
+        }
+    }
 
     fun closePeriksaSheet(onClosed: () -> Unit = {}) {
         coroutineScope.launch {
@@ -128,6 +154,43 @@ fun TransferFormPage(
                 showPeriksaSheet = false
                 onClosed()
             }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        transferViewModel.navEvent.collect { event ->
+            if (event is TransferNavEvent.TransferSubmitted) {
+                closePeriksaSheet {
+                    pendingResult?.let { onLanjutkan(it) } // lanjut ke halaman PIN
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        transferViewModel.getTransferPurpose() // 🔥 HIT ENDPOINT 5
+    }
+
+    // 🔹 Load rekening lainnya begitu halaman dibuka (padanan initState BlocListener Flutter).
+    LaunchedEffect(Unit) {
+        if (berandaUiState.rekeningList == null) {
+            berandaViewModel.loadRekeningLainnya()
+        }
+    }
+
+    // 🔹 Turunkan RekeningSumberUiState dari state Beranda.
+    val rekeningSumberState: RekeningSumberUiState = remember(
+        berandaUiState.isRekeningLoading,
+        berandaUiState.rekeningList,
+        berandaUiState.rekeningError,
+    ) {
+        when {
+            berandaUiState.isRekeningLoading && berandaUiState.rekeningList == null ->
+                RekeningSumberUiState.Loading
+            berandaUiState.rekeningList != null ->
+                RekeningSumberUiState.Success(berandaUiState.rekeningList!!)
+            else ->
+                RekeningSumberUiState.Error(berandaUiState.rekeningError ?: "Data rekening tidak tersedia")
         }
     }
 
@@ -145,8 +208,12 @@ fun TransferFormPage(
             ),
         )
     }
-    val tujuanOptions = remember {
-        listOf("Investasi", "Pemindahan Dana", "Pembelian", "Lainnya").map { OptionItem(it) }
+    val tujuanOptions = remember(transferUiState.transferPurposes) {
+        if (transferUiState.transferPurposes.isNotEmpty()) {
+            transferUiState.transferPurposes.map { OptionItem(it.name) }
+        } else {
+            listOf("Investasi", "Pemindahan Dana", "Pembelian", "Lainnya").map { OptionItem(it) }
+        }
     }
     val frekuensiOptions = remember {
         listOf("Sekali", "Setiap Bulan").map { OptionItem(it) }
@@ -189,8 +256,8 @@ fun TransferFormPage(
             JumlahTransferField(
                 amount = jumlah,
                 onAmountChange = { jumlah = it },
-                minAmount =  10_000,
-                maxAmount =  100_000_000
+                minAmount = 10_000,
+                maxAmount = 100_000_000
             )
 
             Column(
@@ -253,8 +320,8 @@ fun TransferFormPage(
                         textColor = if (!isScheduled) MaterialTheme.extendedColors.onSuccess else MaterialTheme.extendedColors.textSecondary,
                         onClick = { isScheduled = false },
                         modifier = Modifier
-                                    .weight(1f)
-                                    .height(36.dp),
+                            .weight(1f)
+                            .height(36.dp),
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     AppButton(
@@ -265,8 +332,8 @@ fun TransferFormPage(
                         textColor = if (isScheduled) MaterialTheme.extendedColors.onSuccess else MaterialTheme.extendedColors.textSecondary,
                         onClick = { isScheduled = true },
                         modifier = Modifier
-                                    .weight(1f)
-                                    .height(36.dp),
+                            .weight(1f)
+                            .height(36.dp),
                     )
                 }
 
@@ -372,7 +439,7 @@ fun TransferFormPage(
                         activeAccountNumber = rekening.number
                         sumberAktif = rekening
                     },
-                    onRetry = onRetryRekeningSumber,
+                    onRetry = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -398,7 +465,6 @@ fun TransferFormPage(
                             tujuanTransfer = tujuanTransfer,
                             sumber = sumber,
                         )
-                        submitError = null
                         showPeriksaSheet = true
                     },
                 )
@@ -452,7 +518,6 @@ fun TransferFormPage(
         PilihHariSheet(
             selectedDate = tanggal.ifEmpty { null },
             onDismiss = { showHariSheet = false },
-
             onSelected = { date, isEndOfMonth ->
                 tanggal = if (isEndOfMonth) "Akhir Bulan" else date
             },
@@ -516,15 +581,30 @@ fun TransferFormPage(
                         penerimaAccountNumber = accountNumber,
                         result = result,
                     ),
-                    isSubmitting = isSubmitting,
-                    errorMessage = submitError,
+                    isSubmitting = transferUiState.isSubmittingTransfer,
+                    errorMessage = transferUiState.transferError,
                     onConfirm = {
-                        isSubmitting = true
-                        submitError = null
-                        isSubmitting = false
-                        closePeriksaSheet {
-                            onLanjutkan(result)
-                        }
+                        val (scheduleDate, endOfMonth) = TransferMapper.mapSchedulePayload(
+                            isScheduled = result.isScheduled,
+                            tanggal = result.tanggal,
+                        )
+                        transferViewModel.transfer(
+                            TransferRequestPayload(
+                                sourceAccountNo = result.sumber.number,
+                                amount = result.jumlah.toDouble(),
+                                service = TransferMapper.mapService(result.layananTransfer),
+                                scheduleType = TransferMapper.mapScheduleType(result.isScheduled),
+                                frequency = if (result.isScheduled) TransferMapper.mapFrequency(result.frekuensi) else null,
+                                scheduleDate = scheduleDate,
+                                endOfMonth = endOfMonth,
+                                startDate = if (result.isScheduled && result.frekuensi == "Setiap Bulan")
+                                    TransferMapper.formatMonthYearToEnglish(result.mulai) else null,
+                                endDate = if (result.isScheduled && result.frekuensi == "Setiap Bulan")
+                                    TransferMapper.formatMonthYearToEnglish(result.sampai) else null,
+                                remark = result.keterangan.ifEmpty { null },
+                                purpose = result.tujuanTransfer.ifEmpty { null },
+                            ),
+                        ) // 🔥 HIT ENDPOINT 3
                     },
                 )
             }

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.AppModalBottomSheet
 import bsb.dev.bsb_bangking_jp.core.component.AppTextField
+import bsb.dev.bsb_bangking_jp.core.component.PilihRentangTanggalSheet
 import bsb.dev.bsb_bangking_jp.core.component.PilihTanggalSheet
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
@@ -74,8 +75,7 @@ fun FilterTransaksiModal(
         )
     }
 
-    var showFromPicker by remember { mutableStateOf(false) }
-    var showToPicker by remember { mutableStateOf(false) }
+    var showRangePicker by remember { mutableStateOf(false) }
 
     fun toggle(current: Set<String>, item: String): Set<String> {
         if (item == "Semua") return setOf("Semua")
@@ -91,29 +91,19 @@ fun FilterTransaksiModal(
 
             Text(text = "Tanggal", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                AppTextField(
-                    value = fromDate?.let { LocalDate.parse(it, backendFormatter).format(displayFormatter) } ?: "",
-                    onValueChange = {},
-                    hintText = "Dari",
-                    icon = Icons.Default.CalendarToday,
-                    readOnly = true,
-                    isDropdown = true,
-                    onClick = { showFromPicker = true },
-                    modifier = Modifier.weight(1f),
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                AppTextField(
-                    value = toDate?.let { LocalDate.parse(it, backendFormatter).format(displayFormatter) } ?: "",
-                    onValueChange = {},
-                    hintText = "Sampai",
-                    icon = Icons.Default.CalendarToday,
-                    readOnly = true,
-                    isDropdown = true,
-                    onClick = { showToPicker = true },
-                    modifier = Modifier.weight(1f),
-                )
-            }
+            AppTextField(
+                value = if (fromDate != null && toDate != null) {
+                    val start = LocalDate.parse(fromDate, backendFormatter).format(displayFormatter)
+                    val end = LocalDate.parse(toDate, backendFormatter).format(displayFormatter)
+                    "$start - $end"
+                } else "",
+                onValueChange = {},
+                hintText = "Pilih Rentang Tanggal",
+                icon = Icons.Default.CalendarToday,
+                readOnly = true,
+                isDropdown = true,
+                onClick = { showRangePicker = true },
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "Pilihan Cepat", style = MaterialTheme.typography.titleMedium)
@@ -181,7 +171,8 @@ fun FilterTransaksiModal(
             Row(modifier = Modifier.fillMaxWidth()) {
                 AppButton(
                     text = "Atur Ulang",
-                    outlined = true,
+                    backgroundColor = MaterialTheme.colorScheme.inverseSurface,
+                    textColor =  MaterialTheme.colorScheme.inverseOnSurface,
                     modifier = Modifier.weight(1f),
                     onClick = {
                         fromDate = null
@@ -224,29 +215,16 @@ fun FilterTransaksiModal(
         }
     }
 
-    if (showFromPicker) {
-        AppModalBottomSheet(onDismissRequest = { showFromPicker = false }) {
-            PilihTanggalSheet(
-                selectedDate = fromDate?.let { LocalDate.parse(it, backendFormatter) } ?: LocalDate.now(),
-                onDatePicked = {},
-                onConfirm = { picked ->
-                    fromDate = picked.format(backendFormatter)
+    if (showRangePicker) {
+        AppModalBottomSheet(onDismissRequest = { showRangePicker = false }) {
+            PilihRentangTanggalSheet(
+                initialStart = fromDate?.let { LocalDate.parse(it, backendFormatter) },
+                initialEnd = toDate?.let { LocalDate.parse(it, backendFormatter) },
+                onConfirm = { start, end ->
+                    fromDate = start.format(backendFormatter)
+                    toDate = end.format(backendFormatter)
                     selectedQuickRange = null
-                    showFromPicker = false
-                },
-            )
-        }
-    }
-
-    if (showToPicker) {
-        AppModalBottomSheet(onDismissRequest = { showToPicker = false }) {
-            PilihTanggalSheet(
-                selectedDate = toDate?.let { LocalDate.parse(it, backendFormatter) } ?: LocalDate.now(),
-                onDatePicked = {},
-                onConfirm = { picked ->
-                    toDate = picked.format(backendFormatter)
-                    selectedQuickRange = null
-                    showToPicker = false
+                    showRangePicker = false
                 },
             )
         }

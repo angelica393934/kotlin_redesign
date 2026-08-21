@@ -48,11 +48,16 @@ import androidx.compose.ui.Alignment
 import bsb.dev.bsb_bangking_jp.core.component.LoadingOverlayHost
 import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.component.rememberLoadingOverlayState
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.cashBalanceValue
 import org.koin.androidx.compose.koinViewModel
 import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPage
 import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPinFlow
 import bsb.dev.bsb_bangking_jp.feature.login_existing.OtpMasukAkunPage
 import bsb.dev.bsb_bangking_jp.feature.login_existing.presentation.LoginExistingViewModel
+import androidx.compose.ui.platform.LocalContext
+import bsb.dev.bsb_bangking_jp.core.component.formatRupiah
+import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
+
 private const val BSB_BANK_NAME = "Bank Sumsel Babel"
 
 @Composable
@@ -60,6 +65,7 @@ fun AppNavigation(
     darkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
 ) {
+    val context = LocalContext.current
     val navController = rememberNavController()
     val toastState = rememberToastState()
     val loadingOverlayState = rememberLoadingOverlayState()
@@ -74,7 +80,7 @@ fun AppNavigation(
         Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
-                startDestination = "splash",
+                startDestination = "navbar",
             ) {
 
                 composable("splash") {
@@ -280,20 +286,13 @@ fun AppNavigation(
 
                 composable("transfer_baru") {
                     TransferBaruPage(
-                        onBackClick = {
-                            navController.popBackStack()
-                        },
+                        onBackClick = { navController.popBackStack() },
                         onContinueToNextPage = { inquiry ->
-                            // 🔹 Tentukan tujuan berdasarkan bank yang dipilih di TransferBaruPage.
-                            val isTujuanBsb =
-                                inquiry.bankName.trim().equals(BSB_BANK_NAME, ignoreCase = true)
-                            val destination = if (isTujuanBsb) "transfer_bsb" else "transfer_umum"
-
-                            // Path argument perlu di-encode (nama bank/nasabah bisa mengandung spasi).
+                            // 🔹 Sekarang pakai isOnUs asli dari backend, bukan cek nama bank string.
+                            val destination = if (inquiry.isOnUs) "transfer_bsb" else "transfer_umum"
                             val bank = Uri.encode(inquiry.bankName)
                             val accountNumber = Uri.encode(inquiry.beneficiaryAccountNo)
                             val name = Uri.encode(inquiry.beneficiaryName)
-
                             navController.navigate("$destination/$bank/$accountNumber/$name")
                         },
                     )
@@ -325,9 +324,7 @@ fun AppNavigation(
                                 result = result,
                             )
                             pendingSumberKlasifikasi = "Tabungan Sekarang"
-                            pendingSumberSaldoInt = result.sumber.saldo
-                                .filter { it.isDigit() }
-                                .toIntOrNull() ?: 0
+                            pendingSumberSaldoInt = result.sumber.cashBalanceValue().toInt()
                             navController.navigate("pin_transfer")
                         },
                     )
@@ -359,9 +356,7 @@ fun AppNavigation(
                                 result = result,
                             )
                             pendingSumberKlasifikasi = "Tabungan Sekarang"
-                            pendingSumberSaldoInt = result.sumber.saldo
-                                .filter { it.isDigit() }
-                                .toIntOrNull() ?: 0
+                            pendingSumberSaldoInt = result.sumber.cashBalanceValue().toInt()
                             navController.navigate("pin_transfer")
                         },
                     )
@@ -377,6 +372,15 @@ fun AppNavigation(
                             onBack = { navController.popBackStack() },
                             onBerhasilSegera = { confirmResult ->
                                 pendingConfirmResult = confirmResult
+
+                                // 🔹 Trigger notifikasi + suara custom, padanan bank sungguhan.
+                                NotificationHelper.showTransaksiBerhasil(
+                                    context = context,
+                                    title = "Transfer Berhasil",
+                                    message = "Transfer ${formatRupiah(confirmResult.totalDebit)} ke " +
+                                            "${confirmResult.beneficiaryName} berhasil diproses.",
+                                )
+
                                 navController.navigate("transfer_berhasil") {
                                     popUpTo("navbar")
                                 }
