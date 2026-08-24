@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.components.skeleton
+package bsb.dev.bsb_bangking_jp.core.skeleton
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,7 +48,7 @@ fun SkeletonDetailTransferTerjadwal(modifier: Modifier = Modifier) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
         Spacer(modifier = Modifier.height(12.dp))
         // === TITLE ===
@@ -60,14 +60,14 @@ fun SkeletonDetailTransferTerjadwal(modifier: Modifier = Modifier) {
         repeat(5) { DetailRowSkeleton() }
 
         Spacer(modifier = Modifier.height(12.dp))
-        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
         Spacer(modifier = Modifier.height(4.dp))
         // === KETERANGAN ===
         DetailRowSkeleton(longValue = true)
 
         Spacer(modifier = Modifier.height(12.dp))
-        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(modifier = Modifier.height(16.dp))
 
         // === REKENING SUMBER ===

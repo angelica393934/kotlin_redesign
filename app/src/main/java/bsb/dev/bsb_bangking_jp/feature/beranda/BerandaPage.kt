@@ -44,8 +44,8 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
 import org.koin.compose.koinInject
 import kotlin.math.roundToInt
-import bsb.dev.bsb_bangking_jp.core.components.skeleton.HaloUserSkeleton
-import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonSaldoCard
+import bsb.dev.bsb_bangking_jp.core.skeleton.HaloUserSkeleton
+import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonSaldoCard
 
 private val PULL_REFRESH_MAX_PUSH = 64.dp // 🔹 seberapa jauh konten terdorong turun saat full refresh
 

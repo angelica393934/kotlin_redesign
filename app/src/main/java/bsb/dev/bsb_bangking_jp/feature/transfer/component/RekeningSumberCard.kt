@@ -32,7 +32,7 @@ import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
 import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
 import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
-import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonRekeningCard
+import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonRekeningCard
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem

@@ -51,8 +51,8 @@ import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.component.FilterChipBar
 import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
-import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonList
-import bsb.dev.bsb_bangking_jp.core.components.skeleton.SkeletonSaldoCard
+import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonList
+import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonSaldoCard
 import bsb.dev.bsb_bangking_jp.core.util.ActivityFilterChipMapper
 import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
 import bsb.dev.bsb_bangking_jp.core.util.DateFormatterUtil

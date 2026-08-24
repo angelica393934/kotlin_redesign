@@ -1,34 +1,25 @@
-package bsb.dev.bsb_bangking_jp.core.components.skeleton
+package bsb.dev.bsb_bangking_jp.core.skeleton
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 
-/** Setara `SkeletonTrailingType` di Flutter. */
 enum class SkeletonTrailingType { NONE, COLUMN, BOX }
 
-/** Setara `SkeletonListLayout` di Flutter. */
 enum class SkeletonListLayout { AVATAR, FULL_ROW }
 
-/**
- * Setara `SkeletonList` di Flutter.
- * Dipakai NON-lazy (Column biasa) karena aslinya juga shrinkWrap + NeverScrollableScrollPhysics,
- * artinya memang didesain untuk ditaruh di dalam parent yang sudah scrollable.
- * Kalau daftarnya panjang & berdiri sendiri, ganti isi Column ini jadi LazyColumn.
- */
 @Composable
 fun SkeletonList(
     modifier: Modifier = Modifier,
@@ -63,7 +54,7 @@ fun SkeletonList(
                     }
                 }
                 if (index != itemCount - 1) {
-                    Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.extendedColors.strip)
                 }
             }
         }

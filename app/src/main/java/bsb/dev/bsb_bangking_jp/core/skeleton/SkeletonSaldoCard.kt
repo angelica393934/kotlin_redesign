@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.components.skeleton
+package bsb.dev.bsb_bangking_jp.core.skeleton
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,12 +11,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 
 /** Setara `SkeletonSaldoCard` di Flutter: card saldo dengan rekening, nilai besar, dan footer. */
 @Composable
@@ -62,7 +63,7 @@ fun SkeletonSaldoCard(modifier: Modifier = Modifier) {
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+            HorizontalDivider(thickness = 1.dp, color =  MaterialTheme.extendedColors.strip)
             Spacer(modifier = Modifier.height(8.dp))
 
             // Footer: klasifikasi + tombol "Rekening Lainnya"

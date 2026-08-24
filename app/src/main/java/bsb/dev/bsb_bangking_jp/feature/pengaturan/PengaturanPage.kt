@@ -49,7 +49,7 @@ import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.AccountProfileCard
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingItemData
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingSection
 import org.koin.compose.koinInject
-import bsb.dev.bsb_bangking_jp.core.components.skeleton.ProfileSettingSkeleton
+import bsb.dev.bsb_bangking_jp.core.skeleton.ProfileSettingSkeleton
 
 private val HeaderHeight = 100.dp
 private val ProfileCardHalfHeight = 44.dp

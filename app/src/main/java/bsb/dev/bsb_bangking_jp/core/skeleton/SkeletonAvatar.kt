@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.components.skeleton
+package bsb.dev.bsb_bangking_jp.core.skeleton
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
