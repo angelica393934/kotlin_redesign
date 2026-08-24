@@ -11,11 +11,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.*
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferInquiry
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferNavEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferInquiry
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferUiEvent
 
 @Composable
 fun DetailRekeningBaruModal(
@@ -46,7 +47,7 @@ fun DetailRekeningBaruModal(
     }
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
-            if (event is bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferUiEvent.ShowToastError) {
+            if (event is TransferUiEvent.ShowToastError) {
                 toastState.showError(event.message)
             }
         }

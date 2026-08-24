@@ -1,8 +1,9 @@
 // feature/transfer/presentation/TransferContract.kt
-package bsb.dev.bsb_bangking_jp.feature.transfer.presentation
+package bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer
 
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferInquiry
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferPurpose
+import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferInquiry
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferPurpose
 
 data class TransferUiState(
     val isInquiryLoading: Boolean = false,
@@ -25,7 +26,7 @@ sealed class TransferNavEvent {
     object RecipientSaved : TransferNavEvent()
     object TransferSubmitted : TransferNavEvent() // lanjut ke halaman PIN
     data class ConfirmSuccess(
-        val result: bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult,
+        val result: ConfirmTransferResult,
     ) : TransferNavEvent()
 }
 

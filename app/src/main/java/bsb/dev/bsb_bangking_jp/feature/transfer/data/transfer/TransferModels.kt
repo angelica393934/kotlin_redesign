@@ -1,11 +1,11 @@
-package bsb.dev.bsb_bangking_jp.feature.transfer.data
+package bsb.dev.bsb_bangking_jp.feature.transfer.data.transfer
 
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferAdminFee
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferInquiry
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferPurpose
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferResult
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferResultBeneficiary
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferAdminFee
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferInquiry
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferPurpose
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferResult
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferResultBeneficiary
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.Date

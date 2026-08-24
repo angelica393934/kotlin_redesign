@@ -8,8 +8,8 @@ import bsb.dev.bsb_bangking_jp.core.component.InputPinPage
 import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PeriksaKembaliData
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferNavEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
 import org.koin.compose.koinInject
 
 @Composable

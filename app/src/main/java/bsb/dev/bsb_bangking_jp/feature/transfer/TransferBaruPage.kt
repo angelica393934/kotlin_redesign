@@ -30,10 +30,10 @@ import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.DetailRekeningBaruModal
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PilihBankSheet
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferInquiry
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferNavEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferUiEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferInquiry
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
 import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.daftar_bank.DaftarBankViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

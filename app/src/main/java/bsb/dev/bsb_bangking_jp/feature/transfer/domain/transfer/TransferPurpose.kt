@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.transfer.domain
+package bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer
 
 /** Padanan item hasil GET /v1/gettransferpurpose. */
 data class TransferPurpose(

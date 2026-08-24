@@ -15,8 +15,8 @@ import bsb.dev.bsb_bangking_jp.MainActivity
 import bsb.dev.bsb_bangking_jp.R
 
 /**
- * Helper notifikasi lokal (bukan push/FCM) dengan suara custom -- padanan
- * "notifikasi transaksi berhasil" yang muncul di aplikasi bank sungguhan
+ * Helper notifikasi lokal (bukan push/FCM)  -- padanan
+ * "notifikasi transaksi berhasil" yang muncul di aplikasi bank
  * setelah transfer sukses.
  */
 object NotificationHelper {

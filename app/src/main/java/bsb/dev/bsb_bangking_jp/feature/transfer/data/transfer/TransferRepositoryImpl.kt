@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.transfer.data
+package bsb.dev.bsb_bangking_jp.feature.transfer.data.transfer
 
 import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
@@ -9,11 +9,11 @@ import bsb.dev.bsb_bangking_jp.core.network.NetworkErrorMapper
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferInquiry
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferPurpose
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferRepository
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferRequestPayload
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferResult
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferInquiry
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferPurpose
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferRepository
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferRequestPayload
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferResult
 
 private const val SUCCESS_CODE = "0000"
 

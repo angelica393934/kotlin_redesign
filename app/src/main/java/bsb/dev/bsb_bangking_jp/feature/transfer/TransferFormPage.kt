@@ -56,10 +56,10 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.component.PilihBulanTahunSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PilihHariSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.RekeningSumberCard
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.RekeningSumberUiState
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferRequestPayload
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferNavEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferUiEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferRequestPayload
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
 import bsb.dev.bsb_bangking_jp.feature.transfer.util.TransferMapper
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject

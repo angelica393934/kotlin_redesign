@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.transfer.domain
+package bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer
 
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
 
@@ -10,7 +10,7 @@ interface TransferRepository {
     suspend fun getTransferPurpose(): Result<List<TransferPurpose>>
 }
 
-/** Padanan parameter TransferEvent.transfer() di Flutter, dikumpulkan jadi satu payload. */
+/** Padanan parameter TransferEvent.transfer(), dikumpulkan jadi satu payload. */
 data class TransferRequestPayload(
     val sourceAccountNo: String,
     val amount: Double,

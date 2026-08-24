@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.transfer.domain
+package bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer
 
 /** Padanan TransferInquiryModel di Flutter -- hasil dari getaccountdest. */
 data class TransferInquiry(

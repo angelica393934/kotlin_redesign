@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.transfer.data
+package bsb.dev.bsb_bangking_jp.feature.transfer.data.transfer
 
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
 import retrofit2.Response

@@ -7,10 +7,10 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.data.daftar_bank.DaftarBankRepos
 import bsb.dev.bsb_bangking_jp.feature.transfer.domain.daftar_bank.DaftarBankRepository
 import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.daftar_bank.DaftarBankViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
-import bsb.dev.bsb_bangking_jp.feature.transfer.data.TransferApiService
-import bsb.dev.bsb_bangking_jp.feature.transfer.data.TransferRepositoryImpl
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.TransferRepository
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.data.transfer.TransferApiService
+import bsb.dev.bsb_bangking_jp.feature.transfer.data.transfer.TransferRepositoryImpl
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferRepository
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
