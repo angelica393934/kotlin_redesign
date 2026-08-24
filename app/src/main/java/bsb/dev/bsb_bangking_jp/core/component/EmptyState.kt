@@ -1,11 +1,14 @@
 package bsb.dev.bsb_bangking_jp.core.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Image
 import bsb.dev.bsb_bangking_jp.R
 
 @Composable
@@ -28,15 +30,16 @@ fun EmptyState(
     message: String = "Tidak ada hasil yang sesuai.",
     subMessage: String = "Gunakan kata kunci atau filter berbeda.",
     actionText: String? = "Coba Lagi",
+    smallWidth: Boolean = true,
     onAction: (() -> Unit)? = null,
 ) {
     BoxWithConstraints(
         modifier = modifier.fillMaxSize()
     ) {
-        // 🔥 AUTO DETECT COMPACT
+        // AUTO DETECT COMPACT
         val isCompact = maxHeight < 500.dp
 
-        val imageSize = if (isCompact) 800.dp else 720.dp
+        val imageSize = if (isCompact) 150.dp else 180.dp
         val spacingLarge = if (isCompact) 8.dp else 10.dp
         val spacingSmall = if (isCompact) 3.dp else 5.dp
 
@@ -52,8 +55,6 @@ fun EmptyState(
             MaterialTheme.typography.bodyMedium
         }
 
-        val buttonFullWidth = !isCompact
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -64,14 +65,15 @@ fun EmptyState(
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.not_found), // hasil convert svg -> vector
+                painter = painterResource(id = R.drawable.not_found),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-
-                modifier = Modifier.width(imageSize)
+                modifier = Modifier.size(imageSize)
             )
 
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(top = spacingLarge))
+            Spacer(
+                modifier = Modifier.padding(top = spacingLarge)
+            )
 
             Text(
                 text = message,
@@ -80,7 +82,9 @@ fun EmptyState(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(top = spacingSmall))
+            Spacer(
+                modifier = Modifier.padding(top = spacingSmall)
+            )
 
             Text(
                 text = subMessage,
@@ -89,13 +93,16 @@ fun EmptyState(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 🔥 BUTTON OPTIONAL
+            // BUTTON OPTIONAL
             if (onAction != null && actionText != null) {
-                androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(top = spacingLarge))
+                Spacer(
+                    modifier = Modifier.padding(top = spacingLarge)
+                )
+
                 AppButton(
                     text = actionText,
                     onClick = onAction,
-                    smallWidth = buttonFullWidth,
+                    smallWidth = smallWidth,
                 )
             }
         }

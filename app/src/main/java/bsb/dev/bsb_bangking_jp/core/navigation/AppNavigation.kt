@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +58,9 @@ import bsb.dev.bsb_bangking_jp.feature.login_existing.presentation.LoginExisting
 import androidx.compose.ui.platform.LocalContext
 import bsb.dev.bsb_bangking_jp.core.component.formatRupiah
 import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
+import org.koin.compose.koinInject
 
 private const val BSB_BANK_NAME = "Bank Sumsel Babel"
 
@@ -275,11 +279,22 @@ fun AppNavigation(
                 }
 
                 composable("transfer_home") {
+                    val transferViewModel: TransferViewModel = koinInject()
+
+                    LaunchedEffect(Unit) {
+                        transferViewModel.navEvent.collect { event ->
+                            if (event is TransferNavEvent.ToDetailRekening) {
+                                // arahkan sesuai isOnUs, sama seperti alur transfer_baru
+                            }
+                        }
+                    }
+
                     TransferHomePage(
                         navController = navController,
                         onBackClick = { navController.popBackStack() },
-                        onTransferSekarang = {
-                            navController.navigate("transfer_baru")
+                        onTransferSekarang = { navController.navigate("transfer_baru") },
+                        onLastTransferTap = { item ->
+                            transferViewModel.getAccountDest(code = item.bankCode, accountNumber = item.accountDestination)
                         },
                     )
                 }

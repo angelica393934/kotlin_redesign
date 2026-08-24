@@ -10,6 +10,8 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningLainnyaRepositoryImp
 import bsb.dev.bsb_bangking_jp.feature.beranda.domain.ProfileRepository
 import bsb.dev.bsb_bangking_jp.feature.beranda.domain.RekeningLainnyaRepository
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.last_transfer.LastTransferRepository
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.saved_recipient.SavedRecipientRepository
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
@@ -24,7 +26,10 @@ val BerandaModule = module {
             repositories = listOf(
                 get<ProfileRepository>() as ClearableRepository,
                 get<RekeningLainnyaRepository>() as ClearableRepository,
-                get<ActivityHistoryRepository>() as ClearableRepository,)
+                get<ActivityHistoryRepository>() as ClearableRepository,
+                get<LastTransferRepository>() as ClearableRepository,
+                get<SavedRecipientRepository>() as ClearableRepository,
+                )
         )
     }
 

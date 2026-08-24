@@ -1,0 +1,228 @@
+package bsb.dev.bsb_bangking_jp.feature.transfer.component
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import bsb.dev.bsb_bangking_jp.core.component.AccountTile
+import bsb.dev.bsb_bangking_jp.core.component.AppButton
+import bsb.dev.bsb_bangking_jp.core.component.AppModalBottomSheet
+import bsb.dev.bsb_bangking_jp.core.component.AppTextField
+import bsb.dev.bsb_bangking_jp.core.component.BottomSheetIndicator
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.saved_recipient.SavedRecipientItem
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UbahAliasSheet(
+    item: SavedRecipientItem,
+    viewModel: SavedRecipientViewModel,
+    onDismiss: () -> Unit,
+) {
+    var alias by remember(item.id) {
+        mutableStateOf(item.alias)
+    }
+
+    var localError by remember(item.id) {
+        mutableStateOf<String?>(null)
+    }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // ============================================================
+    // UPDATE SUCCESS
+    // ============================================================
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is SavedRecipientUiEvent.AliasUpdated) {
+                onDismiss()
+            }
+        }
+    }
+
+    AppModalBottomSheet(
+        onDismissRequest = onDismiss,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(
+                    start = 24.dp,
+                    end = 24.dp,
+                    top = 16.dp,
+                    bottom = 20.dp,
+                ),
+        ) {
+
+            // ====================================================
+            // INDICATOR
+            // ====================================================
+
+            BottomSheetIndicator()
+
+            Spacer(
+                modifier = Modifier.height(20.dp)
+            )
+
+            // ====================================================
+            // PEMILIK REKENING
+            // ====================================================
+
+            Text(
+                text = "Pemilik Rekening",
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Spacer(
+                modifier = Modifier.height(15.dp)
+            )
+
+            // ====================================================
+            // ACCOUNT INFO
+            // ====================================================
+
+            AccountTile(
+                initials = item.alias,
+                nama = item.alias,
+                bank = item.bankName,
+                accountNumber = item.accountNumber,
+            )
+
+            Spacer(
+                modifier = Modifier.height(15.dp)
+            )
+
+            // ====================================================
+            // DIVIDER
+            // ====================================================
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+
+            Spacer(
+                modifier = Modifier.height(15.dp)
+            )
+
+            // ====================================================
+            // TITLE
+            // ====================================================
+
+            Text(
+                text = "Ubah Nama Alias",
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Spacer(
+                modifier = Modifier.height(6.dp)
+            )
+
+            Text(
+                text = "Perbarui nama rekening agar mudah dikenali saat melakukan transfer.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            // ====================================================
+            // INPUT ALIAS
+            // ====================================================
+
+            val error = localError ?: uiState.updateError
+
+            AppTextField(
+                value = alias,
+                onValueChange = { value ->
+                    alias = value
+
+                    if (value.isNotEmpty()) {
+                        localError = null
+                        viewModel.clearUpdateError()
+                    }
+                },
+                labelText = "Nama Alias",
+                hintText = "Masukkan Nama Alias",
+                icon = Icons.Default.Person,
+                errorText = error,
+                showError = error != null,
+            )
+
+            Spacer(
+                modifier = Modifier.height(24.dp)
+            )
+
+            // ====================================================
+            // BUTTON SIMPAN
+            // ====================================================
+
+            AppButton(
+                text = if (uiState.isUpdating) {
+                    "Menyimpan..."
+                } else {
+                    "Simpan"
+                },
+                enabled = alias.isNotBlank() && !uiState.isUpdating,
+                onClick = {
+
+                    val value = alias.trim()
+
+                    // -------------------------------
+                    // Alias kosong
+                    // -------------------------------
+
+                    if (value.isEmpty()) {
+                        localError = "Nama alias tidak boleh kosong"
+                        return@AppButton
+                    }
+
+                    // -------------------------------
+                    // Alias tidak berubah
+                    // -------------------------------
+
+                    if (value == item.alias) {
+                        localError = "Nama alias tidak berubah"
+                        return@AppButton
+                    }
+
+                    // -------------------------------
+                    // Update
+                    // -------------------------------
+
+                    localError = null
+                    viewModel.updateAlias(
+                        item.id,
+                        value,
+                    )
+                },
+            )
+
+            Spacer(
+                modifier = Modifier.height(10.dp)
+            )
+        }
+    }
+}

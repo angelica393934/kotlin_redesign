@@ -32,10 +32,19 @@ import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.component.SearchTextField
 import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyLastTransfer
 import bsb.dev.bsb_bangking_jp.core.dummy.DummySavedRecipient
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.core.util.InitialName
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
+import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonList
+import bsb.dev.bsb_bangking_jp.feature.transfer.component.UbahAliasSheet
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.last_transfer.LastTransferItem
+import bsb.dev.bsb_bangking_jp.feature.transfer.domain.saved_recipient.SavedRecipientItem
+import org.koin.androidx.compose.koinViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.last_transfer.LastTransferUiState
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.last_transfer.LastTransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientViewModel
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -44,22 +53,41 @@ fun TransferHomePage(
     onBackClick: () -> Unit = {},
     onTransferSekarang: () -> Unit = {},
     onAturTerjadwalClick: () -> Unit = {},
-    onSavedRecipientTap: (DummySavedRecipient) -> Unit = {},
-    onLastTransferTap: (DummyLastTransfer) -> Unit = {},
-    onEditAlias: (DummySavedRecipient) -> Unit = {},
+    onSavedRecipientTap: (SavedRecipientItem) -> Unit = {},
+    onLastTransferTap: (LastTransferItem) -> Unit = {},
+    savedRecipientViewModel: SavedRecipientViewModel = koinViewModel(),
+    lastTransferViewModel: LastTransferViewModel = koinViewModel(),
 ) {
     var showRecent by remember { mutableStateOf(true) }
     var isDeleteMode by remember { mutableStateOf(false) }
     val selectedAccounts = remember { mutableStateListOf<String>() }
     var query by remember { mutableStateOf("") }
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var editingItem by remember { mutableStateOf<SavedRecipientItem?>(null) }
 
-    val lastTransferList = DummyData.lastTransferList
-    val savedRecipientList = remember(query) {
-        DummyData.savedRecipientList.filter {
+    val lastTransferState by lastTransferViewModel.uiState.collectAsStateWithLifecycle()
+
+    val savedState by savedRecipientViewModel.uiState.collectAsStateWithLifecycle()
+    val toastState = LocalToastState.current
+    LaunchedEffect(Unit) {
+        lastTransferViewModel.load()
+    }
+
+    val filteredSavedRecipients = remember(query, savedState.list) {
+        savedState.list?.filter {
             it.alias.contains(query, ignoreCase = true) ||
                     it.bankName.contains(query, ignoreCase = true) ||
                     it.accountNumber.contains(query)
+        } ?: emptyList()
+    }
+
+    LaunchedEffect(Unit) {
+        savedRecipientViewModel.uiEvent.collect { event ->
+            when (event) {
+                is SavedRecipientUiEvent.ShowToastSuccess -> toastState.showSuccess(event.message)
+                is SavedRecipientUiEvent.ShowToastError -> toastState.showError(event.message)
+                else -> Unit
+            }
         }
     }
 
@@ -184,63 +212,95 @@ fun TransferHomePage(
 
             Box(modifier = Modifier.weight(1f)) {
                 if (showRecent) {
-                    if (lastTransferList.isEmpty()) {
-                        EmptyState(
-                            message = "Belum ada riwayat transfer.",
-                            subMessage = "Data transfer terakhir akan ditampilkan setelah Anda melakukan transaksi.",
-                            actionText = null,
-                        )
-                    } else {
-                        LazyColumn {
-                            items(lastTransferList, key = { it.id }) { item ->
-                                    Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)){
-                                    AccountTile(
-                                        initials = item.nama,
-                                        nama = item.nama,
-                                        bank = item.bank,
-                                        accountNumber = item.accountNumber,
-                                        onTap = { onLastTransferTap(item) },
-                                    )
+                    when (val state = lastTransferState) {
+                        is LastTransferUiState.Initial,
+                        is LastTransferUiState.Loading -> {
+                            SkeletonList(itemCount = 5, showDateHeader = false)
+                        }
+
+                        is LastTransferUiState.Error -> {
+                            EmptyState(
+                                message = "Gagal memuat data transfer terakhir.",
+                                subMessage = "Terjadi kesalahan saat mengambil data.\nPeriksa koneksi anda dan coba lagi.",
+                                actionText = "Coba Lagi",
+                                onAction = { lastTransferViewModel.retry() },
+                            )
+                        }
+
+                        is LastTransferUiState.Success -> {
+                            if (state.items.isEmpty()) {
+                                EmptyState(
+                                    message = "Belum ada riwayat transfer.",
+                                    subMessage = "Data transfer terakhir akan ditampilkan setelah Anda melakukan transaksi.",
+                                    actionText = null,
+                                )
+                            } else {
+                                LazyColumn {
+                                    items(state.items, key = { it.accountDestination }) { item ->
+                                        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
+                                            AccountTile(
+                                                initials = item.accountDestinationName,
+                                                nama = item.accountDestinationName,
+                                                bank = item.bankName,
+                                                accountNumber = item.accountDestination,
+                                                onTap = { onLastTransferTap(item) },
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                } else {
-                    if (savedRecipientList.isEmpty()) {
-                        EmptyState(
-                            message = "Belum ada rekening tersimpan.",
-                            subMessage = "Tambahkan rekening tersimpan untuk mempermudah transfer berikutnya.",
-                            actionText = null,
-                        )
-                    } else {
-                        LazyColumn {
-                            items(savedRecipientList, key = { it.id }) { item ->
-                                val isSelected = selectedAccounts.contains(item.id)
-                                Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
-                                    AccountTile(
-                                        initials = item.alias,
-                                        nama = item.alias,
-                                        bank = item.bankName,
-                                        accountNumber = item.accountNumber,
-                                        isSelected = isSelected,
-                                        showCheckbox = isDeleteMode,
-                                        checkboxValue = isSelected,
-                                        onCheckboxChanged = { checked ->
-                                            if (checked) selectedAccounts.add(item.id)
-                                            else selectedAccounts.remove(item.id)
-                                        },
-                                        onTap = {
-                                            if (isDeleteMode) {
-                                                if (isSelected) selectedAccounts.remove(item.id)
-                                                else selectedAccounts.add(item.id)
-                                            } else {
-                                                onSavedRecipientTap(item)
-                                            }
-                                        },
-                                        onEdit = if (!isDeleteMode) {
-                                            { onEditAlias(item) }
-                                        } else null,
-                                    )
+                }else {
+                    when {
+                        savedState.isLoading && savedState.list == null -> {
+                            SkeletonList(itemCount = 5, showDateHeader = false)
+                        }
+                        savedState.error != null && savedState.list == null -> {
+                            EmptyState(
+                                message = "Gagal memuat daftar rekening tersimpan.",
+                                subMessage = "Terjadi kesalahan saat mengambil data.\nPeriksa koneksi Anda dan coba lagi.",
+                                actionText = "Coba Lagi",
+                                onAction = { savedRecipientViewModel.getSavedRecipients() },
+                            )
+                        }
+                        filteredSavedRecipients.isEmpty() -> {
+                            EmptyState(
+                                message = "Belum ada rekening tersimpan.",
+                                subMessage = "Tambahkan rekening tersimpan untuk mempermudah transfer berikutnya.",
+                                actionText = null,
+                            )
+                        }
+                        else -> {
+                            LazyColumn {
+                                items(filteredSavedRecipients, key = { it.id }) { item ->
+                                    val isSelected = selectedAccounts.contains(item.id)
+                                    Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
+                                        AccountTile(
+                                            initials = item.alias,
+                                            nama = item.alias,
+                                            bank = item.bankName,
+                                            accountNumber = item.accountNumber,
+                                            isSelected = isSelected,
+                                            showCheckbox = isDeleteMode,
+                                            checkboxValue = isSelected,
+                                            onCheckboxChanged = { checked ->
+                                                if (checked) selectedAccounts.add(item.id)
+                                                else selectedAccounts.remove(item.id)
+                                            },
+                                            onTap = {
+                                                if (isDeleteMode) {
+                                                    if (isSelected) selectedAccounts.remove(item.id)
+                                                    else selectedAccounts.add(item.id)
+                                                } else {
+                                                    onSavedRecipientTap(item)
+                                                }
+                                            },
+                                            onEdit = if (!isDeleteMode) {
+                                                { editingItem = item }
+                                            } else null,
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -284,8 +344,7 @@ fun TransferHomePage(
                         textColor = MaterialTheme.extendedColors.onDanger,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            // TODO: panggil use case/ViewModel untuk hapus DummyData.savedRecipientList
-                            // berdasarkan selectedAccounts, lalu refresh list.
+                            savedRecipientViewModel.deleteSavedRecipients(selectedAccounts.toList())
                             selectedAccounts.clear()
                             isDeleteMode = false
                             showDeleteConfirm = false
@@ -295,6 +354,15 @@ fun TransferHomePage(
             }
         }
     }
+    // Sheet ubah alias
+    editingItem?.let { item ->
+        UbahAliasSheet(
+            item = item,
+            viewModel = savedRecipientViewModel,
+            onDismiss = { editingItem = null },
+        )
+    }
+
 }
 
 @Composable
