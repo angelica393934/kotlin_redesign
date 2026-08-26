@@ -22,7 +22,7 @@ class LastTransferRepositoryImpl(
         if (!forceRefresh && cache != null) {
             return cache!!
         }
-        val fresh = retry(maxAttempt = 3) { fetchLastTransfer() }
+        val fresh = retry { fetchLastTransfer() }
         cache = fresh
         return fresh
     }

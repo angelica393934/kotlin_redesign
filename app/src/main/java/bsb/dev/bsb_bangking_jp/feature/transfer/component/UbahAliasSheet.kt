@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -25,7 +24,9 @@ import bsb.dev.bsb_bangking_jp.core.component.AccountTile
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.AppModalBottomSheet
 import bsb.dev.bsb_bangking_jp.core.component.AppTextField
-import bsb.dev.bsb_bangking_jp.core.component.BottomSheetIndicator
+import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
+import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
+import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.feature.transfer.domain.saved_recipient.SavedRecipientItem
 import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientUiEvent
 import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientViewModel
@@ -46,6 +47,14 @@ fun UbahAliasSheet(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val loadingOverlay = LocalLoadingOverlay.current
+    val toastState = LocalToastState.current
+
+// 🔹 Loading overlay mengikuti proses inquiry (getAccountDest).
+    LaunchedEffect(uiState.isUpdating) {
+        if (uiState.isUpdating) loadingOverlay.show() else loadingOverlay.hide()
+    }
+
 
     // ============================================================
     // UPDATE SUCCESS
@@ -66,23 +75,7 @@ fun UbahAliasSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(
-                    start = 24.dp,
-                    end = 24.dp,
-                    top = 16.dp,
-                    bottom = 20.dp,
-                ),
         ) {
-
-            // ====================================================
-            // INDICATOR
-            // ====================================================
-
-            BottomSheetIndicator()
-
-            Spacer(
-                modifier = Modifier.height(20.dp)
-            )
 
             // ====================================================
             // PEMILIK REKENING
@@ -109,7 +102,7 @@ fun UbahAliasSheet(
             )
 
             Spacer(
-                modifier = Modifier.height(15.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             // ====================================================
@@ -118,11 +111,11 @@ fun UbahAliasSheet(
 
             HorizontalDivider(
                 thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant,
+                color = MaterialTheme.extendedColors.strip,
             )
 
             Spacer(
-                modifier = Modifier.height(15.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             // ====================================================
@@ -141,11 +134,11 @@ fun UbahAliasSheet(
             Text(
                 text = "Perbarui nama rekening agar mudah dikenali saat melakukan transfer.",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.extendedColors.cardBackground,
             )
 
             Spacer(
-                modifier = Modifier.height(16.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             // ====================================================
@@ -164,7 +157,6 @@ fun UbahAliasSheet(
                         viewModel.clearUpdateError()
                     }
                 },
-                labelText = "Nama Alias",
                 hintText = "Masukkan Nama Alias",
                 icon = Icons.Default.Person,
                 errorText = error,
@@ -172,7 +164,7 @@ fun UbahAliasSheet(
             )
 
             Spacer(
-                modifier = Modifier.height(24.dp)
+                modifier = Modifier.height(15.dp)
             )
 
             // ====================================================
@@ -180,12 +172,7 @@ fun UbahAliasSheet(
             // ====================================================
 
             AppButton(
-                text = if (uiState.isUpdating) {
-                    "Menyimpan..."
-                } else {
-                    "Simpan"
-                },
-                enabled = alias.isNotBlank() && !uiState.isUpdating,
+                text = "Simpan",
                 onClick = {
 
                     val value = alias.trim()
@@ -218,10 +205,6 @@ fun UbahAliasSheet(
                         value,
                     )
                 },
-            )
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
             )
         }
     }

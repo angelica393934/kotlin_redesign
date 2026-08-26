@@ -32,7 +32,7 @@ class SavedRecipientRepositoryImpl(
         }
         // 🔹 Padanan Flutter "NO RETRY" cuma untuk get pertama kali dari Bloc,
         // tapi di layer repository kita tetap pakai retry (konsisten dgn repo lain di project ini).
-        val fresh = retry(maxAttempt = 3) { fetchSavedRecipients() }
+        val fresh = retry { fetchSavedRecipients() }
         cache = fresh
         return fresh
     }

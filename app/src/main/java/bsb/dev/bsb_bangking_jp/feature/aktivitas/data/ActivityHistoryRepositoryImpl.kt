@@ -27,7 +27,7 @@ class ActivityHistoryRepositoryImpl(
         filter: ActivityFilterPayload,
     ): List<HistoryItem> {
         reset()
-        val fresh = retry(maxAttempt = 3) { fetchHistory(accountNumber, filter) }
+        val fresh = retry { fetchHistory(accountNumber, filter) }
         _items.addAll(fresh)
         _hasMore = fresh.size == LIMIT
         offset += LIMIT

@@ -29,7 +29,7 @@ class RekeningLainnyaRepositoryImpl(
         if (!forceRefresh && cache != null) {
             return cache!!
         }
-        val fresh = retry(maxAttempt = 3) { fetchAccountSourceProfile() }
+        val fresh = retry { fetchAccountSourceProfile() }
         cache = fresh
         return fresh
     }

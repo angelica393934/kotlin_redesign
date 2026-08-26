@@ -7,10 +7,8 @@ data class SavedRecipientUiState(
     val isRefreshing: Boolean = false,
     val list: List<SavedRecipientItem>? = null,
     val error: String? = null,
-
     val isUpdating: Boolean = false,
     val updateError: String? = null,
-
     val isDeleting: Boolean = false,
 )
 

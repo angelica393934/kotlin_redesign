@@ -33,6 +33,7 @@ class BsbApplication : Application() {
                 BerandaModule,
                 aktivitasModule,
                 transferModule,
+
                 // tambahkan module fitur lain di sini
             )
         }

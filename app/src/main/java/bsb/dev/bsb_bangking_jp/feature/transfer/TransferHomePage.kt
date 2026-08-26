@@ -37,6 +37,7 @@ import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonList
+import bsb.dev.bsb_bangking_jp.feature.transfer.component.DeleteConfirmSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.UbahAliasSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.domain.last_transfer.LastTransferItem
 import bsb.dev.bsb_bangking_jp.feature.transfer.domain.saved_recipient.SavedRecipientItem
@@ -309,50 +310,22 @@ fun TransferHomePage(
             }
         }
     }
-
-    // Konfirmasi hapus rekening terpilih (padanan CustomModalConfirm di Flutter)
+    //sheet hapus
     if (showDeleteConfirm) {
-        val sheetState = rememberModalBottomSheetState()
-        ModalBottomSheet(
-            onDismissRequest = { showDeleteConfirm = false },
-            sheetState = sheetState,
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Text(
-                    text = "Hapus Rekening Terpilih?",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+        DeleteConfirmSheet(
+            onDismiss = {
+                showDeleteConfirm = false
+            },
+            onConfirm = {
+                savedRecipientViewModel.deleteSavedRecipients(
+                    selectedAccounts.toList()
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Rekening yang dihapus akan hilang dari daftar tersimpan dan tidak dapat dipulihkan. Lanjutkan menghapus rekening ini?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.extendedColors.textSecondary,
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Row {
-                    AppButton(
-                        text = "Batal",
-                        outlined = true,
-                        modifier = Modifier.weight(1f),
-                        onClick = { showDeleteConfirm = false },
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    AppButton(
-                        text = "Hapus",
-                        backgroundColor = MaterialTheme.extendedColors.danger,
-                        textColor = MaterialTheme.extendedColors.onDanger,
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            savedRecipientViewModel.deleteSavedRecipients(selectedAccounts.toList())
-                            selectedAccounts.clear()
-                            isDeleteMode = false
-                            showDeleteConfirm = false
-                        },
-                    )
-                }
+
+                selectedAccounts.clear()
+                isDeleteMode = false
+                showDeleteConfirm = false
             }
-        }
+        )
     }
     // Sheet ubah alias
     editingItem?.let { item ->

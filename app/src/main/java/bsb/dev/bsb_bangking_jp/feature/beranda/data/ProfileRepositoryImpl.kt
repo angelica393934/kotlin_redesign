@@ -28,7 +28,7 @@ class ProfileRepositoryImpl(
         if (!forceRefresh && cache != null) {
             return cache!!
         }
-        val fresh = retry(maxAttempt = 3) { fetchProfile() }
+        val fresh = retry { fetchProfile() }
         cache = fresh
         return fresh
     }

@@ -38,7 +38,7 @@ class DaftarBankRepositoryImpl(
             }
         }
 
-        val fresh = retry(maxAttempt = 3) { fetchDaftarBank() }
+        val fresh = retry { fetchDaftarBank() }
         memoryCache = fresh
         localStore.save(fresh)
         return fresh
