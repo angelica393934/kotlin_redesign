@@ -164,11 +164,8 @@ fun BerandaPage(
                         }
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    uiState.bannerList?.forEach { banner ->
-                        key(banner.name) { // atau id unik lain
-                            BannerKeamanan(title = banner.name.ifBlank { null }, desc = banner.description)
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
+                    uiState.bannerList?.let { banners ->
+                        BannerKeamanan(banners = banners) // persistKey default "beranda_pemberitahuan"
                     }
 
                     Spacer(modifier = Modifier.height(15.dp))

@@ -4,6 +4,7 @@ import android.app.Application
 import bsb.dev.bsb_bangking_jp.core.device.DeviceContext
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.device.deviceModule
+import bsb.dev.bsb_bangking_jp.core.get_image.imageModule
 import bsb.dev.bsb_bangking_jp.core.network.networkModule
 import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.aktivitasModule
@@ -33,6 +34,7 @@ class BsbApplication : Application() {
                 BerandaModule,
                 aktivitasModule,
                 transferModule,
+                imageModule,
 
                 // tambahkan module fitur lain di sini
             )
