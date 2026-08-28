@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
 import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
 import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.cashBalanceValue
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.cashBalanceValue
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.SaldoCardBase
 
 /**

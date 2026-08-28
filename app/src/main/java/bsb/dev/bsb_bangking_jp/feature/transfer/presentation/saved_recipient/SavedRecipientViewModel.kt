@@ -70,6 +70,7 @@ class SavedRecipientViewModel(
                 .onFailure { error ->
                     val message = (error as? ApiException)?.respMessage ?: error.message ?: "Gagal mengubah alias."
                     _uiState.update { it.copy(isUpdating = false, updateError = message) }
+                    _uiEvent.emit(SavedRecipientUiEvent.ShowToastError(message)) // 🔹 baru
                 }
         }
     }

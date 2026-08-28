@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.beranda.data
+package bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya
 
 import com.google.gson.annotations.SerializedName
 

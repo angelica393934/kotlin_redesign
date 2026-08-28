@@ -2,8 +2,9 @@ package bsb.dev.bsb_bangking_jp.feature.beranda.presentation
 
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
 import bsb.dev.bsb_bangking_jp.core.session.SessionClearer
-import bsb.dev.bsb_bangking_jp.feature.beranda.domain.ProfileRepository
+import bsb.dev.bsb_bangking_jp.feature.beranda.domain.profile.ProfileRepository
 import bsb.dev.bsb_bangking_jp.feature.beranda.domain.RekeningLainnyaRepository
+import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.GetBannerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,6 +21,7 @@ class BerandaViewModel(
     private val profileRepository: ProfileRepository,
     private val rekeningRepository: RekeningLainnyaRepository,
     private val sessionClearer: SessionClearer,
+    private val bannerRepository: GetBannerRepository,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
@@ -83,6 +85,32 @@ class BerandaViewModel(
         }
     }
 
+    /** 🔹 Padanan `GetBannerBloc._onFetchBanner`. Tidak fetch ulang kalau sudah pernah sukses, kecuali forceRefresh. */
+    fun loadBanner(forceRefresh: Boolean = false) {
+        scope.launch {
+            if (!forceRefresh && bannerRepository.hasData) {
+                _uiState.update {
+                    it.copy(isBannerLoading = false, bannerList = bannerRepository.cachedBanners, bannerError = null)
+                }
+                return@launch
+            }
+
+            _uiState.update { it.copy(isBannerLoading = true, bannerError = null) }
+            try {
+                val result = bannerRepository.getBanner(forceRefresh)
+                _uiState.update { it.copy(isBannerLoading = false, bannerList = result, bannerError = null) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isBannerLoading = false,
+                        bannerError = (e as? ApiException)?.respMessage ?: e.message ?: "Gagal memuat banner",
+                    )
+                }
+            }
+        }
+    }
+
+
     // 🔹 INI YANG HILANG -- pastikan method ini ada di file-mu
     fun setPrimaryAccount(accountNumber: String) {
         scope.launch {
@@ -105,6 +133,7 @@ class BerandaViewModel(
     fun refreshAll() {
         loadProfile(forceRefresh = true)
         loadRekeningLainnya(forceRefresh = true)
+        loadBanner(forceRefresh = true)
     }
 
     fun logout() {

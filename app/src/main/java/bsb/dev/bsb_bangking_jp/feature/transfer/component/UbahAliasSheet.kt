@@ -49,12 +49,12 @@ fun UbahAliasSheet(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val loadingOverlay = LocalLoadingOverlay.current
     val toastState = LocalToastState.current
-
-// 🔹 Loading overlay mengikuti proses inquiry (getAccountDest).
+// 🔹 Cuma SHOW di sini. HIDE sengaja dipindah ke handler event di bawah,
+    // supaya urutannya pasti: overlay tertutup dulu, baru sheet dismiss --
+    // tidak bergantung pada dua LaunchedEffect terpisah yang bisa beda timing.
     LaunchedEffect(uiState.isUpdating) {
-        if (uiState.isUpdating) loadingOverlay.show() else loadingOverlay.hide()
+        if (uiState.isUpdating) loadingOverlay.show()
     }
-
 
     // ============================================================
     // UPDATE SUCCESS
@@ -62,8 +62,17 @@ fun UbahAliasSheet(
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
-            if (event is SavedRecipientUiEvent.AliasUpdated) {
-                onDismiss()
+            when (event) {
+                is SavedRecipientUiEvent.AliasUpdated -> {
+                    loadingOverlay.hide() // tutup overlay dulu...
+                    onDismiss()           // ...baru tutup sheet
+                }
+                is SavedRecipientUiEvent.ShowToastError -> {
+                    loadingOverlay.hide() // gagal -> overlay tetap harus ditutup
+                    // toast-nya sendiri sudah ditampilkan oleh collector global
+                    // di TransferHomePage (lihat poin 3), jadi tidak perlu diulang di sini.
+                }
+                else -> Unit
             }
         }
     }

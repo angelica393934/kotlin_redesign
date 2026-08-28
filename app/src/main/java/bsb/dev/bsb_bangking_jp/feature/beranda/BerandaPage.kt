@@ -21,6 +21,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,8 +74,12 @@ fun BerandaPage(
 
     LaunchedEffect(Unit) {
         berandaViewModel.loadRekeningLainnya()
+        berandaViewModel.loadBanner()
     }
 
+    LaunchedEffect(uiState.bannerError) {
+        uiState.bannerError?.let { toastState.showError(it) }
+    }
     LaunchedEffect(uiState.profileError) {
         uiState.profileError?.let { toastState.showError(it) }
     }
@@ -159,8 +164,11 @@ fun BerandaPage(
                         }
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    DummyData.bannerList.firstOrNull()?.let { banner ->
-                        BannerKeamanan(desc = banner.message)
+                    uiState.bannerList?.forEach { banner ->
+                        key(banner.name) { // atau id unik lain
+                            BannerKeamanan(title = banner.name.ifBlank { null }, desc = banner.description)
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(15.dp))

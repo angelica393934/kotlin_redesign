@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.beranda.data
+package bsb.dev.bsb_bangking_jp.feature.beranda.data.get_banner
 
 import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
@@ -10,39 +10,52 @@ import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
 import bsb.dev.bsb_bangking_jp.core.session.ClearableRepository
 import bsb.dev.bsb_bangking_jp.core.util.retry
-import bsb.dev.bsb_bangking_jp.feature.beranda.domain.ProfileRepository
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.BerandaApiService
+import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.BannerItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.GetBannerRepository
+import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.isBanner
 
 private const val SUCCESS_CODE = "0000"
+private const val TTL_MILLIS = 24 * 60 * 60 * 1000L // padanan `ttl = Duration(hours: 24)`
 
-class ProfileRepositoryImpl(
+class GetBannerRepositoryImpl(
     private val api: BerandaApiService,
     private val secureStorage: SecureStorageService,
-) : ProfileRepository, ClearableRepository {
+) : GetBannerRepository, ClearableRepository {
 
-    private var cache: ProfileData? = null // 🔹 ProfileData, BUKAN ProfileExternalData
+    private var cache: List<BannerItem>? = null
+    private var lastFetchTime: Long? = null
 
-    override val hasProfile: Boolean get() = cache != null
-    override val cachedProfile: ProfileData? get() = cache // 🔹 ProfileData
+    override val hasData: Boolean get() = cache != null
+    override val cachedBanners: List<BannerItem>? get() = cache
 
-    override suspend fun getProfile(forceRefresh: Boolean): ProfileData { // 🔹 ProfileData
-        if (!forceRefresh && cache != null) {
+    override suspend fun getBanner(forceRefresh: Boolean): List<BannerItem> {
+        if (!forceRefresh && hasData && !shouldRefresh()) {
             return cache!!
         }
-        val fresh = retry { fetchProfile() }
+
+        val fresh = retry(maxAttempt = 3) { fetchBanner() }
         cache = fresh
+        lastFetchTime = System.currentTimeMillis()
         return fresh
     }
 
-    private suspend fun fetchProfile(): ProfileData { // 🔹 ProfileData
+    private fun shouldRefresh(): Boolean {
+        val last = lastFetchTime ?: return true
+        return System.currentTimeMillis() - last > TTL_MILLIS
+    }
+
+    private suspend fun fetchBanner(): List<BannerItem> {
         try {
             val privateKey = secureStorage.getPrivateKey()
                 ?: throw IllegalStateException("Private key tidak ditemukan, device belum ter-init.")
 
+            // GET tanpa body -> sign payload kosong, sama seperti pola getAccountSourceProfile/getDaftarBank.
             val timestamp = ApiHeaders.currentTimestamp()
             val signature = SignatureUtils.sign(emptyMap<String, String>(), timestamp, privateKey)
             val headers = ApiHeaders.withSignature(signature, ApiHeaders.full(timestamp))
 
-            val response = api.getProfile(
+            val response = api.getBanner(
                 headers = headers,
                 tokenPhase = TokenPhaseTag(TokenPhase.LOGIN),
             )
@@ -53,23 +66,22 @@ class ProfileRepositoryImpl(
 
             val body = response.body()
             if (body?.respCode != SUCCESS_CODE) {
-                throw ApiException(
-                    body?.respCode,
-                    body?.respMessage ?: "Terjadi kendala saat menampilkan profil Anda."
-                )
+                throw ApiException(body?.respCode, body?.respMessage ?: "Gagal memuat banner")
             }
 
-            return body.data // 🔹 langsung return ProfileData penuh, BUKAN body.data.external.data
+            // Padanan filter `.where((e) => e.isBanner)`.
+            return body.data.banner
+                .map { it.toDomain() }
+                .filter { it.isBanner }
         } catch (e: ApiException) {
-            // sudah pesan resmi dari server (respMessage) atau dari ApiErrorParser -- teruskan apa adanya
             throw e
         } catch (e: Exception) {
-            // exception mentah (jaringan/parsing/dll) -- ubah dulu jadi pesan ramah sebelum naik ke ViewModel
             throw ApiException(null, NetworkErrorMapper.toUserMessage(e))
         }
     }
 
     override fun clear() {
         cache = null
+        lastFetchTime = null
     }
 }

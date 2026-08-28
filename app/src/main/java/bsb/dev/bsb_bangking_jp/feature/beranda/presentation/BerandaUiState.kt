@@ -1,8 +1,9 @@
 // feature/beranda/presentation/BerandaUiState.kt
 package bsb.dev.bsb_bangking_jp.feature.beranda.presentation
 
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.ProfileData
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.profile.ProfileData
+import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
+import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.BannerItem
 
 data class BerandaUiState(
     val isProfileLoading: Boolean = false,
@@ -15,6 +16,10 @@ data class BerandaUiState(
     val rekeningError: String? = null,
 
     val isSettingPrimaryAccount: Boolean = false,
+
+    val isBannerLoading: Boolean = false,
+    val bannerList: List<BannerItem>? = null,
+    val bannerError: String? = null,
 )
 
 sealed class BerandaUiEvent {

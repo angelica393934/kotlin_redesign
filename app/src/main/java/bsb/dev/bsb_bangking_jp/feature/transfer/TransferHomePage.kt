@@ -13,10 +13,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
+import android.net.Uri
+import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
+import org.koin.compose.koinInject
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,8 +35,6 @@ import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.component.SearchTextField
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
-import bsb.dev.bsb_bangking_jp.core.dummy.DummySavedRecipient
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
@@ -54,10 +56,9 @@ fun TransferHomePage(
     onBackClick: () -> Unit = {},
     onTransferSekarang: () -> Unit = {},
     onAturTerjadwalClick: () -> Unit = {},
-    onSavedRecipientTap: (SavedRecipientItem) -> Unit = {},
-    onLastTransferTap: (LastTransferItem) -> Unit = {},
     savedRecipientViewModel: SavedRecipientViewModel = koinViewModel(),
     lastTransferViewModel: LastTransferViewModel = koinViewModel(),
+    transferViewModel: TransferViewModel = koinInject()
 ) {
     var showRecent by remember { mutableStateOf(true) }
     var isDeleteMode by remember { mutableStateOf(false) }
@@ -72,6 +73,40 @@ fun TransferHomePage(
     val toastState = LocalToastState.current
     LaunchedEffect(Unit) {
         lastTransferViewModel.load()
+    }
+
+    val transferUiState by transferViewModel.uiState.collectAsStateWithLifecycle()
+    val loadingOverlay = LocalLoadingOverlay.current
+
+    // 🔹 Overlay menyala saat: (a) proses getAccountDest (tap daftar tersimpan),
+    // ATAU (b) proses hapus rekening tersimpan sedang berlangsung.
+    LaunchedEffect(transferUiState.isInquiryLoading, savedState.isDeleting) {
+        if (transferUiState.isInquiryLoading || savedState.isDeleting) {
+            loadingOverlay.show()
+        } else {
+            loadingOverlay.hide()
+        }
+    }
+
+    // 🔹 getAccountDest sukses -> arahkan ke form transfer sesuai jenis rekening
+    // tujuan (sesama BSB / bank lain), persis logic yang dipakai transfer_baru.
+    LaunchedEffect(Unit) {
+        transferViewModel.navEvent.collect { event ->
+            if (event is TransferNavEvent.ToDetailRekening) {
+                val inquiry = event.inquiry
+                val destination = if (inquiry.isOnUs) "transfer_bsb" else "transfer_umum"
+                val bank = Uri.encode(inquiry.bankName)
+                val accountNumber = Uri.encode(inquiry.beneficiaryAccountNo)
+                val name = Uri.encode(inquiry.beneficiaryName)
+                navController.navigate("$destination/$bank/$accountNumber/$name")
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        transferViewModel.uiEvent.collect { event ->
+            if (event is TransferUiEvent.ShowToastError) toastState.showError(event.message)
+        }
     }
 
     val filteredSavedRecipients = remember(query, savedState.list) {
@@ -244,7 +279,12 @@ fun TransferHomePage(
                                                 nama = item.accountDestinationName,
                                                 bank = item.bankName,
                                                 accountNumber = item.accountDestination,
-                                                onTap = { onLastTransferTap(item) },
+                                                onTap = {
+                                                    transferViewModel.getAccountDest(
+                                                        code = item.bankCode,
+                                                        accountNumber = item.accountDestination,
+                                                    )
+                                                },
                                             )
                                         }
                                     }
@@ -294,7 +334,10 @@ fun TransferHomePage(
                                                     if (isSelected) selectedAccounts.remove(item.id)
                                                     else selectedAccounts.add(item.id)
                                                 } else {
-                                                    onSavedRecipientTap(item)
+                                                    transferViewModel.getAccountDest(
+                                                        code = item.bankCode,
+                                                        accountNumber = item.accountNumber,
+                                                    )
                                                 }
                                             },
                                             onEdit = if (!isDeleteMode) {

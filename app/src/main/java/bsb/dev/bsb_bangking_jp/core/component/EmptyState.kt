@@ -39,7 +39,7 @@ fun EmptyState(
         // AUTO DETECT COMPACT
         val isCompact = maxHeight < 500.dp
 
-        val imageSize = if (isCompact) 150.dp else 180.dp
+        val imageSize = if (isCompact) 120.dp else 150.dp
         val spacingLarge = if (isCompact) 8.dp else 10.dp
         val spacingSmall = if (isCompact) 3.dp else 5.dp
 

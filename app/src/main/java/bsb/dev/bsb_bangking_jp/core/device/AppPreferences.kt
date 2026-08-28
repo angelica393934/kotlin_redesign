@@ -4,6 +4,9 @@ package bsb.dev.bsb_bangking_jp.core.device
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.Date
 
 class AppPreferences(context: Context) {
 
@@ -39,6 +42,25 @@ class AppPreferences(context: Context) {
             remove(KEY_REMEMBERED_USERID)
         }
     }
+
+    /**
+     * 🔹 Padanan kebutuhan "banner ditutup, jangan muncul lagi seharian ini".
+     * Disimpan sebagai tanggal (bukan boolean polos) supaya otomatis "reset" sendiri
+     * keesokan harinya tanpa perlu job/worker terpisah untuk membersihkannya.
+     */
+    fun isBannerDismissedToday(key: String): Boolean {
+        val savedDate = prefs.getString(bannerDismissKey(key), null) ?: return false
+        return savedDate == todayDateString()
+    }
+
+    fun dismissBannerToday(key: String) {
+        prefs.edit { putString(bannerDismissKey(key), todayDateString()) }
+    }
+
+    private fun bannerDismissKey(key: String) = "banner_dismissed_$key"
+
+    private fun todayDateString(): String =
+        SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
 
     companion object {
         private const val PREFS_NAME = "app_prefs"
