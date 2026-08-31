@@ -21,7 +21,6 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,16 +36,19 @@ import bsb.dev.bsb_bangking_jp.core.component.BannerKeamanan
 import bsb.dev.bsb_bangking_jp.core.component.CustomRefreshIndicator
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyData
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.feature.beranda.section.HaloUserSection
 import bsb.dev.bsb_bangking_jp.feature.beranda.section.MenuUtama
 import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
-import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
-import org.koin.compose.koinInject
 import kotlin.math.roundToInt
 import bsb.dev.bsb_bangking_jp.core.skeleton.HaloUserSkeleton
+import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonBerita
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonSaldoCard
+import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsUiState
+import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsViewModel
+import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 private val PULL_REFRESH_MAX_PUSH = 64.dp // 🔹 seberapa jauh konten terdorong turun saat full refresh
 
@@ -56,7 +58,6 @@ fun BerandaPage(
     navController: NavController,
     onNotificationClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
-    onLihatSemuaBeritaClick: () -> Unit = {},
     onTransferClick: () -> Unit = {},
     onTopUpClick: () -> Unit = {},
     onVirtualAccountClick: () -> Unit = {},
@@ -215,11 +216,8 @@ fun BerandaPage(
 
                     Spacer(modifier = Modifier.height(15.dp))
 
-                    BeritaSection(
-                        berita = DummyData.beritaList,
-                        onLihatSemuaClick = onLihatSemuaBeritaClick,
-                        navController = navController,
-                    )
+                    BeritaSection(navController = navController)
+
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }

@@ -1,6 +1,5 @@
 package bsb.dev.bsb_bangking_jp.pages.beranda.section
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,28 +19,146 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import bsb.dev.bsb_bangking_jp.R
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyBerita
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import bsb.dev.bsb_bangking_jp.R
+import bsb.dev.bsb_bangking_jp.core.get_image.NetworkImage
+import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonBerita
+import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
+import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsUiState
+import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsViewModel
 import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun BeritaSection(
     navController: NavController,
-    berita: List<DummyBerita>,
-    onLihatSemuaClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: NewsViewModel = koinViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) { viewModel.load() }
+
+    when (val state = uiState) {
+        is NewsUiState.Initial, is NewsUiState.Loading -> {
+            SkeletonBerita(modifier = modifier)
+        }
+
+        is NewsUiState.Error -> {
+            // 🔹 Kotak tetap ada, isinya ikon "gambar tidak tersedia" -- bukan hilang total.
+            BeritaSectionUnavailable(
+                navController = navController,
+                onRetry = { viewModel.load(forceRefresh = true) },
+                modifier = modifier,
+            )
+        }
+
+        is NewsUiState.Success -> {
+            // 🔹 Padanan `if (news.isEmpty) SizedBox.shrink()` -- kalau sukses tapi memang
+            // kosong, section boleh tidak ditampilkan sama sekali (bukan kegagalan).
+            if (state.items.isEmpty()) return
+            BeritaSectionContent(
+                navController = navController,
+                berita = state.items.map { it.pathImage },
+                modifier = modifier,
+            )
+        }
+    }
+}
+
+/** Kondisi gagal fetch -- frame section tetap sama, cuma slider-nya diganti ikon kosong. */
+@Composable
+private fun BeritaSectionUnavailable(
+    navController: NavController,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
+    ) {
+        BeritaSectionHeader(navController = navController)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.extendedColors.inputBackground)
+                .clickable { onRetry() },
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.ImageNotSupported,
+                    contentDescription = null,
+                    tint = MaterialTheme.extendedColors.textDisabled,
+                    modifier = Modifier.size(40.dp),
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Berita tidak tersedia",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.extendedColors.textSecondary,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BeritaSectionHeader(navController: NavController) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.label_berita),
+            style = MaterialTheme.typography.titleLarge,
+        )
+        Row(
+            modifier = Modifier.clickable { navController.navigate("berita_list") },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.label_lihat_semua),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = Icons.Default.ArrowForwardIos,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(14.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun BeritaSectionContent(
+    navController: NavController,
+    berita: List<String>,
     modifier: Modifier = Modifier,
 ) {
     val pagerState = rememberPagerState(pageCount = { berita.size })
@@ -63,42 +180,9 @@ fun BeritaSection(
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
     ) {
-        // ===== HEADER =====
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = stringResource(R.string.label_berita),
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Row(
-                modifier = Modifier.clickable {
-                    navController.navigate("berita_list")
-                },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.label_lihat_semua),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-
-                Spacer(modifier = Modifier.width(4.dp))
-
-                Icon(
-                    imageVector = Icons.Default.ArrowForwardIos,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(14.dp),
-                )
-            }
-        }
-
+        BeritaSectionHeader(navController = navController)
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ===== SLIDER =====
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,9 +190,11 @@ fun BeritaSection(
                 .clip(RoundedCornerShape(12.dp)),
         ) {
             HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-                Image(
-                    painter = painterResource(id = berita[page].imageRes),
-                    contentDescription = berita[page].title,
+                // 🔹 Kalau 1 gambar tertentu gagal dimuat, NetworkImage sendiri sudah
+                // otomatis fallback ke ikon kosong (lihat NetworkImageState.Failed).
+                NetworkImage(
+                    path = berita[page],
+                    contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -117,7 +203,6 @@ fun BeritaSection(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ===== INDICATOR =====
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,

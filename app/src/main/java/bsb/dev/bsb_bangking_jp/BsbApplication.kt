@@ -12,6 +12,7 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.BerandaModule
 import bsb.dev.bsb_bangking_jp.feature.init.initModule
 import bsb.dev.bsb_bangking_jp.feature.login.loginModule
 import bsb.dev.bsb_bangking_jp.feature.login_existing.loginExistingModule
+import bsb.dev.bsb_bangking_jp.feature.news.newsModule
 import bsb.dev.bsb_bangking_jp.feature.splash.splashModule
 import bsb.dev.bsb_bangking_jp.feature.transfer.transferModule
 import org.koin.android.ext.android.get
@@ -35,7 +36,7 @@ class BsbApplication : Application() {
                 aktivitasModule,
                 transferModule,
                 imageModule,
-
+                newsModule,
                 // tambahkan module fitur lain di sini
             )
         }

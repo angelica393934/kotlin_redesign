@@ -57,6 +57,7 @@ import bsb.dev.bsb_bangking_jp.feature.login_existing.presentation.LoginExisting
 import androidx.compose.ui.platform.LocalContext
 import bsb.dev.bsb_bangking_jp.core.component.formatRupiah
 import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.berita.BeritaDetailPage
 
 @Composable
 fun AppNavigation(
@@ -266,9 +267,21 @@ fun AppNavigation(
                 composable("berita_list") {
                     BeritaListPage(
                         navController = navController,
-                        onBackClick = {
-                            navController.popBackStack()
+                        onBeritaClick = { item ->
+                            navController.navigate("berita_detail/${item.id}")
                         },
+                        onBackClick = { navController.popBackStack() },
+                    )
+                }
+
+                composable(
+                    route = "berita_detail/{newsId}",
+                    arguments = listOf(navArgument("newsId") { type = NavType.IntType }),
+                ) { backStackEntry ->
+                    val newsId = backStackEntry.arguments?.getInt("newsId") ?: 0
+                    BeritaDetailPage(
+                        newsId = newsId,
+                        onBackClick = { navController.popBackStack() },
                     )
                 }
 

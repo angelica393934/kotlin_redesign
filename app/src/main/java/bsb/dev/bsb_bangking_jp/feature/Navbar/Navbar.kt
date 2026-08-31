@@ -131,7 +131,7 @@ fun Navbar(
                     onPajakPendidikanClick = onPajakPendidikanClick,
                     onTagihanClick = onTagihanClick,
                     onCardlessClick = onCardlessClick,
-                    )
+                )
                 1 -> AktivitasPage()
                 2 -> PesanPage()
                 3 -> PengaturanPage(
