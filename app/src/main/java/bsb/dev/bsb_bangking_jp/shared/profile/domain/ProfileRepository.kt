@@ -1,6 +1,6 @@
-package bsb.dev.bsb_bangking_jp.feature.beranda.domain.profile
+package bsb.dev.bsb_bangking_jp.shared.profile.domain
 
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.profile.ProfileData
+import bsb.dev.bsb_bangking_jp.shared.profile.data.ProfileData
 
 interface ProfileRepository {
     val hasProfile: Boolean

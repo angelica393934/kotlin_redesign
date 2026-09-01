@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.cashBalanceValue
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.cashBalanceValue
 
 enum class RekeningSheetMode {
     PILIH_REKENING_UTAMA,

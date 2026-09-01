@@ -1,8 +1,8 @@
 // feature/beranda/presentation/BerandaUiState.kt
 package bsb.dev.bsb_bangking_jp.feature.beranda.presentation
 
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.profile.ProfileData
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.profile.data.ProfileData
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
 import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.BannerItem
 
 data class BerandaUiState(

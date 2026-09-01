@@ -1,11 +1,11 @@
 package bsb.dev.bsb_bangking_jp.feature.beranda
 
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.BerandaApiService
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.profile.ProfileRepositoryImpl
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningLainnyaRepositoryImpl
+import bsb.dev.bsb_bangking_jp.shared.profile.data.ProfileRepositoryImpl
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningLainnyaRepositoryImpl
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.get_banner.GetBannerRepositoryImpl
-import bsb.dev.bsb_bangking_jp.feature.beranda.domain.profile.ProfileRepository
-import bsb.dev.bsb_bangking_jp.feature.beranda.domain.RekeningLainnyaRepository
+import bsb.dev.bsb_bangking_jp.shared.profile.domain.ProfileRepository
+import bsb.dev.bsb_bangking_jp.shared.account_source.domain.RekeningLainnyaRepository
 import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.GetBannerRepository
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import org.koin.dsl.module

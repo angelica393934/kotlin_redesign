@@ -5,7 +5,7 @@ import bsb.dev.bsb_bangking_jp.core.network.GetWithBodyApiHelper
 import bsb.dev.bsb_bangking_jp.core.network.NetworkErrorMapper
 import bsb.dev.bsb_bangking_jp.core.session.ClearableRepository
 import bsb.dev.bsb_bangking_jp.core.util.retry
-import bsb.dev.bsb_bangking_jp.feature.beranda.domain.RekeningLainnyaRepository
+import bsb.dev.bsb_bangking_jp.shared.account_source.domain.RekeningLainnyaRepository
 import bsb.dev.bsb_bangking_jp.feature.transfer.last_transfer.domain.LastTransferItem
 import bsb.dev.bsb_bangking_jp.feature.transfer.last_transfer.domain.LastTransferRepository
 

@@ -27,8 +27,8 @@ import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
 import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
 import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.cashBalanceValue
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.cashBalanceValue
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.SaldoCardBase
 
 @Composable

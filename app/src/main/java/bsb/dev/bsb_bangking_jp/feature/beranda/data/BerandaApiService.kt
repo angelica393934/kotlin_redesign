@@ -3,10 +3,10 @@ package bsb.dev.bsb_bangking_jp.feature.beranda.data
 
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.get_banner.GetBannerResponse
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.profile.ProfileResponse
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningLainnyaResponse
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.SetPrimaryAccountRequest
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.SetPrimaryAccountResponse
+import bsb.dev.bsb_bangking_jp.shared.profile.data.ProfileResponse
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningLainnyaResponse
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.SetPrimaryAccountRequest
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.SetPrimaryAccountResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

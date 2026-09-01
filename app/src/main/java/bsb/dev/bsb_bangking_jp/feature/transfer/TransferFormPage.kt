@@ -45,7 +45,7 @@ import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.component.PilihTanggalSheet
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.JumlahTransferField
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.OptionItem

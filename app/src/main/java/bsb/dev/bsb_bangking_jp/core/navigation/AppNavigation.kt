@@ -48,7 +48,7 @@ import androidx.compose.ui.Alignment
 import bsb.dev.bsb_bangking_jp.core.component.LoadingOverlayHost
 import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.component.rememberLoadingOverlayState
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.cashBalanceValue
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.cashBalanceValue
 import org.koin.androidx.compose.koinViewModel
 import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPage
 import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPinFlow

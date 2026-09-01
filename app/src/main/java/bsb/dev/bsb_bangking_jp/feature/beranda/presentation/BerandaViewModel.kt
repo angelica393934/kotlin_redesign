@@ -2,8 +2,8 @@ package bsb.dev.bsb_bangking_jp.feature.beranda.presentation
 
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
 import bsb.dev.bsb_bangking_jp.core.session.SessionClearer
-import bsb.dev.bsb_bangking_jp.feature.beranda.domain.profile.ProfileRepository
-import bsb.dev.bsb_bangking_jp.feature.beranda.domain.RekeningLainnyaRepository
+import bsb.dev.bsb_bangking_jp.shared.profile.domain.ProfileRepository
+import bsb.dev.bsb_bangking_jp.shared.account_source.domain.RekeningLainnyaRepository
 import bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner.GetBannerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

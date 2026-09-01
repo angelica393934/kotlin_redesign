@@ -1,7 +1,6 @@
-// feature/beranda/domain/RekeningLainnyaRepository.kt
-package bsb.dev.bsb_bangking_jp.feature.beranda.domain
+package bsb.dev.bsb_bangking_jp.shared.account_source.domain
 
-import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
 
 interface RekeningLainnyaRepository {
     val hasData: Boolean
