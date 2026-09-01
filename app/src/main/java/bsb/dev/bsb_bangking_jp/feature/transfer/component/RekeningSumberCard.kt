@@ -34,7 +34,7 @@ import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
 import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonRekeningCard
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.cashBalanceValue
 
@@ -123,7 +123,7 @@ private fun RekeningSumberContent(
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = CurrencyUtils.formatRupiah(aktif.cashBalanceValue().toInt()),
+                    text = RupiahFormat(aktif.cashBalanceValue().toInt()),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )

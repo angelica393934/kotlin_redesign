@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -53,11 +52,12 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
+import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.component.TransactionDetailRow
-import bsb.dev.bsb_bangking_jp.core.component.formatRupiah
-import bsb.dev.bsb_bangking_jp.core.component.maskAccountNumber
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
+import bsb.dev.bsb_bangking_jp.core.util.maskAccountNumber
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -74,6 +74,7 @@ fun TransferBerhasilPage(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val graphicsLayer = rememberGraphicsLayer()
+    val toastState = LocalToastState.current
 
     var isSaving by remember { mutableStateOf(false) }
 
@@ -81,19 +82,20 @@ fun TransferBerhasilPage(
         SimpleDateFormat("d MMMM yyyy - HH:mm 'WIB'", Locale("id", "ID")).format(result.transactionDate)
     }
 
+
     fun saveScreenshot() {
         coroutineScope.launch {
             isSaving = true
             try {
                 val bitmap = graphicsLayer.toImageBitmap().asAndroidBitmap()
                 val saved = saveBitmapToGallery(context, bitmap)
-                Toast.makeText(
-                    context,
-                    if (saved) "Bukti transaksi disimpan ke galeri" else "Gagal menyimpan bukti transaksi",
-                    Toast.LENGTH_SHORT,
-                ).show()
+                if (saved) {
+                    toastState.showSuccess("Bukti transaksi disimpan ke galeri")
+                } else {
+                    toastState.showError("Gagal menyimpan bukti transaksi")
+                }
             } catch (e: Exception) {
-                Toast.makeText(context, "Gagal menyimpan: ${e.message}", Toast.LENGTH_SHORT).show()
+                toastState.showError("Gagal menyimpan: ${e.message}")
             } finally {
                 isSaving = false
             }
@@ -107,7 +109,7 @@ fun TransferBerhasilPage(
                 val bitmap = graphicsLayer.toImageBitmap().asAndroidBitmap()
                 shareBitmap(context, bitmap)
             } catch (e: Exception) {
-                Toast.makeText(context, "Gagal membagikan: ${e.message}", Toast.LENGTH_SHORT).show()
+                toastState.showError("Gagal membagikan: ${e.message}")
             } finally {
                 isSaving = false
             }
@@ -214,12 +216,12 @@ fun TransferBerhasilPage(
                 Spacer(modifier = Modifier.height(3.dp))
 
                 TransactionDetailRow("Layanan Transfer", "Transfer Sesama")
-                TransactionDetailRow("Nominal Transfer", formatRupiah(result.amount))
-                TransactionDetailRow("Biaya Layanan", formatRupiah(result.adminFee))
+                TransactionDetailRow("Nominal Transfer", RupiahFormat(result.amount))
+                TransactionDetailRow("Biaya Layanan", RupiahFormat(result.adminFee))
                 Spacer(modifier = Modifier.height(8.dp))
                 TransactionDetailRow(
                     title = "Total Transfer",
-                    value = formatRupiah(result.totalDebit),
+                    value = RupiahFormat(result.totalDebit),
                     titleStyle = MaterialTheme.typography.titleMedium,
                     valueStyle = MaterialTheme.typography.titleLarge,
                 )
@@ -336,7 +338,7 @@ private fun saveBitmapToGallery(context: Context, bitmap: Bitmap): Boolean {
             }
         }
         uri != null
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         false
     }
 }

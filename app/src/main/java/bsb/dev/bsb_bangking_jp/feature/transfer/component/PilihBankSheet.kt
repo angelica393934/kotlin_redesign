@@ -29,9 +29,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
 import bsb.dev.bsb_bangking_jp.core.component.SearchTextField
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.daftar_bank.BankItem
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.daftar_bank.DaftarBankUiState
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.daftar_bank.DaftarBankViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.daftar_bank.domain.BankItem
+import bsb.dev.bsb_bangking_jp.feature.transfer.daftar_bank.presentation.DaftarBankUiState
+import bsb.dev.bsb_bangking_jp.feature.transfer.daftar_bank.presentation.DaftarBankViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

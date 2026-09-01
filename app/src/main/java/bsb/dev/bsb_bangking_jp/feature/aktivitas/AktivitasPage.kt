@@ -54,7 +54,7 @@ import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonList
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonSaldoCard
 import bsb.dev.bsb_bangking_jp.core.util.ActivityFilterChipMapper
-import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.core.util.DateFormatterUtil
 import bsb.dev.bsb_bangking_jp.core.util.groupByDateSortedDesc
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.component.FilterTransaksiModal
@@ -305,7 +305,7 @@ private fun TransaksiItem(transaksi: HistoryItem, modifier: Modifier = Modifier)
     val subtitle = descLines.getOrNull(1).orEmpty()
 
     val nominalInt = transaksi.amount.toDoubleOrNull()?.toInt() ?: 0
-    val nominalFormatted = CurrencyUtils.formatRupiah(nominalInt)
+    val nominalFormatted = RupiahFormat(nominalInt)
     val nominalDisplay = if (transaksi.isMasuk) "+ $nominalFormatted" else "- $nominalFormatted"
 
     Column(modifier = modifier.fillMaxWidth()) {

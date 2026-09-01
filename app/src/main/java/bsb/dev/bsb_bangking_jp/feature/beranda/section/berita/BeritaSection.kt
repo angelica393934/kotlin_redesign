@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.get_image.NetworkImage
+import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonBerita
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsUiState
@@ -194,6 +195,7 @@ private fun BeritaSectionContent(
                 // otomatis fallback ke ikon kosong (lihat NetworkImageState.Failed).
                 NetworkImage(
                     path = berita[page],
+                    category = ImageCategory.NEWS,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),

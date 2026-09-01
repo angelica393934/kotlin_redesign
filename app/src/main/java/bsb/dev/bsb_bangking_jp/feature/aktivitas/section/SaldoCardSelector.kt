@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
 import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
-import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.cashBalanceValue
 import bsb.dev.bsb_bangking_jp.pages.beranda.section.SaldoCardBase
@@ -50,7 +50,7 @@ fun SaldoCardSelector(
     SaldoCardBase(
         nama = rekeningAktif.name,
         rekening = rekeningAktif.number,
-        saldo = CurrencyUtils.formatRupiah(rekeningAktif.cashBalanceValue().toInt()),
+        saldo = RupiahFormat(rekeningAktif.cashBalanceValue().toInt()),
         modifier = modifier,
     ) {
         Row(

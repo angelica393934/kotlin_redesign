@@ -11,12 +11,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.*
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferInquiry
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.domain.TransferInquiry
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferUiEvent
 
 @Composable
 fun DetailRekeningBaruModal(

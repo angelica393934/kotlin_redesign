@@ -35,6 +35,7 @@ import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.get_image.NetworkImage
+import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.feature.news.domain.AllNewsItem
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.AllNewsUiState
@@ -62,10 +63,7 @@ fun BeritaListPage(
     ) {
         AppHeader(
             title = stringResource(R.string.label_berita),
-            onBackClick = {
-                onBackClick.invoke()
-                navController.popBackStack()
-            },
+            onBackClick = onBackClick,
         )
 
         when (val state = uiState) {
@@ -144,6 +142,7 @@ private fun BeritaCard(
     ) {
         NetworkImage(
             path = item.pathImage,
+            category = ImageCategory.NEWS,
             contentDescription = item.name,
             contentScale = ContentScale.Crop,
             modifier = Modifier

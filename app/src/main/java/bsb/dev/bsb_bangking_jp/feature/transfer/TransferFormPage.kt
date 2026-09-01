@@ -56,10 +56,10 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.component.PilihBulanTahunSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PilihHariSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.RekeningSumberCard
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.RekeningSumberUiState
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.transfer.TransferRequestPayload
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferUiEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.domain.TransferRequestPayload
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferViewModel
 import bsb.dev.bsb_bangking_jp.feature.transfer.util.TransferMapper
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -159,22 +159,21 @@ fun TransferFormPage(
 
     LaunchedEffect(Unit) {
         transferViewModel.navEvent.collect { event ->
-            if (event is TransferNavEvent.TransferSubmitted) {
-                closePeriksaSheet {
-                    pendingResult?.let { onLanjutkan(it) } // lanjut ke halaman PIN
+            when (event) {
+                is TransferNavEvent.TransferSubmitted -> {
+                    closePeriksaSheet {
+                        pendingResult?.let { onLanjutkan(it) } // lanjut ke halaman PIN
+                    }
                 }
+                is TransferNavEvent.TransferSessionExpired -> {
+                    // 🔹 Padanan Navigator.pop(context) 2x di listener Flutter:
+                    // pop 1 -> tutup PeriksaKembaliSheet, pop 2 -> keluar dari TransferFormPage.
+                    closePeriksaSheet {
+                        onBack()
+                    }
+                }
+                else -> Unit
             }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        transferViewModel.getTransferPurpose() // 🔥 HIT ENDPOINT 5
-    }
-
-    // 🔹 Load rekening lainnya begitu halaman dibuka (padanan initState BlocListener Flutter).
-    LaunchedEffect(Unit) {
-        if (berandaUiState.rekeningList == null) {
-            berandaViewModel.loadRekeningLainnya()
         }
     }
 
@@ -582,7 +581,6 @@ fun TransferFormPage(
                         result = result,
                     ),
                     isSubmitting = transferUiState.isSubmittingTransfer,
-                    errorMessage = transferUiState.transferError,
                     onConfirm = {
                         val (scheduleDate, endOfMonth) = TransferMapper.mapSchedulePayload(
                             isScheduled = result.isScheduled,

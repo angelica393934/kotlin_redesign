@@ -14,17 +14,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.core.skeleton.rememberShimmerBrush
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 
 @Composable
 fun NetworkImage(
     path: String?,
+    category: ImageCategory,
     contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
 ) {
-    when (val state = rememberNetworkImageState(path)) {
+    when (val state = rememberNetworkImageState(path, category)) {
         is NetworkImageState.Loading -> {
             val brush = rememberShimmerBrush()
             Box(modifier = modifier.background(brush))

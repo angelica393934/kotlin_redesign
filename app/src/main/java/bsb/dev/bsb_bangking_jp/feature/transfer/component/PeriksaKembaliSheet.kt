@@ -13,17 +13,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
-import android.widget.Toast
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.feature.transfer.TransferFormResult
 
 private const val SUMBER_BANK_NAME = "Bank Sumsel Babel"
@@ -41,13 +38,8 @@ fun PeriksaKembaliSheet(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
     isSubmitting: Boolean = false,
-    errorMessage: String? = null,
 ) {
-    val context = LocalContext.current
     val result = data.result
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
-    }
 
     val biayaLayananInt = result.biayaLayanan.filter { it.isDigit() }.toIntOrNull() ?: 0
     val total = result.jumlah + biayaLayananInt
@@ -95,10 +87,10 @@ fun PeriksaKembaliSheet(
             DetailRow("Tujuan Transfer", result.tujuanTransfer)
         }
         DetailRow("Biaya Layanan", result.biayaLayanan)
-        DetailRow("Nominal Transaksi", CurrencyUtils.formatRupiah(result.jumlah))
+        DetailRow("Nominal Transaksi", RupiahFormat(result.jumlah))
         DetailRow(
             title = "Total Transaksi",
-            value = CurrencyUtils.formatRupiah(total),
+            value = RupiahFormat(total),
             titleStyle = MaterialTheme.typography.titleLarge,
             valueStyle = MaterialTheme.typography.titleLarge,
         )

@@ -1,5 +1,4 @@
-
-package bsb.dev.bsb_bangking_jp.pages.beranda
+package bsb.dev.bsb_bangking_jp.feature.beranda
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -39,11 +39,11 @@ import androidx.compose.ui.unit.sp
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.TransactionDetailRow
-import bsb.dev.bsb_bangking_jp.core.component.formatRupiah
-import bsb.dev.bsb_bangking_jp.core.component.maskAccountNumber
 import bsb.dev.bsb_bangking_jp.core.dummy.ConfirmTransferResult
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.core.component.InitialAvatar
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
+import bsb.dev.bsb_bangking_jp.core.util.maskAccountNumber
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -152,11 +152,11 @@ fun TransferBerhasilDijadwalkanPage(
             )
             Spacer(modifier = Modifier.height(4.dp))
             TransactionDetailRow("Pilihan Transaksi", "Terjadwal")
-            TransactionDetailRow("Nominal Transfer", formatRupiah(result.amount))
-            TransactionDetailRow("Biaya Layanan", formatRupiah(result.adminFee))
+            TransactionDetailRow("Nominal Transfer", RupiahFormat(result.amount))
+            TransactionDetailRow("Biaya Layanan", RupiahFormat(result.adminFee))
             TransactionDetailRow(
                 title = "Total Transfer",
-                value = formatRupiah(result.totalDebit),
+                value = RupiahFormat(result.totalDebit),
                 valueStyle = MaterialTheme.typography.titleMedium,
             )
             HorizontalDivider(
@@ -230,7 +230,7 @@ fun TransferBerhasilDijadwalkanPage(
                         color = MaterialTheme.colorScheme.primary,
                     )
                 }
-                Text(text = formatRupiah(sumberSaldo), style = MaterialTheme.typography.titleLarge)
+                Text(text = RupiahFormat(sumberSaldo), style = MaterialTheme.typography.titleLarge)
                 Text(
                     text = "${result.beneficiaryBankName} - ${maskAccountNumber(result.senderAccountNo)}",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),

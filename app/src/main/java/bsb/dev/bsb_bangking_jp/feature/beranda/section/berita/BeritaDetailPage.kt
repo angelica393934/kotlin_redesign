@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.get_image.NetworkImage
+import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.feature.news.domain.NewsDetail
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsDetailUiState
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsDetailViewModel
@@ -113,6 +114,7 @@ private fun BeritaDetailContent(data: NewsDetail) {
                 path = data.pathImage,
                 contentDescription = data.subtitle,
                 contentScale = ContentScale.Fit,
+                category = ImageCategory.NEWS,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)

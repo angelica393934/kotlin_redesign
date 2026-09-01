@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.core.util.CurrencyUtils
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.RekeningItem
 import bsb.dev.bsb_bangking_jp.feature.beranda.data.rekening_lainnya.cashBalanceValue
 
@@ -142,7 +142,7 @@ private fun RekeningItemCard(
     val borderColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.extendedColors.textDisabled
     val backgroundColor = if (isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background
 
-    val saldoFormatted = CurrencyUtils.formatRupiah(rekening.cashBalanceValue().toInt())
+    val saldoFormatted = RupiahFormat(rekening.cashBalanceValue().toInt())
 
     Box(
         modifier = modifier

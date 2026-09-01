@@ -15,9 +15,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import android.net.Uri
 import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferNavEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferUiEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.transfer.TransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferNavEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferViewModel
 import org.koin.compose.koinInject
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,13 +41,12 @@ import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonList
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.DeleteConfirmSheet
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.UbahAliasSheet
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.last_transfer.LastTransferItem
-import bsb.dev.bsb_bangking_jp.feature.transfer.domain.saved_recipient.SavedRecipientItem
+import bsb.dev.bsb_bangking_jp.feature.transfer.saved_recipient.domain.SavedRecipientItem
 import org.koin.androidx.compose.koinViewModel
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.last_transfer.LastTransferUiState
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.last_transfer.LastTransferViewModel
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientUiEvent
-import bsb.dev.bsb_bangking_jp.feature.transfer.presentation.saved_recipient.SavedRecipientViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.last_transfer.presentation.LastTransferUiState
+import bsb.dev.bsb_bangking_jp.feature.transfer.last_transfer.presentation.LastTransferViewModel
+import bsb.dev.bsb_bangking_jp.feature.transfer.saved_recipient.presentation.SavedRecipientUiEvent
+import bsb.dev.bsb_bangking_jp.feature.transfer.saved_recipient.presentation.SavedRecipientViewModel
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable

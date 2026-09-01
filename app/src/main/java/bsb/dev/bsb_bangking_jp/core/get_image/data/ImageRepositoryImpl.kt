@@ -2,6 +2,7 @@ package bsb.dev.bsb_bangking_jp.core.get_image.data
 
 import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
+import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageRepository
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
@@ -11,54 +12,41 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-/**
- * Padanan GetImageRepository (Flutter). Sengaja TIDAK PERNAH throw -- gambar gagal
- * cukup dianggap "tidak ada", tidak boleh mengganggu layar yang menampilkannya.
- *
- * PENTING: kegagalan TIDAK di-cache permanen. Kalau geturlnews gagal ambil gambar
- * di Beranda, lalu user pindah ke getallnews/getnewsbyid yang butuh gambar sama,
- * repository ini akan MENCOBA LAGI -- bukan langsung dianggap kosong selamanya.
- * Yang di-cache permanen cuma hasil SUKSES (biar tidak hit API berulang untuk
- * gambar yang memang ada).
- */
 class ImageRepositoryImpl(
     private val api: ImageApiService,
     private val secureStorage: SecureStorageService,
 ) : ImageRepository, ClearableRepository {
 
     private val successCache = mutableMapOf<String, ByteArray>()
-
-    // 🔹 Coalescing: cegah beberapa consumer yang minta path SAMA di waktu BERSAMAAN
-    // menembak API berkali-kali secara paralel. Bukan cache kegagalan -- begitu
-    // request ini selesai (sukses/gagal), entry-nya langsung dibuang (lihat finally).
     private val inFlight = mutableMapOf<String, CompletableDeferred<ByteArray?>>()
     private val inFlightMutex = Mutex()
 
-    override suspend fun getImage(path: String?): ByteArray? {
-        val cleanPath = extractPath(path)
-        if (cleanPath.isEmpty()) return null
+    override suspend fun getImage(path: String?, category: ImageCategory): ByteArray? {
+        val fileName = extractFileName(path)
+        if (fileName.isEmpty()) return null
 
-        successCache[cleanPath]?.let { return it }
+        // 🔹 Path final yang benar-benar dikirim ke API, mis. "banner/1770604454_BI Fast.jpeg"
+        val requestPath = "${category.segment}/$fileName"
 
-        // Kalau ada request lain yang sedang jalan utk path yang sama, ikut nunggu
-        // hasilnya saja -- jangan ikut nembak API lagi.
-        val existing = inFlightMutex.withLock { inFlight[cleanPath] }
+        successCache[requestPath]?.let { return it }
+
+        val existing = inFlightMutex.withLock { inFlight[requestPath] }
         if (existing != null) return existing.await()
 
         val deferred = CompletableDeferred<ByteArray?>()
-        inFlightMutex.withLock { inFlight[cleanPath] = deferred }
+        inFlightMutex.withLock { inFlight[requestPath] = deferred }
 
         try {
-            val result = fetchFromApi(cleanPath)
-            if (result != null) successCache[cleanPath] = result
+            val result = fetchFromApi(requestPath)
+            if (result != null) successCache[requestPath] = result
             deferred.complete(result)
             return result
         } finally {
-            inFlightMutex.withLock { inFlight.remove(cleanPath) }
+            inFlightMutex.withLock { inFlight.remove(requestPath) }
         }
     }
 
-    private suspend fun fetchFromApi(cleanPath: String): ByteArray? {
+    private suspend fun fetchFromApi(requestPath: String): ByteArray? {
         return try {
             val privateKey = secureStorage.getPrivateKey() ?: return null
             val timestamp = ApiHeaders.currentTimestamp()
@@ -67,7 +55,7 @@ class ImageRepositoryImpl(
 
             val response = api.getImage(
                 headers = headers,
-                path = cleanPath,
+                path = requestPath,
                 tokenPhase = TokenPhaseTag(TokenPhase.LOGIN),
             )
 
@@ -80,15 +68,22 @@ class ImageRepositoryImpl(
         }
     }
 
-    /** Padanan ImagePathUtils.extractImagePath -- buang base URL kalau path masih full URL. */
-    private fun extractPath(fullPath: String?): String {
+    /**
+     * Ambil NAMA FILE saja dari path mentah backend, tidak peduli prefix-nya apa
+     * ("/v1/image/xxx.jpeg", "v1/somethingelse/xxx.jpeg", full URL, dll) -- prefix
+     * lama ini SELALU dibuang, digantikan `category.segment` di [getImage].
+     */
+    private fun extractFileName(fullPath: String?): String {
         if (fullPath.isNullOrBlank()) return ""
-        return fullPath.substringAfter("://").substringAfter("/", missingDelimiterValue = fullPath)
+        val withoutScheme = if (fullPath.contains("://")) {
+            fullPath.substringAfter("://").substringAfter("/", missingDelimiterValue = "")
+        } else {
+            fullPath
+        }
+        return withoutScheme.substringAfterLast("/")
     }
 
     override fun clear() {
         successCache.clear()
-        // inFlight sengaja tidak disentuh -- request yang sedang berjalan biarkan selesai wajar,
-        // deferred-nya akan clear diri sendiri lewat finally di atas.
     }
 }

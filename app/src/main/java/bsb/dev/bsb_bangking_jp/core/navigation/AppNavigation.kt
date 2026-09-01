@@ -55,8 +55,8 @@ import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPinFlow
 import bsb.dev.bsb_bangking_jp.feature.login_existing.OtpMasukAkunPage
 import bsb.dev.bsb_bangking_jp.feature.login_existing.presentation.LoginExistingViewModel
 import androidx.compose.ui.platform.LocalContext
-import bsb.dev.bsb_bangking_jp.core.component.formatRupiah
 import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.feature.beranda.section.berita.BeritaDetailPage
 
 @Composable
@@ -386,7 +386,7 @@ fun AppNavigation(
                                 NotificationHelper.showTransaksiBerhasil(
                                     context = context,
                                     title = "Transfer Berhasil",
-                                    message = "Transfer ${formatRupiah(confirmResult.totalDebit)} ke " +
+                                    message = "Transfer ${RupiahFormat(confirmResult.totalDebit)} ke " +
                                             "${confirmResult.beneficiaryName} berhasil diproses.",
                                 )
 
@@ -398,6 +398,15 @@ fun AppNavigation(
                                 pendingConfirmResult = confirmResult
                                 navController.navigate("transfer_berhasil_dijadwalkan") {
                                     popUpTo("navbar")
+                                }
+                            },
+                            onSessionExpired = {
+                                // 🔹 Padanan pop 2x + pushReplacement(TransferPage): buang seluruh
+                                // stack alur transfer (transfer_baru, transfer_bsb/umum, pin_transfer)
+                                // dan mendarat balik di TransferHomePage.
+                                navController.navigate("transfer_home") {
+                                    popUpTo("transfer_home") { inclusive = false }
+                                    launchSingleTop = true
                                 }
                             },
                         )
