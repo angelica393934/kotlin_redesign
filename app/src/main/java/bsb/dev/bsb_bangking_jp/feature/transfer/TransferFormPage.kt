@@ -45,7 +45,7 @@ import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.component.PilihTanggalSheet
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.RekeningItem
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.JumlahTransferField
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.OptionItem
@@ -61,6 +61,7 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.Trans
 import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferUiEvent
 import bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.presentation.TransferViewModel
 import bsb.dev.bsb_bangking_jp.feature.transfer.util.TransferMapper
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.presentation.RekeningLainnyaViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDate
@@ -96,7 +97,7 @@ fun TransferFormPage(
     onBack: () -> Unit = {},
     onLanjutkan: (TransferFormResult) -> Unit = {},
     transferViewModel: TransferViewModel = koinInject(),
-    berandaViewModel: BerandaViewModel = koinInject(),
+    rekeningViewModel: RekeningLainnyaViewModel = koinInject(),
 ) {
     var jumlah by remember { mutableStateOf(0) }
     var keterangan by remember { mutableStateOf("") }
@@ -127,7 +128,7 @@ fun TransferFormPage(
     val kalenderSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val transferUiState by transferViewModel.uiState.collectAsStateWithLifecycle()
-    val berandaUiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
+    val rekeningUiState by rekeningViewModel.uiState.collectAsStateWithLifecycle()
 
     val toastState = LocalToastState.current
     val loadingOverlay = LocalLoadingOverlay.current
@@ -179,17 +180,17 @@ fun TransferFormPage(
 
     // 🔹 Turunkan RekeningSumberUiState dari state Beranda.
     val rekeningSumberState: RekeningSumberUiState = remember(
-        berandaUiState.isRekeningLoading,
-        berandaUiState.rekeningList,
-        berandaUiState.rekeningError,
+        rekeningUiState.isLoading,
+        rekeningUiState.rekeningList,
+        rekeningUiState.error,
     ) {
         when {
-            berandaUiState.isRekeningLoading && berandaUiState.rekeningList == null ->
+            rekeningUiState.isLoading && rekeningUiState.rekeningList == null ->
                 RekeningSumberUiState.Loading
-            berandaUiState.rekeningList != null ->
-                RekeningSumberUiState.Success(berandaUiState.rekeningList!!)
+            rekeningUiState.rekeningList != null ->
+                RekeningSumberUiState.Success(rekeningUiState.rekeningList!!)
             else ->
-                RekeningSumberUiState.Error(berandaUiState.rekeningError ?: "Data rekening tidak tersedia")
+                RekeningSumberUiState.Error(rekeningUiState.error ?: "Data rekening tidak tersedia")
         }
     }
 
@@ -438,7 +439,7 @@ fun TransferFormPage(
                         activeAccountNumber = rekening.number
                         sumberAktif = rekening
                     },
-                    onRetry = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
+                    onRetry = { rekeningViewModel.load(forceRefresh = true) },
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))

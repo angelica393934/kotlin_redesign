@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.pages.pesan
+package bsb.dev.bsb_bangking_jp.feature.pesan
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

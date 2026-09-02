@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.component.RekeningLainnyaSheet
 import bsb.dev.bsb_bangking_jp.core.component.RekeningSheetMode
 import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
-import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
-import bsb.dev.bsb_bangking_jp.shared.account_source.data.cashBalanceValue
-import bsb.dev.bsb_bangking_jp.pages.beranda.section.SaldoCardBase
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.cashBalanceValue
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardBase
 
 /**
  * Padanan SaldoCardSelector.dart -- BEDA dengan SaldoCardDashboard (di Beranda):

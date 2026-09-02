@@ -1,7 +1,7 @@
 // feature/beranda/data/ProfileResponse.kt
 package bsb.dev.bsb_bangking_jp.shared.profile.data
 
-import bsb.dev.bsb_bangking_jp.shared.account_source.data.AdditionalInfo
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.AdditionalInfo
 import com.google.gson.annotations.SerializedName
 
 data class ProfileResponse(

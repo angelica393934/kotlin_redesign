@@ -41,12 +41,10 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.section.MenuUtama
 import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
 import kotlin.math.roundToInt
 import bsb.dev.bsb_bangking_jp.core.skeleton.HaloUserSkeleton
-import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonBerita
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonSaldoCard
-import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsUiState
-import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsViewModel
-import bsb.dev.bsb_bangking_jp.pages.beranda.section.BeritaSection
-import org.koin.androidx.compose.koinViewModel
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.BeritaSection
+import bsb.dev.bsb_bangking_jp.shared.profile.presentation.ProfileViewModel
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.presentation.RekeningLainnyaViewModel
 import org.koin.compose.koinInject
 
 private val PULL_REFRESH_MAX_PUSH = 64.dp // 🔹 seberapa jauh konten terdorong turun saat full refresh
@@ -66,32 +64,40 @@ fun BerandaPage(
     onCardlessClick: () -> Unit = {},
     onLainnyaClick: () -> Unit = {},
     berandaViewModel: BerandaViewModel = koinInject(),
+    profileViewModel: ProfileViewModel = koinInject(),
+    rekeningViewModel: RekeningLainnyaViewModel = koinInject(),
 ) {
     val uiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
     val toastState = LocalToastState.current
     val pullToRefreshState = rememberPullToRefreshState()
     val density = LocalDensity.current
+    val berandaUiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
+    val profileUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
+    val rekeningUiState by rekeningViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        berandaViewModel.loadRekeningLainnya()
+        rekeningViewModel.load()
         berandaViewModel.loadBanner()
     }
 
-    LaunchedEffect(uiState.bannerError) {
-        uiState.bannerError?.let { toastState.showError(it) }
+    LaunchedEffect(berandaUiState.bannerError) {
+        berandaUiState.bannerError?.let { toastState.showError(it)
+        }
     }
-    LaunchedEffect(uiState.profileError) {
-        uiState.profileError?.let { toastState.showError(it) }
+    LaunchedEffect(profileUiState.error) {
+        profileUiState.error?.let { toastState.showError(it)
+        }
     }
-    LaunchedEffect(uiState.rekeningError) {
-        uiState.rekeningError?.let { toastState.showError(it) }
+    LaunchedEffect(rekeningUiState.error) {
+        rekeningUiState.error?.let { toastState.showError(it)
+        }
     }
 
-    val namaUser = uiState.profile?.user?.customerName?.takeIf { it.isNotBlank() }
-        ?: uiState.profile?.external?.data?.name?.takeIf { it.isNotBlank() }
+    val namaUser = profileUiState.profile?.user?.customerName?.takeIf { it.isNotBlank() }
+        ?: profileUiState.profile?.external?.data?.name?.takeIf { it.isNotBlank() }
         ?: "-"
 
-    val isRefreshing = uiState.isProfileLoading || uiState.isRekeningRefreshing
+    val isRefreshing = profileUiState.isLoading  || rekeningUiState.isRefreshing
 
     val maxPushPx = with(density) { PULL_REFRESH_MAX_PUSH.toPx() }
     val pushOffsetPx = if (isRefreshing) {
@@ -124,7 +130,7 @@ fun BerandaPage(
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 60.dp),
         ) {
-            if (uiState.isProfileLoading) {
+            if (profileUiState.isLoading) {
                 HaloUserSkeleton()
             } else {
                 HaloUserSection(
@@ -170,31 +176,31 @@ fun BerandaPage(
 
                     Spacer(modifier = Modifier.height(15.dp))
 
-                    if (uiState.isRekeningLoading && uiState.rekeningList == null) {
+                    if (rekeningUiState.isLoading && rekeningUiState.rekeningList == null) {
                         // Loading pertama kali, belum ada data sama sekali -> skeleton
                         SkeletonSaldoCard()
                     } else {
                         // Sudah pernah ada data -> tetap tampilkan data lama walau sedang refresh
                         // (uiState.isRekeningRefreshing true tidak mengubah kondisi ini)
                         when {
-                            uiState.isRekeningLoading && uiState.rekeningList == null -> {
+                            rekeningUiState.isLoading && rekeningUiState.rekeningList == null -> {
                                 // Loading pertama kali, belum ada data sama sekali -> skeleton
                                 SkeletonSaldoCard()
                             }
-                            uiState.rekeningList != null -> {
+                            rekeningUiState.rekeningList != null -> {
                                 // Sudah pernah ada data -> tetap tampilkan data lama walau sedang refresh
                                 // (uiState.isRekeningRefreshing true tidak mengubah kondisi ini)
                                 SaldoCardDashboard(
-                                    rekeningList = uiState.rekeningList!!,
+                                    rekeningList = rekeningUiState.rekeningList!!,
                                     onSelectPrimaryAccount = { accountNumber ->
-                                        berandaViewModel.setPrimaryAccount(accountNumber)
+                                        rekeningViewModel.setPrimaryAccount(accountNumber)
                                     },
                                 )
                             }
                             else -> {
                                 // Gagal & belum pernah ada data -> card tetap ada, isinya "-"
                                 SaldoCardEmpty(
-                                    onRetry = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
+                                    onRetry = { rekeningViewModel.load(forceRefresh = true) },
                                 )
                             }
                         }

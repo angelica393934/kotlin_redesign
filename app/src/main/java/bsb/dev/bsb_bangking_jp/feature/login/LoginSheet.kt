@@ -36,10 +36,10 @@ import bsb.dev.bsb_bangking_jp.core.component.LocalToastState
 import bsb.dev.bsb_bangking_jp.core.components.AppCheckBox
 import bsb.dev.bsb_bangking_jp.core.components.AppMenu
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.feature.login.presentation.LoginNavEvent
 import bsb.dev.bsb_bangking_jp.feature.login.presentation.LoginUiEvent
 import bsb.dev.bsb_bangking_jp.feature.login.presentation.LoginViewModel
+import bsb.dev.bsb_bangking_jp.shared.profile.presentation.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -69,8 +69,7 @@ fun LoginSheet(
     // dari uiState.useridLogin kalau ada nilai "remembered" tersimpan.
     var useridInput by remember(uiState.useridLogin) { mutableStateOf(uiState.useridLogin) }
     var passcodeInput by remember { mutableStateOf("") }
-
-    val berandaViewModel: BerandaViewModel = koinInject()
+    val profileViewModel: ProfileViewModel = koinInject()
 
     LaunchedEffect(uiState.isLoading) {
         if (uiState.isLoading) loadingOverlay.show() else loadingOverlay.hide()
@@ -79,7 +78,7 @@ fun LoginSheet(
     LaunchedEffect(Unit) {
         viewModel.navEvent.collect { event ->
             if (event is LoginNavEvent.ToNavbar) {
-                berandaViewModel.loadProfile()
+                profileViewModel.loadProfile()
                 navController.navigate("navbar") { popUpTo(0) }
             }
         }

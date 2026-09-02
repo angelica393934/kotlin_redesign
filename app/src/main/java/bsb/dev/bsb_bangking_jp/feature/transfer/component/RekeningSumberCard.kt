@@ -35,8 +35,8 @@ import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonRekeningCard
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
-import bsb.dev.bsb_bangking_jp.shared.account_source.data.RekeningItem
-import bsb.dev.bsb_bangking_jp.shared.account_source.data.cashBalanceValue
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.RekeningItem
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.cashBalanceValue
 
 /** Padanan RekeningLainnyaState (initial/loading/refreshing/success/error) di Flutter. */
 sealed interface RekeningSumberUiState {

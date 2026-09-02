@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.shared.account_source.data
+package bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data
 
 import com.google.gson.annotations.SerializedName
 

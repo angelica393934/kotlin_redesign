@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.pages.beranda.section
+package bsb.dev.bsb_bangking_jp.feature.beranda.section
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable

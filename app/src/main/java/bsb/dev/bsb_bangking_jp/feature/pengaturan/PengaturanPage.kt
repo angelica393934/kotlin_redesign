@@ -50,6 +50,7 @@ import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingItemData
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingSection
 import org.koin.compose.koinInject
 import bsb.dev.bsb_bangking_jp.core.skeleton.ProfileSettingSkeleton
+import bsb.dev.bsb_bangking_jp.shared.profile.presentation.ProfileViewModel
 
 private val HeaderHeight = 100.dp
 private val ProfileCardHalfHeight = 44.dp
@@ -58,11 +59,11 @@ private val ProfileCardHalfHeight = 44.dp
 fun PengaturanPage(
     darkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
-    berandaViewModel: BerandaViewModel = koinInject(), // 🔹 sumber data profile yang sama dengan Beranda
+    profileViewModel: ProfileViewModel = koinInject(), // 🔹 sumber data profile yang sama dengan Beranda
 ) {
     val context = LocalContext.current
     val appVersion = remember { getAppVersion(context) }
-    val uiState by berandaViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
     // 🔹 Ambil dari response API, fallback ke DummyData kalau belum ada data (mis. belum sempat loadProfile()).
     val namaUser = uiState.profile?.user?.customerName?.takeIf { it.isNotBlank() }
@@ -156,7 +157,7 @@ fun PengaturanPage(
                     Spacer(modifier = Modifier.height(130.dp))
                 }
             }
-            if (uiState.isProfileLoading) {
+            if (uiState.isLoading) {
                 ProfileSettingSkeleton(
                     modifier = Modifier
                         .align(Alignment.TopCenter)

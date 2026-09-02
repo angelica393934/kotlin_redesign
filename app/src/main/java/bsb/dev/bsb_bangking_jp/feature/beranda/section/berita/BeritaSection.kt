@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.pages.beranda.section
+package bsb.dev.bsb_bangking_jp.feature.beranda.section
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

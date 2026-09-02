@@ -42,13 +42,13 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.TransferBerhasilPage
 import bsb.dev.bsb_bangking_jp.feature.transfer.TransferHomePage
 import bsb.dev.bsb_bangking_jp.feature.transfer.TransferUmumPage
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PeriksaKembaliData
-import bsb.dev.bsb_bangking_jp.pages.beranda.section.berita.BeritaListPage
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.berita.BeritaListPage
 import androidx.navigation.compose.navigation
 import androidx.compose.ui.Alignment
 import bsb.dev.bsb_bangking_jp.core.component.LoadingOverlayHost
 import bsb.dev.bsb_bangking_jp.core.component.LocalLoadingOverlay
 import bsb.dev.bsb_bangking_jp.core.component.rememberLoadingOverlayState
-import bsb.dev.bsb_bangking_jp.shared.account_source.data.cashBalanceValue
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.cashBalanceValue
 import org.koin.androidx.compose.koinViewModel
 import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPage
 import bsb.dev.bsb_bangking_jp.feature.login_existing.MasukPinFlow

@@ -16,7 +16,7 @@ import bsb.dev.bsb_bangking_jp.shared.profile.domain.ProfileRepository
 private const val SUCCESS_CODE = "0000"
 
 class ProfileRepositoryImpl(
-    private val api: BerandaApiService,
+    private val api: ProfileApiService,
     private val secureStorage: SecureStorageService,
 ) : ProfileRepository, ClearableRepository {
 

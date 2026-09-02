@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.pages.aktivitas
+package bsb.dev.bsb_bangking_jp.feature.aktivitas
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,15 +63,17 @@ import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation.ActivityHistoryViewModel
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.section.SaldoCardSelector
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.presentation.RekeningLainnyaViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AktivitasPage(
-    berandaViewModel: BerandaViewModel = koinInject(),
     activityViewModel: ActivityHistoryViewModel = koinInject(), // 🔹 koinInject, bukan koinViewModel
-) {
-    val berandaState by berandaViewModel.uiState.collectAsStateWithLifecycle()
+    rekeningViewModel: RekeningLainnyaViewModel = koinInject(),
+    ) {
+    val rekeningUiState by rekeningViewModel.uiState.collectAsStateWithLifecycle()
+
     val activityState by activityViewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val pullToRefreshState = rememberPullToRefreshState()
@@ -82,7 +84,7 @@ fun AktivitasPage(
     // melakukannya di halamannya sendiri, tapi kalau user buka app dan langsung ke tab
     // lain, ini jaga-jaga supaya tetap ke-trigger.
     LaunchedEffect(Unit) {
-        if (berandaState.rekeningList == null) berandaViewModel.loadRekeningLainnya()
+        if (rekeningUiState.rekeningList == null) rekeningViewModel.load()
     }
 
     // accountNo & pemicu fetch histori SEKARANG sepenuhnya dikelola di dalam
@@ -124,12 +126,12 @@ fun AktivitasPage(
                     .offset(y = 65.dp),
             ) {
                 when {
-                    berandaState.isRekeningLoading && berandaState.rekeningList == null -> {
+                    rekeningUiState.isLoading && rekeningUiState.rekeningList == null -> {
                         SkeletonSaldoCard()
                     }
-                    berandaState.rekeningList != null -> {
+                    rekeningUiState.rekeningList != null -> {
                         SaldoCardSelector(
-                            rekeningList = berandaState.rekeningList!!,
+                            rekeningList = rekeningUiState.rekeningList!!,
                             activeAccountNumber = accountNo,
                             onRekeningSelected = { selected ->
                                 activityViewModel.switchAccount(selected.number)
@@ -138,7 +140,7 @@ fun AktivitasPage(
                     }
                     else -> {
                         SaldoCardEmpty(
-                            onRetry = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
+                            onRetry = { rekeningViewModel.load(forceRefresh = true) },
                         )
                     }
                 }
@@ -193,13 +195,13 @@ fun AktivitasPage(
         // ===== LIST TRANSAKSI =====
         Box(modifier = Modifier.weight(1f)) {
             when {
-                accountNo == null && berandaState.rekeningError != null -> {
+                accountNo == null && rekeningUiState.error != null -> {
                     EmptyState(
                         modifier = Modifier.fillMaxSize(),
                         message = "Data rekening tidak dapat dimuat.",
                         subMessage = "Riwayat transaksi butuh data rekening terlebih dahulu.\nPeriksa koneksi Anda dan coba lagi.",
                         actionText = "Coba Lagi",
-                        onAction = { berandaViewModel.loadRekeningLainnya(forceRefresh = true) },
+                        onAction = { rekeningViewModel.load(forceRefresh = true) },
                     )
                 }
                 accountNo == null -> {

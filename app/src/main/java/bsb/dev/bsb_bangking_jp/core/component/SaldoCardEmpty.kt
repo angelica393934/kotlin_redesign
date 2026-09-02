@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.pages.beranda.section.SaldoCardBase
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardBase
 
 /**
  * Varian SaldoCardBase untuk kondisi rekening GAGAL dimuat & belum pernah ada data
