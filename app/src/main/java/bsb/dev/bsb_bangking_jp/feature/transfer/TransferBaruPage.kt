@@ -81,7 +81,7 @@ fun TransferBaruPage(
         }
     }
 
-    // 🔹 Error toast (padanan `else -> showErrorToast(...)` di listener Flutter).
+    // 🔹 Error toast (padanan `else -> showErrorToast(...)` di listener ).
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             if (event is TransferUiEvent.ShowToastError) toastState.showError(event.message)

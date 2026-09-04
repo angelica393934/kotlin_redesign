@@ -12,4 +12,4 @@ val BerandaModule = module {
     single<GetBannerRepository> { GetBannerRepositoryImpl(get(), get()) }
 
     // 🔹 single, BUKAN viewModel -- state banner tetap bertahan lintas navigasi.
-    single { BerandaViewModel(get(), get(), get(), get()) }}
+    single { BerandaViewModel(get(), get(),  get()) }}

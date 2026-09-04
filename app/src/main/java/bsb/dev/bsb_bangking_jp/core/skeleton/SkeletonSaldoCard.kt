@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 
-/** Setara `SkeletonSaldoCard` di Flutter: card saldo dengan rekening, nilai besar, dan footer. */
+/** Setara `SkeletonSaldoCard` di : card saldo dengan rekening, nilai besar, dan footer. */
 @Composable
 fun SkeletonSaldoCard(modifier: Modifier = Modifier) {
     Card(

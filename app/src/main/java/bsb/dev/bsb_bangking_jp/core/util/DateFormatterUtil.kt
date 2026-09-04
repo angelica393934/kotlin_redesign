@@ -8,7 +8,7 @@ private val indonesianMonths = listOf(
 )
 
 /**
- * Padanan top-level function `parseYYMMDD()` di Flutter -- parsing manual per-substring
+ * Padanan top-level function `parseYYMMDD()` di  -- parsing manual per-substring
  * (BUKAN lewat DateTimeFormatter, karena formatnya bukan pola tanggal standar).
  * "yy" diasumsikan selalu abad 2000-an (di-prefix "20").
  */
@@ -19,7 +19,7 @@ fun parseYYMMDD(value: String): LocalDate {
     return LocalDate.of(year, month, day)
 }
 
-/** Padanan class DateFormatterUtil di Flutter. */
+/** Padanan class DateFormatterUtil di . */
 object DateFormatterUtil {
 
     /** Padanan DateFormatterUtil.fromYYMMDD -- dipakai buat header tanggal di list transaksi. */

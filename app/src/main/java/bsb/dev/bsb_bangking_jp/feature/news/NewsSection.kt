@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.R
-import bsb.dev.bsb_bangking_jp.core.get_image.NetworkImage
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
+import bsb.dev.bsb_bangking_jp.shared.get_image.NetworkImage
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonBerita
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsUiState
@@ -45,7 +45,7 @@ import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun BeritaSection(
+fun NewsSection(
     navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: NewsViewModel = koinViewModel(),
@@ -61,7 +61,7 @@ fun BeritaSection(
 
         is NewsUiState.Error -> {
             // 🔹 Kotak tetap ada, isinya ikon "gambar tidak tersedia" -- bukan hilang total.
-            BeritaSectionUnavailable(
+            NewsSectionUnavailable(
                 navController = navController,
                 onRetry = { viewModel.load(forceRefresh = true) },
                 modifier = modifier,
@@ -72,7 +72,7 @@ fun BeritaSection(
             // 🔹 Padanan `if (news.isEmpty) SizedBox.shrink()` -- kalau sukses tapi memang
             // kosong, section boleh tidak ditampilkan sama sekali (bukan kegagalan).
             if (state.items.isEmpty()) return
-            BeritaSectionContent(
+            NewsSectionContent(
                 navController = navController,
                 berita = state.items.map { it.pathImage },
                 modifier = modifier,
@@ -83,7 +83,7 @@ fun BeritaSection(
 
 /** Kondisi gagal fetch -- frame section tetap sama, cuma slider-nya diganti ikon kosong. */
 @Composable
-private fun BeritaSectionUnavailable(
+private fun NewsSectionUnavailable(
     navController: NavController,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -95,7 +95,7 @@ private fun BeritaSectionUnavailable(
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
     ) {
-        BeritaSectionHeader(navController = navController)
+        NewsSectionHeader(navController = navController)
         Spacer(modifier = Modifier.height(12.dp))
 
         Box(
@@ -126,7 +126,7 @@ private fun BeritaSectionUnavailable(
 }
 
 @Composable
-private fun BeritaSectionHeader(navController: NavController) {
+private fun NewsSectionHeader(navController: NavController) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -157,7 +157,7 @@ private fun BeritaSectionHeader(navController: NavController) {
 }
 
 @Composable
-private fun BeritaSectionContent(
+private fun NewsSectionContent(
     navController: NavController,
     berita: List<String>,
     modifier: Modifier = Modifier,
@@ -181,7 +181,7 @@ private fun BeritaSectionContent(
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
     ) {
-        BeritaSectionHeader(navController = navController)
+        NewsSectionHeader(navController = navController)
         Spacer(modifier = Modifier.height(12.dp))
 
         Box(
@@ -214,11 +214,11 @@ private fun BeritaSectionContent(
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
-                        .size(if (isActive) 10.dp else 8.dp)
+                        .size(if (isActive) 9.dp else 8.dp)
                         .clip(RoundedCornerShape(50))
                         .background(
-                            if (isActive) MaterialTheme.colorScheme.secondary
-                            else MaterialTheme.colorScheme.outline,
+                            if (isActive) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.inverseSurface,
                         ),
                 )
             }

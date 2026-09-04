@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.get_image.data
+package bsb.dev.bsb_bangking_jp.shared.get_image.data
 
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag
 import okhttp3.ResponseBody

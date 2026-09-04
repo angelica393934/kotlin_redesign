@@ -58,7 +58,7 @@ fun OtpForm(
     val resendShakeOffset = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
-    // 🔹 Countdown, padanan Timer.periodic di Flutter.
+    // 🔹 Countdown, padanan Timer.periodic di .
     LaunchedEffect(Unit) {
         while (remainingSeconds > 0 && !isExpired) {
             delay(1000)

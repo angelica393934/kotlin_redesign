@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.get_image
+package bsb.dev.bsb_bangking_jp.shared.get_image
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.core.skeleton.rememberShimmerBrush
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 

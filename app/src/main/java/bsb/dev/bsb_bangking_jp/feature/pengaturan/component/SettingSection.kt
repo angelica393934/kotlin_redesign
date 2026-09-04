@@ -27,11 +27,8 @@ data class SettingItemData(
 fun SettingSection(
     title: String,
     items: List<SettingItemData>,
-    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-    ) {
+    Column{
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(

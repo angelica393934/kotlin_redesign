@@ -34,7 +34,7 @@ class GetBannerRepositoryImpl(
             return cache!!
         }
 
-        val fresh = retry(maxAttempt = 3) { fetchBanner() }
+        val fresh = retry { fetchBanner() }
         cache = fresh
         lastFetchTime = System.currentTimeMillis()
         return fresh

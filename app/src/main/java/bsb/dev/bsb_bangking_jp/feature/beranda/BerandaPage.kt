@@ -20,6 +20,8 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,19 +44,20 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.section.SaldoCardDashboard
 import kotlin.math.roundToInt
 import bsb.dev.bsb_bangking_jp.core.skeleton.HaloUserSkeleton
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonSaldoCard
-import bsb.dev.bsb_bangking_jp.feature.beranda.section.BeritaSection
+import bsb.dev.bsb_bangking_jp.feature.beranda.section.NewsSection
+import bsb.dev.bsb_bangking_jp.shared.logout.LogoutConfirmSheet
 import bsb.dev.bsb_bangking_jp.shared.profile.presentation.ProfileViewModel
 import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.presentation.RekeningLainnyaViewModel
 import org.koin.compose.koinInject
+import androidx.compose.runtime.setValue
 
-private val PULL_REFRESH_MAX_PUSH = 64.dp // 🔹 seberapa jauh konten terdorong turun saat full refresh
+private val PULL_REFRESH_MAX_PUSH = 60.dp // 🔹 seberapa jauh konten terdorong turun saat full refresh
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BerandaPage(
     navController: NavController,
     onNotificationClick: () -> Unit = {},
-    onLogoutClick: () -> Unit = {},
     onTransferClick: () -> Unit = {},
     onTopUpClick: () -> Unit = {},
     onVirtualAccountClick: () -> Unit = {},
@@ -75,7 +78,10 @@ fun BerandaPage(
     val profileUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
     val rekeningUiState by rekeningViewModel.uiState.collectAsStateWithLifecycle()
 
+    var showLogoutSheet by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
+        profileViewModel.loadProfile()
         rekeningViewModel.load()
         berandaViewModel.loadBanner()
     }
@@ -134,13 +140,10 @@ fun BerandaPage(
                 HaloUserSkeleton()
             } else {
                 HaloUserSection(
-                    nama = namaUser, // sudah fallback "-" dari elvis chain yang ada
+                    nama = namaUser,
                     photoBytes = null,
                     onNotificationClick = onNotificationClick,
-                    onLogoutClick = {
-                        berandaViewModel.logout()
-                        onLogoutClick()
-                    },
+                    onLogoutClick = { showLogoutSheet = true },
                 )
             }
 
@@ -221,11 +224,25 @@ fun BerandaPage(
 
                     Spacer(modifier = Modifier.height(15.dp))
 
-                    BeritaSection(navController = navController)
+                    NewsSection(navController = navController)
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
             }
         }
     }
+if (showLogoutSheet) {
+    LogoutConfirmSheet(
+        onDismiss = { showLogoutSheet = false },
+        onLoggedOut = {
+            showLogoutSheet = false
+            // 🔥 Reset state lokal Beranda (Profile & RekeningLainnya ViewModel)
+            // SETELAH SessionManager.clearSession() sukses dijalankan LogoutViewModel.
+            berandaViewModel.resetLocalState()
+            navController.navigate("portal") {
+                popUpTo(0)
+            }
+        },
+    )
+}
 }

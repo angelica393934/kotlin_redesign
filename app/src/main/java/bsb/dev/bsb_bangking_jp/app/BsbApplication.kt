@@ -5,7 +5,7 @@ import bsb.dev.bsb_bangking_jp.app.di.sessionModule
 import bsb.dev.bsb_bangking_jp.core.device.DeviceContext
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
 import bsb.dev.bsb_bangking_jp.core.device.deviceModule
-import bsb.dev.bsb_bangking_jp.core.get_image.imageModule
+import bsb.dev.bsb_bangking_jp.shared.get_image.imageModule
 import bsb.dev.bsb_bangking_jp.core.network.networkModule
 import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.aktivitasModule
@@ -16,6 +16,9 @@ import bsb.dev.bsb_bangking_jp.feature.login_existing.loginExistingModule
 import bsb.dev.bsb_bangking_jp.feature.news.newsModule
 import bsb.dev.bsb_bangking_jp.feature.splash.splashModule
 import bsb.dev.bsb_bangking_jp.feature.transfer.transferModule
+import bsb.dev.bsb_bangking_jp.shared.logout.logoutModule
+import bsb.dev.bsb_bangking_jp.shared.profile.profileModule
+import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.rekeningLainnyaModule
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -39,6 +42,9 @@ class BsbApplication : Application() {
                 imageModule,
                 newsModule,
                 sessionModule,
+                profileModule,
+                rekeningLainnyaModule,
+                logoutModule,
                 // tambahkan module fitur lain di sini
             )
         }

@@ -1,6 +1,6 @@
 package bsb.dev.bsb_bangking_jp.feature.beranda.domain.get_banner
 
-/** Padanan GetBannerModel di Flutter. */
+/** Padanan GetBannerModel di . */
 data class BannerItem(
     val name: String,
     val description: String,

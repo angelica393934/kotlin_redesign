@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.get_image.domain
+package bsb.dev.bsb_bangking_jp.shared.get_image.domain
 
 interface ImageRepository {
     /**

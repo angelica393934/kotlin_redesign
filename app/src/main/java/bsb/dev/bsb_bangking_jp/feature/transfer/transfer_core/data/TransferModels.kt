@@ -27,7 +27,7 @@ data class GetAccountDestResponse(
 )
 
 // TODO: verifikasi ke backend -- struktur nested profile/external ini mengikuti
-// TransferInquiryModel.fromJson() Flutter persis.
+// TransferInquiryModel.fromJson()  persis.
 data class TransferInquiryData(
     @SerializedName("profile") val profile: TransferInquiryProfile = TransferInquiryProfile(),
     @SerializedName("external") val external: TransferInquiryExternal = TransferInquiryExternal(),
@@ -203,7 +203,7 @@ fun ConfirmTransferResultDto.toDomain(): ConfirmTransferResult = ConfirmTransfer
 // ============================================================
 
 // TODO: verifikasi ke backend -- bentuk objek "purpose" belum terlihat di source Dart
-// (Flutter cuma teruskan Map mentah). Diasumsikan list of {code, name}.
+// ( cuma teruskan Map mentah). Diasumsikan list of {code, name}.
 data class TransferPurposeResponse(
     @SerializedName("respCode") val respCode: String? = null,
     @SerializedName("respMessage") val respMessage: String? = null,

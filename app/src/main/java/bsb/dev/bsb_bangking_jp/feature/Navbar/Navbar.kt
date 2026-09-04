@@ -136,7 +136,8 @@ fun Navbar(
                 2 -> PesanPage()
                 3 -> PengaturanPage(
                     darkTheme = darkTheme,
-                    onThemeChange = onThemeChange,)
+                    onThemeChange = onThemeChange,
+                    navController = navController,)
             }
         }
     }

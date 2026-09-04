@@ -38,7 +38,7 @@ import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.RekeningItem
 import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.data.cashBalanceValue
 
-/** Padanan RekeningLainnyaState (initial/loading/refreshing/success/error) di Flutter. */
+/** Padanan RekeningLainnyaState (initial/loading/refreshing/success/error) di . */
 sealed interface RekeningSumberUiState {
     data object Loading : RekeningSumberUiState
     data class Success(val data: List<RekeningItem>) : RekeningSumberUiState

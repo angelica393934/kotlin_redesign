@@ -39,7 +39,7 @@ fun SplashScreen(
         }
     }
 
-    // Toast error, padanan showErrorToast(context, message) di listener Bloc Flutter.
+    // Toast error, padanan showErrorToast(context, message) di listener Bloc .
     LaunchedEffect(uiState) {
         val state = uiState
         if (state is SplashUiState.Error) {

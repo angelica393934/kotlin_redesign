@@ -96,7 +96,7 @@ fun InputPinPage(
 
     val isUsingCustomHeader = usePolaHeader || centerTitleWithBackButton
 
-    // Box di root = padanan `Stack` di Flutter: latar (bg.png) digambar penuh
+    // Box di root = padanan `Stack` di : latar (bg.png) digambar penuh
     // satu layar dulu, baru Scaffold (header + konten + banner + keypad) di
     // atasnya dengan container transparan supaya latarnya kelihatan.
     Box(modifier = modifier.background(MaterialTheme.colorScheme.background)) {

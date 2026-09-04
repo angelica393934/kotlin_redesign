@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
-import bsb.dev.bsb_bangking_jp.core.navigation.AppNavigation
+import bsb.dev.bsb_bangking_jp.app.navigation.AppNavigation
 import bsb.dev.bsb_bangking_jp.core.theme.BSBBangkingJPTheme
 import bsb.dev.bsb_bangking_jp.viewmodel.SettingsViewModel
 

@@ -19,8 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
 /**
- * Setara `SkeletonMenuUtama` di Flutter: judul + grid 4 kolom berisi [SkeletonMenu].
- * `Wrap` di Flutter -> [FlowRow] di Compose (`maxItemsInEachRow = 4` = 4 kolom per baris).
+ * Setara `SkeletonMenuUtama` di : judul + grid 4 kolom berisi [SkeletonMenu].
+ * `Wrap` di  -> [FlowRow] di Compose (`maxItemsInEachRow = 4` = 4 kolom per baris).
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.beranda.section.berita
+package bsb.dev.bsb_bangking_jp.feature.news
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,8 +34,8 @@ import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
-import bsb.dev.bsb_bangking_jp.core.get_image.NetworkImage
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
+import bsb.dev.bsb_bangking_jp.shared.get_image.NetworkImage
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 import bsb.dev.bsb_bangking_jp.feature.news.domain.AllNewsItem
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.AllNewsUiState
@@ -45,7 +45,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun BeritaListPage(
+fun AllNewsPage(
     navController: NavController,
     onBeritaClick: (AllNewsItem) -> Unit,
     onBackClick: () -> Unit,
@@ -70,7 +70,7 @@ fun BeritaListPage(
             is AllNewsUiState.Initial, is AllNewsUiState.Loading -> {
                 Box(modifier = Modifier.weight(1f))
                 // 🔹 padanan ArcLoadingIndicator di tengah layar
-                androidx.compose.foundation.layout.Box(
+                Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {

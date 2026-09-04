@@ -146,7 +146,7 @@ private fun BankItemRow(
     ) {
         // 🔹 InitialAvatar sudah otomatis fallback ke inisial kalau `imagePath`
         // null/gagal load (lihat GlideImage di dalamnya) -- padanan skeleton+fallback
-        // manual yang ada di GetImageBloc versi Flutter.
+        // manual yang ada di GetImageBloc versi .
         InitialAvatar(
             initials = bank.bankName,
             imagePath = bank.picture,

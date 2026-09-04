@@ -7,13 +7,13 @@ import retrofit2.http.HeaderMap
 import retrofit2.http.Tag
 
 interface NewsApiService {
-    // Endpoint 1 -- ringkasan utk Beranda, tanpa tokenPhase khusus (padanan Flutter, no extra).
+    // Endpoint 1 -- ringkasan utk Beranda, tanpa tokenPhase khusus (padanan , no extra).
     @GET("v1/info/geturlnews")
     suspend fun getNews(
         @HeaderMap headers: Map<String, String>,
     ): Response<GetNewsResponse>
 
-    // Endpoint 2 -- daftar lengkap utk BeritaListPage.
+    // Endpoint 2 -- daftar lengkap utk AllNewsPage.
     @GET("v1/info/getallnews")
     suspend fun getAllNews(
         @HeaderMap headers: Map<String, String>,

@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/** Setara `ProfileSettingSkeleton` di Flutter: card putih dengan shadow tipis. */
+/** Setara `ProfileSettingSkeleton` di : card putih dengan shadow tipis. */
 @Composable
 fun ProfileSettingSkeleton(modifier: Modifier = Modifier) {
     Card(

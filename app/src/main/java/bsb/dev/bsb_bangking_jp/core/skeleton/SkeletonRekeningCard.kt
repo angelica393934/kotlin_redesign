@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
-/** Setara `SkeletonRekeningCard` di Flutter: judul + card rekening dengan border. */
+/** Setara `SkeletonRekeningCard` di : judul + card rekening dengan border. */
 @Composable
 fun SkeletonRekeningCard(modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth()) {

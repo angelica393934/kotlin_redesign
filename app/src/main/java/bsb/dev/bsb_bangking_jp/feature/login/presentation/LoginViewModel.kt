@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-// Padanan respCode di listener LoginSheet Flutter-mu
+// Padanan respCode di listener LoginSheet -mu
 private const val PASSCODE_ERROR_CODE = "0601"
 private const val USERID_ERROR_CODE = "0610"
 

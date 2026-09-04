@@ -23,7 +23,7 @@ class NewsDetailRepositoryImpl(
             return cache.getValue(id)
         }
 
-        val fresh = retry(maxAttempt = 3) { fetchDetail(id) }
+        val fresh = retry { fetchDetail(id) }
         cache[id] = fresh
         lastFetchTime[id] = System.currentTimeMillis()
         return fresh

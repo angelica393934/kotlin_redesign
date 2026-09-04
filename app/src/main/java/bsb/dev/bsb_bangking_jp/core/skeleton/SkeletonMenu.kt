@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/** Setara `SkeletonMenu` di Flutter: avatar bulat + label kecil di bawahnya. */
+/** Setara `SkeletonMenu` di : avatar bulat + label kecil di bawahnya. */
 @Composable
 fun SkeletonMenu(modifier: Modifier = Modifier) {
     Column(

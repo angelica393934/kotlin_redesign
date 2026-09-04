@@ -26,7 +26,7 @@ class NewsRepositoryImpl(
         if (!forceRefresh && cache != null && !shouldRefresh()) {
             return cache!!
         }
-        val fresh = retry(maxAttempt = 3) { fetchNews() }
+        val fresh = retry{ fetchNews() }
         cache = fresh
         lastFetchTime = System.currentTimeMillis()
         return fresh

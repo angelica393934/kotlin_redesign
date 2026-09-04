@@ -17,7 +17,7 @@ class LastTransferViewModel(
     private val _uiState = MutableStateFlow<LastTransferUiState>(LastTransferUiState.Initial)
     val uiState: StateFlow<LastTransferUiState> = _uiState.asStateFlow()
 
-    /** Padanan `_onLoad` di Bloc Flutter -- kalau sudah Success, tidak fetch ulang kecuali forceRefresh. */
+    /** Padanan `_onLoad` di Bloc  -- kalau sudah Success, tidak fetch ulang kecuali forceRefresh. */
     fun load(forceRefresh: Boolean = false) {
         if (!forceRefresh && _uiState.value is LastTransferUiState.Success) return
 

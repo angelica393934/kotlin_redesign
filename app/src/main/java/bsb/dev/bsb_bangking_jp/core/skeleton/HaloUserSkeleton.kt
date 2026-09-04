@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/** Setara `HaloUserSkeleton` di Flutter: avatar + "Halo, Nama" di kiri, 2 ikon di kanan. */
+/** Setara `HaloUserSkeleton` di : avatar + "Halo, Nama" di kiri, 2 ikon di kanan. */
 @Composable
 fun HaloUserSkeleton(modifier: Modifier = Modifier) {
     Row(

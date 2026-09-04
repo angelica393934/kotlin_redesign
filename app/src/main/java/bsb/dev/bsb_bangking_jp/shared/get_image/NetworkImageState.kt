@@ -1,10 +1,10 @@
-package bsb.dev.bsb_bangking_jp.core.get_image
+package bsb.dev.bsb_bangking_jp.shared.get_image
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageRepository
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageCategory
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageRepository
 import org.koin.compose.koinInject
 
 sealed interface NetworkImageState {

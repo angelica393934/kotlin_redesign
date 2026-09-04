@@ -1,9 +1,9 @@
-package bsb.dev.bsb_bangking_jp.core.get_image.data
+package bsb.dev.bsb_bangking_jp.shared.get_image.data
 
 import bsb.dev.bsb_bangking_jp.core.crypto.SignatureUtils
 import bsb.dev.bsb_bangking_jp.core.device.SecureStorageService
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageRepository
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageCategory
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageRepository
 import bsb.dev.bsb_bangking_jp.core.network.header.ApiHeaders
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhase
 import bsb.dev.bsb_bangking_jp.core.network.token.TokenPhaseTag

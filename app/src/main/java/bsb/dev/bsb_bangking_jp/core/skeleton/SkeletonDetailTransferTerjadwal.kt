@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 
 /**
- * Setara `SkeletonDetailTransferTerjadwal` di Flutter: header penerima,
+ * Setara `SkeletonDetailTransferTerjadwal` di : header penerima,
  * baris-baris detail transfer, kartu rekening sumber, dan hint text di bawah.
  * Butuh [SkeletonRekeningCard] yang dibuat terpisah.
  */

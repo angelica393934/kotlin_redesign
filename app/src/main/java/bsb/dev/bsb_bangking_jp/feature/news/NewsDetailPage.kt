@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.beranda.section.berita
+package bsb.dev.bsb_bangking_jp.feature.news
 
 import android.content.Intent
 import android.net.Uri
@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
-import bsb.dev.bsb_bangking_jp.core.get_image.NetworkImage
-import bsb.dev.bsb_bangking_jp.core.get_image.domain.ImageCategory
+import bsb.dev.bsb_bangking_jp.shared.get_image.NetworkImage
+import bsb.dev.bsb_bangking_jp.shared.get_image.domain.ImageCategory
 import bsb.dev.bsb_bangking_jp.feature.news.domain.NewsDetail
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsDetailUiState
 import bsb.dev.bsb_bangking_jp.feature.news.presentation.NewsDetailViewModel
@@ -48,7 +48,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun BeritaDetailPage(
+fun NewsDetailPage(
     newsId: Int,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -87,7 +87,7 @@ fun BeritaDetailPage(
                 }
 
                 is NewsDetailUiState.Success -> {
-                    BeritaDetailContent(data = state.data)
+                    NewsDetailContent(data = state.data)
                 }
             }
         }
@@ -95,7 +95,7 @@ fun BeritaDetailPage(
 }
 
 @Composable
-private fun BeritaDetailContent(data: NewsDetail) {
+private fun NewsDetailContent(data: NewsDetail) {
     val formattedDate = remember(data.createdDate) {
         SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID")).format(data.createdDate)
     }
@@ -168,7 +168,7 @@ private fun BeritaDetailContent(data: NewsDetail) {
 }
 
 /**
- * Padanan `onTap` TapGestureRecognizer di Flutter -- buka link eksternal.
+ * Padanan `onTap` TapGestureRecognizer di  -- buka link eksternal.
  * Harus @Composable (bukan extension Modifier biasa) karena butuh LocalContext.current
  * dan remember{} yang cuma boleh dipanggil dari composable context.
  */

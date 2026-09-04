@@ -14,7 +14,7 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.saved_recipient.domain.SavedReci
 import bsb.dev.bsb_bangking_jp.feature.transfer.saved_recipient.domain.SavedRecipientRepository
 
 private const val SUCCESS_CODE = "0000"
-private const val EMPTY_DATA_CODE = "0860" // padanan cabang "empty data" di Flutter
+private const val EMPTY_DATA_CODE = "0860" // padanan cabang "empty data" di 
 
 class SavedRecipientRepositoryImpl(
     private val api: SavedRecipientApiService,
@@ -30,7 +30,7 @@ class SavedRecipientRepositoryImpl(
         if (!forceRefresh && cache != null) {
             return cache!!
         }
-        // 🔹 Padanan Flutter "NO RETRY" cuma untuk get pertama kali dari Bloc,
+        // 🔹 Padanan  "NO RETRY" cuma untuk get pertama kali dari Bloc,
         // tapi di layer repository kita tetap pakai retry (konsisten dgn repo lain di project ini).
         val fresh = retry { fetchSavedRecipients() }
         cache = fresh

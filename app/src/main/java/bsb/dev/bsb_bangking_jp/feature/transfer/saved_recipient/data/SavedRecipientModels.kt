@@ -10,7 +10,7 @@ data class SavedRecipientListResponse(
     @SerializedName("data") val data: List<SavedRecipientDto> = emptyList(),
 )
 
-// Field mengikuti persis SavedRecipientModel.fromJson() di Flutter:
+// Field mengikuti persis SavedRecipientModel.fromJson() di :
 // "number" -> accountNumber, "name_code" -> bankName, "bank_code" -> bankCode.
 data class SavedRecipientDto(
     @SerializedName("id") val id: String = "",

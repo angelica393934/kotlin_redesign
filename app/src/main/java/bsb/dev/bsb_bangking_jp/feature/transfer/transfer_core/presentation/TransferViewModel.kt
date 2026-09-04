@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val INQUIRY_INLINE_ERROR_CODE = "0602"
-private const val INQUIRY_SILENT_CODE = "0683" // gagal tapi tidak perlu toast (padanan Flutter)
+private const val INQUIRY_SILENT_CODE = "0683" // gagal tapi tidak perlu toast (padanan )
 
 // 🔹 Padanan respCode "0688" di failure handler transfer() (fase 3).
 private const val TRANSFER_SESSION_EXPIRED_CODE = "0688"
@@ -109,7 +109,7 @@ class TransferViewModel(
 
     /**
      * 3) TRANSFER.
-     * Padanan `failure: (code, msg)` di listener PeriksaKembaliSheet Flutter-mu:
+     * Padanan `failure: (code, msg)` di listener PeriksaKembaliSheet -mu:
      * - code "0688" -> sesi berakhir: toast pesan tetap, lalu tutup sheet + pop 1x lagi.
      * - selain itu -> toast pakai `msg` dari server, tetap di halaman yang sama.
      */
@@ -139,7 +139,7 @@ class TransferViewModel(
 
     /**
      * 4) CONFIRM TRANSFER.
-     * Padanan `failure: (code, message)` di listener PinTfPage Flutter-mu:
+     * Padanan `failure: (code, message)` di listener PinTfPage -mu:
      * - code "0732"/"0465" -> sesi berakhir: toast, pop 2x, lalu pushReplacement ke TransferPage.
      * - selain itu -> tetap tampil inline di field PIN (confirmError, sudah ada sebelumnya).
      */

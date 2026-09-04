@@ -2,7 +2,7 @@ package bsb.dev.bsb_bangking_jp.feature.transfer.transfer_core.domain
 
 import bsb.dev.bsb_bangking_jp.core.util.InitialName
 
-/** Padanan TransferInquiryModel di Flutter -- hasil dari getaccountdest. */
+/** Padanan TransferInquiryModel di  -- hasil dari getaccountdest. */
 data class TransferInquiry(
     val bankName: String,
     val beneficiaryName: String,

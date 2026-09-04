@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.core.navigation
+package bsb.dev.bsb_bangking_jp.app.navigation
 
 import android.net.Uri
 import android.util.Log
@@ -42,7 +42,7 @@ import bsb.dev.bsb_bangking_jp.feature.transfer.TransferBerhasilPage
 import bsb.dev.bsb_bangking_jp.feature.transfer.TransferHomePage
 import bsb.dev.bsb_bangking_jp.feature.transfer.TransferUmumPage
 import bsb.dev.bsb_bangking_jp.feature.transfer.component.PeriksaKembaliData
-import bsb.dev.bsb_bangking_jp.feature.beranda.section.berita.BeritaListPage
+import bsb.dev.bsb_bangking_jp.feature.news.AllNewsPage
 import androidx.navigation.compose.navigation
 import androidx.compose.ui.Alignment
 import bsb.dev.bsb_bangking_jp.core.component.LoadingOverlayHost
@@ -57,7 +57,7 @@ import bsb.dev.bsb_bangking_jp.feature.login_existing.presentation.LoginExisting
 import androidx.compose.ui.platform.LocalContext
 import bsb.dev.bsb_bangking_jp.core.notification.NotificationHelper
 import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
-import bsb.dev.bsb_bangking_jp.feature.beranda.section.berita.BeritaDetailPage
+import bsb.dev.bsb_bangking_jp.feature.news.NewsDetailPage
 
 @Composable
 fun AppNavigation(
@@ -265,7 +265,7 @@ fun AppNavigation(
                 }
 
                 composable("berita_list") {
-                    BeritaListPage(
+                    AllNewsPage(
                         navController = navController,
                         onBeritaClick = { item ->
                             navController.navigate("berita_detail/${item.id}")
@@ -279,7 +279,7 @@ fun AppNavigation(
                     arguments = listOf(navArgument("newsId") { type = NavType.IntType }),
                 ) { backStackEntry ->
                     val newsId = backStackEntry.arguments?.getInt("newsId") ?: 0
-                    BeritaDetailPage(
+                    NewsDetailPage(
                         newsId = newsId,
                         onBackClick = { navController.popBackStack() },
                     )

@@ -3,11 +3,11 @@ package bsb.dev.bsb_bangking_jp.core.dummy
 import java.util.Date
 
 /**
- * Padanan `ConfirmTransferResultModel` (Flutter) -- hasil dari API confirm-transfer.
+ * Padanan `ConfirmTransferResultModel` () -- hasil dari API confirm-transfer.
  *
  * TODO: ganti jadi model response API asli begitu backend transfer sudah terintegrasi. Struktur
  * field di bawah disesuaikan dengan field yang dipakai `TransferBerhasilPage` &
- * `TransferBerhasilDijadwalkanPage` di versi Flutter.
+ * `TransferBerhasilDijadwalkanPage` di versi .
  */
 data class ConfirmTransferResult(
     val reffNum: String,

@@ -31,7 +31,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.R
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
 import bsb.dev.bsb_bangking_jp.core.util.getAppVersion
@@ -50,6 +53,7 @@ import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingItemData
 import bsb.dev.bsb_bangking_jp.feature.pengaturan.component.SettingSection
 import org.koin.compose.koinInject
 import bsb.dev.bsb_bangking_jp.core.skeleton.ProfileSettingSkeleton
+import bsb.dev.bsb_bangking_jp.shared.logout.LogoutConfirmSheet
 import bsb.dev.bsb_bangking_jp.shared.profile.presentation.ProfileViewModel
 
 private val HeaderHeight = 100.dp
@@ -57,6 +61,7 @@ private val ProfileCardHalfHeight = 44.dp
 
 @Composable
 fun PengaturanPage(
+    navController: NavController,
     darkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
     profileViewModel: ProfileViewModel = koinInject(), // 🔹 sumber data profile yang sama dengan Beranda
@@ -71,6 +76,7 @@ fun PengaturanPage(
         ?: "-"
 
     val phoneNumber = uiState.profile?.user?.maskPhone ?: "-"
+    var showLogoutSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -142,8 +148,9 @@ fun PengaturanPage(
                     SettingSection(
                         title = stringResource(R.string.section_keluar),
                         items = listOf(
-                            SettingItemData(Icons.Default.ExitToApp, stringResource(R.string.menu_keluar)),
-                        )
+                            SettingItemData(Icons.Default.ExitToApp, stringResource(R.string.menu_keluar), onClick= { showLogoutSheet = true },),
+                        ),
+
                     )
 
                     Text(
@@ -175,6 +182,20 @@ fun PengaturanPage(
                 )
             }
         }
+    }
+    if (showLogoutSheet) {
+        LogoutConfirmSheet(
+            onDismiss = { showLogoutSheet = false },
+            onLoggedOut = {
+                showLogoutSheet = false
+                // 🔥 Reset state lokal Beranda (Profile & RekeningLainnya ViewModel)
+                // SETELAH SessionManager.clearSession() sukses dijalankan LogoutViewModel.
+//                berandaViewModel.resetLocalState()
+                navController.navigate("portal") {
+                    popUpTo(0)
+                }
+            },
+        )
     }
 }
 

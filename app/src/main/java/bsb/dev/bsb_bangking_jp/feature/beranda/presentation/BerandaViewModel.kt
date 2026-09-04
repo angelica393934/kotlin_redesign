@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 class BerandaViewModel(
     private val profileViewModel: ProfileViewModel,
     private val rekeningViewModel: RekeningLainnyaViewModel,
-    private val sessionClearer: SessionClearer,
     private val bannerRepository: GetBannerRepository,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -60,9 +59,12 @@ class BerandaViewModel(
         rekeningViewModel.load(forceRefresh = true)
         loadBanner(forceRefresh = true)
     }
-
-    fun logout() {
-        sessionClearer.clearAll()
+    /**
+     * Padanan reset state lokal Beranda SETELAH logout sukses (bukan proses logout
+     * itu sendiri). Dipanggil dari BerandaPage.onLoggedOut, SETELAH SessionManager
+     * .clearSession() dijalankan oleh LogoutViewModel.
+     */
+    fun resetLocalState() {
         profileViewModel.clear()
         rekeningViewModel.clear()
         _uiState.update { BerandaUiState() }

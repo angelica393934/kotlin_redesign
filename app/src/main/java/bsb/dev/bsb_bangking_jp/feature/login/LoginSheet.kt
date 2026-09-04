@@ -90,7 +90,7 @@ fun LoginSheet(
         }
     }
 
-    // Catatan: pemblokiran back-press saat loading (padanan PopScope Flutter-mu)
+    // Catatan: pemblokiran back-press saat loading (padanan PopScope -mu)
     // sengaja tidak ditambahkan di sini karena AppModalBottomSheet pembungkusnya
     // sudah skipPartiallyExpanded + non-dismissable secara default saat dibutuhkan.
     // Kalau kamu mau block back-press eksplisit, tambahkan BackHandler(enabled = uiState.isLoading) {}.

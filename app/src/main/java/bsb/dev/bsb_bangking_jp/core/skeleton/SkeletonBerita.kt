@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
-/** Setara `SkeletonBerita` di Flutter: card putih judul + gambar 16:9 + dot indicator. */
+/** Setara `SkeletonBerita` di : card putih judul + gambar 16:9 + dot indicator. */
 @Composable
 fun SkeletonBerita(modifier: Modifier = Modifier) {
     Column(

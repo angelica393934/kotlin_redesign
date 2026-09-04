@@ -83,7 +83,7 @@ data class DummyTransferInquiry(
 )
 
 /**
- * Dummy untuk 1 item metode/riwayat pembayaran (padanan `PaymentItemData` di Flutter),
+ * Dummy untuk 1 item metode/riwayat pembayaran (padanan `PaymentItemData` di ),
  * dipakai di bagian "Daftar Pembayaran Terakhir" pada TopUpPage & VaPage & PajakPendidikanPage.
  */
 data class DummyPaymentMethod(
@@ -94,7 +94,7 @@ data class DummyPaymentMethod(
 
 /**
  * Dummy untuk 1 entri menu berbasis ikon+label (padanan `MenuItemData` / `Map` menu di
- * Flutter), dipakai di grid menu PajakPendidikanPage dan daftar LainnyaPajakPage.
+ * ), dipakai di grid menu PajakPendidikanPage dan daftar LainnyaPajakPage.
  * `route` null berarti menu belum tersedia (fallback ke halaman "fitur belum ada").
  */
 data class DummyMenuIcon(
@@ -105,7 +105,7 @@ data class DummyMenuIcon(
 )
 
 /**
- * Dummy untuk 1 entri riwayat transaksi cardless (padanan `CardlessHistory` di Flutter),
+ * Dummy untuk 1 entri riwayat transaksi cardless (padanan `CardlessHistory` di ),
  * dipakai di CardlessPage.
  */
 data class DummyCardlessHistory(
@@ -187,7 +187,7 @@ object DummyData {
 
     /**
      * Dummy daftar bank untuk PilihBankSheet. bankCode "120" dianggap "Sesama Bank"
-     * (padanan filter `bank.bankCode == "120"` di Flutter), sisanya masuk "Daftar Bank Lain".
+     * (padanan filter `bank.bankCode == "120"` di ), sisanya masuk "Daftar Bank Lain".
      */
     val bankList = listOf(
         DummyBank("120", "Bank Sumsel Babel"),

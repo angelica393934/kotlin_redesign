@@ -44,10 +44,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bsb.dev.bsb_bangking_jp.core.component.AppHeader
+import bsb.dev.bsb_bangking_jp.core.component.CustomRefreshIndicator
 import bsb.dev.bsb_bangking_jp.core.component.EmptyState
 import bsb.dev.bsb_bangking_jp.core.component.FilterChipBar
 import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
@@ -65,18 +68,24 @@ import bsb.dev.bsb_bangking_jp.feature.aktivitas.section.SaldoCardSelector
 import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.presentation.RekeningLainnyaViewModel
 import org.koin.compose.koinInject
+import kotlin.math.roundToInt
+
+// 🔹 Sama seperti PULL_REFRESH_MAX_PUSH di BerandaPage.kt -- seberapa jauh konten
+// terdorong turun saat pull-to-refresh full/aktif.
+private val PULL_REFRESH_MAX_PUSH = 30.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AktivitasPage(
     activityViewModel: ActivityHistoryViewModel = koinInject(), // 🔹 koinInject, bukan koinViewModel
     rekeningViewModel: RekeningLainnyaViewModel = koinInject(),
-    ) {
+) {
     val rekeningUiState by rekeningViewModel.uiState.collectAsStateWithLifecycle()
 
     val activityState by activityViewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val pullToRefreshState = rememberPullToRefreshState()
+    val density = LocalDensity.current
 
     var showFilterModal by remember { mutableStateOf(false) }
 
@@ -92,6 +101,11 @@ fun AktivitasPage(
     // LaunchedEffect kedua di sini lagi.
 
     val accountNo = activityState.accountNumber
+
+    // 🔹 Status refreshing "murni" utk PullToRefreshBox & efek dorong-turun --
+    // pada titik kode ini (branch `else ->` di bawah) items SUDAH pasti tidak kosong,
+    // jadi isLoading di sini artinya "sedang refresh", bukan "loading pertama kali".
+    val isRefreshing = activityState.isLoading
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -228,13 +242,35 @@ fun AktivitasPage(
                     )
                 }
                 else -> {
+                    val maxPushPx = with(density) { PULL_REFRESH_MAX_PUSH.toPx() }
+                    val pushOffsetPx = if (isRefreshing) {
+                        maxPushPx
+                    } else {
+                        (pullToRefreshState.distanceFraction.coerceIn(0f, 1f) * maxPushPx)
+                    }
+
                     PullToRefreshBox(
-                        isRefreshing = activityState.isLoading,
+                        isRefreshing = isRefreshing,
                         onRefresh = { activityViewModel.refresh() },
                         state = pullToRefreshState,
+                        indicator = {
+                            CustomRefreshIndicator(
+                                state = pullToRefreshState,
+                                isRefreshing = isRefreshing,
+                                modifier = Modifier.align(Alignment.TopCenter),
+                            )
+                        },
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                // 🔹 KONTEN IKUT TERDORONG TURUN sesuai jarak tarikan / status refreshing
+                                .offset {
+                                    IntOffset(x = 0, y = pushOffsetPx.roundToInt())
+                                },
+                            state = listState,
+                        ) {
                             grouped.forEach { (tanggal, itemsForDate) ->
                                 item(key = "header_$tanggal") {
                                     TanggalHeader(tanggal = DateFormatterUtil.fromYYMMDD(tanggal))
@@ -267,7 +303,7 @@ fun AktivitasPage(
         Spacer(modifier = Modifier.height(80.dp))
     }
 
-    if (showFilterModal) {
+    if (showFilterModal) {io
         FilterTransaksiModal(
             currentFilter = activityState.activeFilter ?: ActivityFilterPayload.initial(),
             onDismiss = { showFilterModal = false },
@@ -306,7 +342,7 @@ private fun TransaksiItem(transaksi: HistoryItem, modifier: Modifier = Modifier)
         ?: transaksi.jenisTransaksi.ifBlank { "Transaksi" }
     val subtitle = descLines.getOrNull(1).orEmpty()
 
-    val nominalInt = transaksi.amount.toDoubleOrNull()?.toInt() ?: 0
+    val nominalInt = transaksi.amountValue.toInt()
     val nominalFormatted = RupiahFormat(nominalInt)
     val nominalDisplay = if (transaksi.isMasuk) "+ $nominalFormatted" else "- $nominalFormatted"
 

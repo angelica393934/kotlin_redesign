@@ -42,14 +42,14 @@ fun CustomRefreshIndicator(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 900, easing = LinearEasing),
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
         ),
         label = "rotation",
     )
 
     Box(
         modifier = modifier
-            .size(44.dp) // 🔹 lebih kecil dari LoadingOverlay (yang 70dp)
+            .size(40.dp) // 🔹 lebih kecil dari LoadingOverlay (yang 70dp)
             .graphicsLayer {
                 // Saat masih ditarik (belum full refresh), ikuti progress tarikan.
                 // Saat sedang refreshing, biarkan selalu terlihat penuh.
@@ -63,7 +63,7 @@ fun CustomRefreshIndicator(
     ) {
         CircularProgressIndicator(
             modifier = Modifier
-                .size(24.dp)
+                .size(20.dp)
                 .graphicsLayer {
                     // Putar manual mengikuti progress tarikan kalau belum full refresh,
                     // dan animasi muter terus kalau sedang benar-benar refreshing.

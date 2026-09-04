@@ -74,7 +74,7 @@ private fun buildRangeCalendarGrid(yearMonth: YearMonth): List<RangeCalendarDay>
 /**
  * Padanan DateRangePickerBottomSheet.dart -- satu kalender untuk memilih RENTANG tanggal.
  * Batas rentang yang bisa dipilih: firstDate = hari ini - 1 tahun, lastDate = hari ini
- * (padanan `firstDate: DateTime(now.year - 1)` & `lastDate: now` di Flutter).
+ * (padanan `firstDate: DateTime(now.year - 1)` & `lastDate: now` di ).
  * Default saat sheet dibuka pertama kali (belum ada filter aktif): start = end = hari ini.
  */
 @Composable

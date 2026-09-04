@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 
 /**
- * Brush shimmer yang bergerak (mirip [Shimmer.fromColors] dari package `shimmer` di Flutter).
+ * Brush shimmer yang bergerak (mirip [Shimmer.fromColors] dari package `shimmer` di ).
  * Warna base/highlight otomatis menyesuaikan light/dark mode.
  */
 @Composable
@@ -53,9 +53,9 @@ fun rememberShimmerBrush(): Brush {
 }
 
 /**
- * Kotak dasar untuk semua skeleton. Setara dengan `SkeletonBox` di Flutter.
+ * Kotak dasar untuk semua skeleton. Setara dengan `SkeletonBox` di .
  *
- * - `width = null` -> mengisi lebar penuh parent (default Flutter: double.infinity).
+ * - `width = null` -> mengisi lebar penuh parent (default : double.infinity).
  * - `isCircular = true` -> jadi lingkaran (bisa dipakai langsung sebagai avatar,
  *   tanpa perlu widget `SkeletonAvatar` terpisah kalau kamu mau lebih ringkas).
  */

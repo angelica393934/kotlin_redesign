@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.theme.LocalExtendedColors
 
 /**
- * Setara `SkeletonBanner` di Flutter: banner solid (bukan shimmer) dengan
+ * Setara `SkeletonBanner` di : banner solid (bukan shimmer) dengan
  * kotak shimmer di dalamnya + tombol close.
  * Warna background pakai `ExtendedColors.warning` dari tema project (ganti sesuai kebutuhan).
  */

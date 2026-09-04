@@ -18,7 +18,6 @@ data class ActivityHistoryResponse(
     @SerializedName("data") val data: ActivityHistoryData = ActivityHistoryData(),
 ) : bsb.dev.bsb_bangking_jp.core.network.BaseRespCodeResponse
 
-/** Padanan bagian `data` di ActivityHistoryModel.fromJson -- berisi nomor rekening + list histori. */
 data class ActivityHistoryData(
     @SerializedName("number") val number: String = "",
     @SerializedName("history") val history: List<HistoryItem> = emptyList(),
@@ -45,7 +44,21 @@ data class HistoryItem(
     @SerializedName("kategoriTransaksi") val kategoriTransaksi: String = "",
 ) {
     val currency: String get() = detailBalance.amount.currency
+
+    /** Nominal mentah dari backend, mis. "10000,00" (koma sebagai desimal). */
     val amount: String get() = detailBalance.amount.value
+
+    /**
+     * 🔹 BARU: parsing aman nominal -- backend pakai format Indonesia
+     * (titik = pemisah ribuan, koma = desimal), mis. "10000,00" atau "1.500.000,00".
+     * Jangan pakai `amount.toDoubleOrNull()` langsung karena Kotlin cuma paham
+     * titik sebagai desimal -> akan selalu null utk format backend ini.
+     */
+    val amountValue: Double
+        get() = amount
+            .replace(".", "")   // buang pemisah ribuan
+            .replace(",", ".")  // koma desimal -> titik desimal
+            .toDoubleOrNull() ?: 0.0
 
     /** Padanan getter isMasuk -- true kalau kategoriTransaksi persis "berhasil, masuk". */
     val isMasuk: Boolean get() = kategoriTransaksi.lowercase() == "berhasil, masuk"
@@ -62,7 +75,11 @@ data class HistoryItem(
         }
     }
 
-    /** Padanan getter rekeningTujuan -- ambil angka setelah huruf 'S' terakhir di remark, sampai sebelum '-'. */
+    /**
+     * Padanan getter rekeningTujuan -- ambil angka setelah huruf 'S' terakhir di remark,
+     * sampai sebelum '-'. Contoh: "100504     313000S15001001816 - Testing senin"
+     * -> "15001001816".
+     */
     val rekeningTujuan: String get() {
         if (remark.isEmpty()) return ""
         val indexS = remark.lastIndexOf('S')
@@ -70,6 +87,17 @@ data class HistoryItem(
         val afterS = remark.substring(indexS + 1)
         val indexStrip = afterS.indexOf('-')
         return if (indexStrip != -1) afterS.substring(0, indexStrip).trim() else afterS.trim()
+    }
+
+    /**
+     * 🔹 BARU: teks bebas setelah tanda "-" TERAKHIR di remark -- ini catatan/keterangan
+     * transaksi yang diketik user, mis. "100504 313000S15001001816 - Testing senin"
+     * -> "Testing senin". Kosong kalau remark tidak punya "-".
+     */
+    val keteranganTransaksi: String get() {
+        if (remark.isEmpty()) return ""
+        val indexStrip = remark.lastIndexOf('-')
+        return if (indexStrip != -1) remark.substring(indexStrip + 1).trim() else ""
     }
 
     /** Padanan getter deskripsiTransaksi -- "Jenis arah\nrekeningTujuan". */

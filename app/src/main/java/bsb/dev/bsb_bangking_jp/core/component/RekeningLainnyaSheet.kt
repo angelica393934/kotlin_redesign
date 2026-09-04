@@ -156,7 +156,7 @@ private fun RekeningItemCard(
             )
             .clickable { onTap() }
     ) {
-        // Watermark logo transparan, padanan Positioned.fill + Transform.scale(4) di Flutter.
+        // Watermark logo transparan, padanan Positioned.fill + Transform.scale(4) di .
         Image(
             painter = painterResource(id = R.drawable.bg_card),
             contentDescription = null,

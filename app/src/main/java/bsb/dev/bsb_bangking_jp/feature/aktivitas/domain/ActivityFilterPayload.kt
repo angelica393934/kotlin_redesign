@@ -26,7 +26,7 @@ data class ActivityFilterPayload(
     }
 
     /**
-     * Padanan copyWith() dengan reset-flag di Flutter. Kotlin `data class.copy()` tidak bisa
+     * Padanan copyWith() dengan reset-flag di . Kotlin `data class.copy()` tidak bisa
      * bedakan "parameter tidak diisi" vs "sengaja diisi null", jadi dipakai flag reset eksplisit
      * sama seperti versi Dart-nya.
      */

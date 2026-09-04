@@ -97,8 +97,6 @@ class TransferRepositoryImpl(
 
     override suspend fun confirmTransfer(mobilePin: String): Result<ConfirmTransferResult> = runCatchingApi {
         val body = ConfirmTransferRequest(mobilePin = mobilePin)
-        // 🔹 Tanpa X-Signature -- persis Flutter (cuma tokenPhase "transfer", Authorization
-        // otomatis dilampirkan TokenRefreshInterceptor dari secureStorage.getTransferAccessToken()).
         val headers = signedHeaders(body)
 
         val response = api.confirmTransfer(

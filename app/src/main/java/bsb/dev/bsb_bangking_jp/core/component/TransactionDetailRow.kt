@@ -15,11 +15,11 @@ import androidx.compose.ui.unit.dp
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
 
 /**
- * Padanan `_buildDetailRow` yang berulang di beberapa halaman Flutter (PeriksaKembaliSheet,
+ * Padanan `_buildDetailRow` yang berulang di beberapa halaman  (PeriksaKembaliSheet,
  * TransferBerhasilPage, TransferBerhasilDijadwalkanPage) -- disatukan di sini supaya tidak ada
  * 3 copy fungsi yang isinya sama.
  *
- * Auto hijau kalau `value` == "gratis" (case-insensitive), sama seperti versi Flutter aslinya.
+ * Auto hijau kalau `value` == "gratis" (case-insensitive), sama seperti versi  aslinya.
  */
 @Composable
 fun TransactionDetailRow(

@@ -53,7 +53,7 @@ fun PinTfPage(
                     }
                 }
                 is TransferNavEvent.ConfirmSessionExpired -> {
-                    // 🔹 Padanan Navigator.pop 2x + pushReplacement(TransferPage) di Flutter.
+                    // 🔹 Padanan Navigator.pop 2x + pushReplacement(TransferPage) di .
                     onSessionExpired()
                 }
                 else -> Unit

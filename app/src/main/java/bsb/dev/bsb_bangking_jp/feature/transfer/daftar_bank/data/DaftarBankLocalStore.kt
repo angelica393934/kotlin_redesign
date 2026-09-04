@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 
 /**
  * Cache lokal daftar bank -- persist ke DataStore (bertahan lintas restart app).
- * Padanan `DaftarBankCache` (Hive) di Flutter, TTL 24 jam sama seperti versi Dart.
+ * Padanan `DaftarBankCache` (Hive) di , TTL 24 jam sama seperti versi Dart.
  */
 class DaftarBankLocalStore(private val context: Context) {
 
