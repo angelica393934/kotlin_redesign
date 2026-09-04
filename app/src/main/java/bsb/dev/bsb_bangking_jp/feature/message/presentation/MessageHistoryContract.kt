@@ -1,13 +1,13 @@
-package bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation
+package bsb.dev.bsb_bangking_jp.feature.message.presentation
 
 import bsb.dev.bsb_bangking_jp.core.filter.TransactionFilterPayload
-import bsb.dev.bsb_bangking_jp.feature.aktivitas.data.HistoryItem
+import bsb.dev.bsb_bangking_jp.feature.message.domain.MessageItem
 
-data class ActivityHistoryUiState(
+data class MessageHistoryUiState(
     val accountNumber: String? = null,
     val isLoading: Boolean = false,
     val isLoadMore: Boolean = false,
-    val items: List<HistoryItem> = emptyList(),
+    val items: List<MessageItem> = emptyList(),
     val hasMore: Boolean = true,
     val error: String? = null,
     val activeFilter: TransactionFilterPayload? = null,

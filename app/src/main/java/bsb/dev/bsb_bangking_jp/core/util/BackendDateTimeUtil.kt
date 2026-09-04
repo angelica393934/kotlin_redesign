@@ -6,7 +6,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 /**
- * Konversi tanggal sederhana ("yyyy-MM-dd", dipakai internal di ActivityFilterPayload/UI)
+ * Konversi tanggal sederhana ("yyyy-MM-dd", dipakai internal diTransactionFilterPayload/UI)
  * jadi format datetime lengkap yang diharapkan backend untuk field fromDateTime/toDateTime.
  *
  * Pola formatter disamakan persis dengan ApiHeaders.currentTimestamp()

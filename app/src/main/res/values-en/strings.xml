@@ -75,12 +75,12 @@
     <string name="msg_belum_ada_transaksi">No transaction records found for this period.</string>
     <string name="label_pilih_rekening">Select an account</string>
 
-    //pesan
-    <string name="label_pesan">Messages</string>
-    <string name="label_semua_pesan">All Messages</string>
-    <string name="label_cari_pesan">Search Message</string>
-    <string name="msg_tidak_ada_pesan">No Messages</string>
-    <string name="msg_belum_ada_pesan">No message records found for this period.</string>
+    //message
+    <string name="label_message">Messages</string>
+    <string name="label_semua_message">All Messages</string>
+    <string name="label_cari_message">Search Message</string>
+    <string name="msg_tidak_ada_message">No Messages</string>
+    <string name="msg_belum_ada_message">No message records found for this period.</string>
 
     //pengaturan
     <string name="theme_dark">Dark</string>

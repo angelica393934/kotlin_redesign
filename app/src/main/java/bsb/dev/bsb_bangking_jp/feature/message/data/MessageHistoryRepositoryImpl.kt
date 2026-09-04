@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.aktivitas.data
+package bsb.dev.bsb_bangking_jp.feature.message.data
 
 import bsb.dev.bsb_bangking_jp.core.filter.TransactionFilterPayload
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
@@ -6,28 +6,29 @@ import bsb.dev.bsb_bangking_jp.core.network.GetWithBodyApiHelper
 import bsb.dev.bsb_bangking_jp.core.session.ClearableRepository
 import bsb.dev.bsb_bangking_jp.core.util.BackendDateTimeUtil
 import bsb.dev.bsb_bangking_jp.core.util.retry
-import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityHistoryRepository
+import bsb.dev.bsb_bangking_jp.feature.message.domain.MessageHistoryRepository
+import bsb.dev.bsb_bangking_jp.feature.message.domain.MessageItem
 
 private const val SUCCESS_CODE = "0000"
 private const val LIMIT = 10
 
-class ActivityHistoryRepositoryImpl(
+class MessageHistoryRepositoryImpl(
     private val apiHelper: GetWithBodyApiHelper,
-) : ActivityHistoryRepository, ClearableRepository {
+) : MessageHistoryRepository, ClearableRepository {
 
-    private val _items = mutableListOf<HistoryItem>()
+    private val _items = mutableListOf<MessageItem>()
     private var offset = 0
     private var _hasMore = true
 
     override val hasMore: Boolean get() = _hasMore
-    override val items: List<HistoryItem> get() = _items.toList()
+    override val items: List<MessageItem> get() = _items.toList()
 
     override suspend fun loadInitial(
         accountNumber: String,
         filter: TransactionFilterPayload,
-    ): List<HistoryItem> {
+    ): List<MessageItem> {
         reset()
-        val fresh = retry { fetchHistory(accountNumber, filter) }
+        val fresh = retry { fetchMessage(accountNumber, filter) }
         _items.addAll(fresh)
         _hasMore = fresh.size == LIMIT
         offset += LIMIT
@@ -36,21 +37,21 @@ class ActivityHistoryRepositoryImpl(
 
     override suspend fun loadMore(
         accountNumber: String,
-        filter:TransactionFilterPayload,
-    ): List<HistoryItem> {
+        filter: TransactionFilterPayload,
+    ): List<MessageItem> {
         if (!_hasMore) return items
-        val fresh = fetchHistory(accountNumber, filter)
+        val fresh = fetchMessage(accountNumber, filter)
         _items.addAll(fresh)
         _hasMore = fresh.size == LIMIT
         offset += LIMIT
         return items
     }
 
-    private suspend fun fetchHistory(
+    private suspend fun fetchMessage(
         accountNumber: String,
-        filter:TransactionFilterPayload,
-    ): List<HistoryItem> {
-        val body = GetHistoryRequest(
+        filter: TransactionFilterPayload,
+    ): List<MessageItem> {
+        val body = GetMessageRequest(
             accountNumber = accountNumber,
             limit = LIMIT,
             offset = offset,
@@ -64,16 +65,16 @@ class ActivityHistoryRepositoryImpl(
         )
 
         val response = apiHelper.execute(
-            path = "v1/dashboard/gethistory",
+            path = "v1/dashboard/getmessage",
             body = body,
-            responseType = ActivityHistoryResponse::class.java,
+            responseType = MessageHistoryResponse::class.java,
         )
 
         if (response.respCode != SUCCESS_CODE) {
-            throw ApiException(response.respCode, "Gagal memuat riwayat aktivitas.")
+            throw ApiException(response.respCode, response.respMessage ?: "Gagal memuat riwayat message.")
         }
 
-        return response.data.history
+        return response.data.history.map { it.toDomain() }
     }
 
     override fun clear() = reset()

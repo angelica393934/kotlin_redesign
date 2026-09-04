@@ -13,6 +13,7 @@ import bsb.dev.bsb_bangking_jp.feature.beranda.BerandaModule
 import bsb.dev.bsb_bangking_jp.feature.init.initModule
 import bsb.dev.bsb_bangking_jp.feature.login.loginModule
 import bsb.dev.bsb_bangking_jp.feature.login_existing.loginExistingModule
+import bsb.dev.bsb_bangking_jp.feature.message.messageModule
 import bsb.dev.bsb_bangking_jp.feature.news.newsModule
 import bsb.dev.bsb_bangking_jp.feature.splash.splashModule
 import bsb.dev.bsb_bangking_jp.feature.transfer.transferModule
@@ -45,6 +46,7 @@ class BsbApplication : Application() {
                 profileModule,
                 rekeningLainnyaModule,
                 logoutModule,
+                messageModule,
                 // tambahkan module fitur lain di sini
             )
         }

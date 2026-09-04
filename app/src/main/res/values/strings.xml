@@ -29,7 +29,7 @@
 
     <string name="nav_home">Beranda</string>
     <string name="nav_activity">Aktivitas</string>
-    <string name="nav_request">Pesan</string>
+    <string name="nav_request">message</string>
     <string name="nav_settings">Pengaturan</string>
 
 //beranda
@@ -76,12 +76,12 @@
     <string name="msg_belum_ada_transaksi">Belum ditemukan catatan transaksi pada periode ini.</string>
     <string name="label_pilih_rekening">Pilih rekening</string>
 
-    //pesan
-    <string name="label_pesan">Pesan</string>
-    <string name="label_semua_pesan">Semua Pesan</string>
-    <string name="label_cari_pesan">Cari Pesan</string>
-    <string name="msg_tidak_ada_pesan">Tidak ada Pesan</string>
-    <string name="msg_belum_ada_pesan">Belum ditemukan catatan pesan pada periode ini.</string>
+    //message
+    <string name="label_message">message</string>
+    <string name="label_semua_message">Semua message</string>
+    <string name="label_cari_message">Cari message</string>
+    <string name="msg_tidak_ada_message">Tidak ada message</string>
+    <string name="msg_belum_ada_message">Belum ditemukan catatan message pada periode ini.</string>
 
     //pengaturan
     <!-- Theme switch -->

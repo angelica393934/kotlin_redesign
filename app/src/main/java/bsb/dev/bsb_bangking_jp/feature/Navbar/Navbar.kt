@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,14 +35,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,7 +52,7 @@ import androidx.navigation.NavController
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation.ActivityHistoryViewModel
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.AktivitasPage
 import bsb.dev.bsb_bangking_jp.feature.beranda.BerandaPage
-import bsb.dev.bsb_bangking_jp.feature.pesan.PesanPage
+import bsb.dev.bsb_bangking_jp.feature.message.MessagePage
 import org.koin.compose.koinInject
 import kotlin.Unit
 
@@ -133,7 +130,7 @@ fun Navbar(
                     onCardlessClick = onCardlessClick,
                 )
                 1 -> AktivitasPage()
-                2 -> PesanPage()
+                2 -> MessagePage()
                 3 -> PengaturanPage(
                     darkTheme = darkTheme,
                     onThemeChange = onThemeChange,

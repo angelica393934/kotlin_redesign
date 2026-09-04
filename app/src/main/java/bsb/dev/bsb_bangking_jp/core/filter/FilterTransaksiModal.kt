@@ -1,4 +1,4 @@
-package bsb.dev.bsb_bangking_jp.feature.aktivitas.component
+package bsb.dev.bsb_bangking_jp.core.filter
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,9 +33,7 @@ import bsb.dev.bsb_bangking_jp.core.component.AppButton
 import bsb.dev.bsb_bangking_jp.core.component.AppModalBottomSheet
 import bsb.dev.bsb_bangking_jp.core.component.AppTextField
 import bsb.dev.bsb_bangking_jp.core.component.PilihRentangTanggalSheet
-import bsb.dev.bsb_bangking_jp.core.component.PilihTanggalSheet
 import bsb.dev.bsb_bangking_jp.core.theme.extendedColors
-import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -54,9 +52,9 @@ private val displayFormatter = DateTimeFormatter.ofPattern("d MMM")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun FilterTransaksiModal(
-    currentFilter: ActivityFilterPayload,
+    currentFilter:TransactionFilterPayload,
     onDismiss: () -> Unit,
-    onApply: (ActivityFilterPayload) -> Unit,
+    onApply: (TransactionFilterPayload) -> Unit,
 ) {
     var fromDate by remember { mutableStateOf(currentFilter.fromDate.takeUnless { currentFilter.isDefaultDate }) }
     var toDate by remember { mutableStateOf(currentFilter.toDate.takeUnless { currentFilter.isDefaultDate }) }

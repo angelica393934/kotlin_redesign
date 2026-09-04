@@ -25,7 +25,8 @@ fun NetworkImage(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
-) {
+
+    ) {
     when (val state = rememberNetworkImageState(path, category)) {
         is NetworkImageState.Loading -> {
             val brush = rememberShimmerBrush()

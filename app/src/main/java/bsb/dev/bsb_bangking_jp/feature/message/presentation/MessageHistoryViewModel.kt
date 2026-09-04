@@ -1,9 +1,9 @@
-package bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation
+package bsb.dev.bsb_bangking_jp.feature.message.presentation
 
 import bsb.dev.bsb_bangking_jp.core.filter.TransactionFilterPayload
 import bsb.dev.bsb_bangking_jp.core.network.ApiException
 import bsb.dev.bsb_bangking_jp.core.util.DefaultRangeDate
-import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityHistoryRepository
+import bsb.dev.bsb_bangking_jp.feature.message.domain.MessageHistoryRepository
 import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.presentation.RekeningLainnyaViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,78 +17,57 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
- * Koin `single` (BUKAN `viewModel`), sama seperti BerandaViewModel -- supaya 1 instance
- * dipakai di seluruh app dan proses fetch histori TIDAK tergantung apakah AktivitasPage
- * sedang di-compose atau tidak (Navbar cuma compose page yang aktif via `when(currentIndex)`,
- * jadi trigger tidak boleh diletakkan di LaunchedEffect milik AktivitasPage).
- *
- * Begitu class ini pertama kali di-resolve Koin, dia langsung "mengamati" state rekening
- * dari BerandaViewModel lewat coroutine sendiri. Saat rekeningList berhasil terisi untuk
- * PERTAMA KALI, otomatis pilih rekening utama & fetch histori -- tanpa perlu UI mana pun
- * memicunya secara eksplisit.
+ * Koin `single` (bukan `viewModel`) -- sama seperti ActivityHistoryViewModel, supaya
+ * fetch message tidak tergantung apakah messagePage sedang di-compose oleh Navbar atau tidak.
  */
-class ActivityHistoryViewModel(
-    private val repository: ActivityHistoryRepository,
+class MessageHistoryViewModel(
+    private val repository: MessageHistoryRepository,
     private val rekeningViewModel: RekeningLainnyaViewModel,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    private val _uiState = MutableStateFlow(ActivityHistoryUiState())
-    val uiState: StateFlow<ActivityHistoryUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(MessageHistoryUiState())
+    val uiState: StateFlow<MessageHistoryUiState> = _uiState.asStateFlow()
 
     init {
-        android.util.Log.d("ActivityHistory", "ViewModel CREATED (Koin resolve)")
         observeRekeningUntukAutoLoad()
     }
 
-    /**
-     * Padanan `BlocListener<RekeningLainnyaBloc>` di AktivitasPage.dart lama --
-     * tunggu rekening lainnya berhasil dulu, baru jalankan fetch histori pertama kali.
-     * Hanya trigger SEKALI (selama accountNumber belum pernah di-set) supaya tidak
-     * menimpa pilihan rekening manual user setiap kali BerandaViewModel refresh.
-     */
     private fun observeRekeningUntukAutoLoad() {
         scope.launch {
             rekeningViewModel.uiState
                 .map { it.rekeningList }
                 .distinctUntilChangedBy { it?.size to it?.firstOrNull()?.number }
                 .collect { rekeningList ->
-                    android.util.Log.d("ActivityHistory", "observe rekeningList changed, size=${rekeningList?.size}, current accountNumber=${_uiState.value.accountNumber}")
                     if (_uiState.value.accountNumber != null) return@collect
                     if (rekeningList.isNullOrEmpty()) return@collect
 
                     val primary = rekeningList.firstOrNull { it.isPrimary } ?: rekeningList.first()
-                    android.util.Log.d("ActivityHistory", "auto-trigger getInitial() with account=${primary.number}")
                     getInitial(primary.number)
                 }
         }
     }
 
     fun getInitial(accountNumber: String) {
-        android.util.Log.d("ActivityHistory", "getInitial() CALLED account=$accountNumber")
         load(accountNumber, TransactionFilterPayload.initial())
     }
 
-    /** Dipanggil saat user pilih rekening lain lewat SaldoCardSelector. */
     fun switchAccount(accountNumber: String) {
         if (_uiState.value.accountNumber == accountNumber) return
         getInitial(accountNumber)
     }
 
-    /** Padanan ActivityHistoryEvent.applyFilter. */
-    fun applyFilter(filter:TransactionFilterPayload) {
+    fun applyFilter(filter: TransactionFilterPayload) {
         val accountNumber = _uiState.value.accountNumber ?: return
         load(accountNumber, normalizeFilter(filter))
     }
 
-    /** Padanan ActivityHistoryEvent.refresh -- pakai filter aktif yang sedang berlaku. */
     fun refresh() {
         val accountNumber = _uiState.value.accountNumber ?: return
         val filter = _uiState.value.activeFilter ?: return
         load(accountNumber, filter)
     }
 
-    /** Padanan ActivityHistoryEvent.loadMore. */
     fun loadMore() {
         val state = _uiState.value
         val accountNumber = state.accountNumber ?: return
@@ -106,10 +85,8 @@ class ActivityHistoryViewModel(
         }
     }
 
-    private fun load(accountNumber: String, filter:TransactionFilterPayload) {
-        android.util.Log.d("ActivityHistory", "load() launching coroutine, account=$accountNumber")
+    private fun load(accountNumber: String, filter: TransactionFilterPayload) {
         scope.launch {
-            android.util.Log.d("ActivityHistory", "load() coroutine STARTED")
             _uiState.update {
                 it.copy(
                     accountNumber = accountNumber,
@@ -120,12 +97,9 @@ class ActivityHistoryViewModel(
                 )
             }
             try {
-                android.util.Log.d("ActivityHistory", "calling repository.loadInitial()...")
                 val items = repository.loadInitial(accountNumber, filter)
-                android.util.Log.d("ActivityHistory", "loadInitial() SUCCESS, items=${items.size}")
                 _uiState.update { it.copy(isLoading = false, items = items, hasMore = repository.hasMore) }
             } catch (e: Exception) {
-                android.util.Log.e("ActivityHistory", "loadInitial() FAILED", e)
                 _uiState.update { it.copy(isLoading = false, error = errorMessage(e)) }
             }
         }
@@ -134,8 +108,7 @@ class ActivityHistoryViewModel(
     private fun errorMessage(e: Exception): String =
         (e as? ApiException)?.respMessage ?: "Terjadi kesalahan, silakan coba lagi."
 
-    /** Padanan _normalizeFilter -- quickRange dan manual date saling eksklusif. */
-    private fun normalizeFilter(filter:TransactionFilterPayload):TransactionFilterPayload {
+    private fun normalizeFilter(filter: TransactionFilterPayload): TransactionFilterPayload {
         if (filter.quickRange != null) {
             return filter.with(resetFromDate = true, resetToDate = true)
         }

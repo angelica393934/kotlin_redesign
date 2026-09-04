@@ -62,10 +62,10 @@ class ProfileRepositoryImpl(
 
             return body.data // 🔹 langsung return ProfileData penuh, BUKAN body.data.external.data
         } catch (e: ApiException) {
-            // sudah pesan resmi dari server (respMessage) atau dari ApiErrorParser -- teruskan apa adanya
+            // sudah message resmi dari server (respMessage) atau dari ApiErrorParser -- teruskan apa adanya
             throw e
         } catch (e: Exception) {
-            // exception mentah (jaringan/parsing/dll) -- ubah dulu jadi pesan ramah sebelum naik ke ViewModel
+            // exception mentah (jaringan/parsing/dll) -- ubah dulu jadi message ramah sebelum naik ke ViewModel
             throw ApiException(null, NetworkErrorMapper.toUserMessage(e))
         }
     }

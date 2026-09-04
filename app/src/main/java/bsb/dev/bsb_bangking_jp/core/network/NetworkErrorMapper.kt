@@ -7,7 +7,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLHandshakeException
 
- //Mapping exception jaringan -> pesan aman untuk user.
+ //Mapping exception jaringan -> message aman untuk user.
 
 object NetworkErrorMapper {
 
@@ -25,15 +25,15 @@ object NetworkErrorMapper {
             "Koneksi tidak aman terdeteksi. Silakan coba lagi nanti."
 
         is ApiException ->
-            throwable.respMessage // sudah pesan dari server, aman ditampilkan
+            throwable.respMessage // sudah message dari server, aman ditampilkan
 
         // 🔒 Tangkap SEMUA IOException lain (mis. "unexpected end of stream",
-        // ProtocolException, EOFException, dll) SEBELUM jatuh ke else -- pesan
+        // ProtocolException, EOFException, dll) SEBELUM jatuh ke else -- message
         // aslinya sering menyertakan URL/host, jadi jangan pernah diteruskan.
         is IOException ->
             "Koneksi terputus saat menghubungi server. Silakan coba lagi."
 
-        // 🔒 Exception tak dikenal lainnya -- tetap pakai pesan generik,
+        // 🔒 Exception tak dikenal lainnya -- tetap pakai message generik,
         // JANGAN throwable.message (berpotensi bocorkan detail internal).
         else ->
             "Terjadi kesalahan. Silakan coba kembali."

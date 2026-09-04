@@ -110,7 +110,7 @@ class TransferViewModel(
     /**
      * 3) TRANSFER.
      * Padanan `failure: (code, msg)` di listener PeriksaKembaliSheet -mu:
-     * - code "0688" -> sesi berakhir: toast pesan tetap, lalu tutup sheet + pop 1x lagi.
+     * - code "0688" -> sesi berakhir: toast message tetap, lalu tutup sheet + pop 1x lagi.
      * - selain itu -> toast pakai `msg` dari server, tetap di halaman yang sama.
      */
     fun transfer(payload: TransferRequestPayload) {

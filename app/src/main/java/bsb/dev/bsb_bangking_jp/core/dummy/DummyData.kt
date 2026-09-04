@@ -24,7 +24,7 @@ data class DummyTransaksi(
     val tanggal: String, // "02 Jul 2026"
 )
 
-data class DummyPesan(
+data class Dummymessage(
     val title: String,
     val subtitle: String,
     val amount: String,
@@ -134,19 +134,19 @@ object DummyData {
         DummyTransaksi("Tagihan", "Bayar Internet Indihome", "- Rp 350.000", false, "29 Jun 2026"),
     )
 
-    val pesanList = listOf(
-        DummyPesan("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
-        DummyPesan("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Berhasil", "02 Jul 2026"),
-        DummyPesan("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
-        DummyPesan("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
-        DummyPesan("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Gagal", "02 Jul 2026"),
-        DummyPesan("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
-        DummyPesan("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
-        DummyPesan("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Berhasil", "02 Jul 2026"),
-        DummyPesan("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
-        DummyPesan("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
-        DummyPesan("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Gagal", "02 Jul 2026"),
-        DummyPesan("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
+    val messageList = listOf(
+        Dummymessage("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
+        Dummymessage("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Berhasil", "02 Jul 2026"),
+        Dummymessage("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
+        Dummymessage("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
+        Dummymessage("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Gagal", "02 Jul 2026"),
+        Dummymessage("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
+        Dummymessage("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
+        Dummymessage("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Berhasil", "02 Jul 2026"),
+        Dummymessage("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
+        Dummymessage("Transfer ke Budi Santoso", "Transfer berhasil diproses", "- Rp 500.000", "Berhasil", "02 Jul 2026"),
+        Dummymessage("Bayar Listrik PLN", "Pembayaran tagihan berhasil", "- Rp 250.000", "Gagal", "02 Jul 2026"),
+        Dummymessage("Top Up GoPay", "Transaksi sedang diproses", "- Rp 100.000", "Pending", "01 Jul 2026"),
     )
 
     val beritaList = listOf(

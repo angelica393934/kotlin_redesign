@@ -49,8 +49,8 @@ import org.koin.compose.koinInject
 private data class BannerContent(val title: String?, val desc: String)
 
 /**
- * Padanan `widgets/banner_keamanan.dart` (pesan statis, mis. peringatan keamanan di
- * halaman PIN) -- 1 pesan tetap, bisa ditutup. Sekali ditutup, TIDAK tampil lagi hari itu.
+ * Padanan `widgets/banner_keamanan.dart` (message statis, mis. peringatan keamanan di
+ * halaman PIN) -- 1 message tetap, bisa ditutup. Sekali ditutup, TIDAK tampil lagi hari itu.
  */
 @Composable
 fun BannerKeamanan(

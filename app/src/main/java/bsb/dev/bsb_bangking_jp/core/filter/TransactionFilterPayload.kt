@@ -1,8 +1,12 @@
-package bsb.dev.bsb_bangking_jp.feature.aktivitas.domain
+package bsb.dev.bsb_bangking_jp.core.filter
 
 import bsb.dev.bsb_bangking_jp.core.util.DefaultRangeDate
 
-data class ActivityFilterPayload(
+/**
+ * Payload filter generik untuk transaksi/message — dipakai bareng oleh Aktivitas & message
+ * (sebelumnyaTransactionFilterPayload, khusus fitur Aktivitas saja).
+ */
+data class TransactionFilterPayload(
     val fromDate: String? = null,
     val toDate: String? = null,
     val quickRange: Int? = null,
@@ -14,10 +18,9 @@ data class ActivityFilterPayload(
     val label: String = "",
 ) {
     companion object {
-        /** Padanan ActivityFilterPayload.initial() -- satu-satunya default yang sah. */
-        fun initial(): ActivityFilterPayload {
+        fun initial(): TransactionFilterPayload {
             val def = DefaultRangeDate.getCurrentMonth()
-            return ActivityFilterPayload(
+            return TransactionFilterPayload(
                 fromDate = def.from,
                 toDate = def.to,
                 label = "Semua Transaksi",
@@ -25,11 +28,6 @@ data class ActivityFilterPayload(
         }
     }
 
-    /**
-     * Padanan copyWith() dengan reset-flag di . Kotlin `data class.copy()` tidak bisa
-     * bedakan "parameter tidak diisi" vs "sengaja diisi null", jadi dipakai flag reset eksplisit
-     * sama seperti versi Dart-nya.
-     */
     fun with(
         fromDate: String? = this.fromDate,
         resetFromDate: Boolean = false,
@@ -45,7 +43,7 @@ data class ActivityFilterPayload(
         isAllCategory: Boolean = this.isAllCategory,
         isDefaultDate: Boolean = this.isDefaultDate,
         label: String = this.label,
-    ): ActivityFilterPayload = ActivityFilterPayload(
+    ): TransactionFilterPayload = TransactionFilterPayload(
         fromDate = if (resetFromDate) null else fromDate,
         toDate = if (resetToDate) null else toDate,
         quickRange = if (resetQuickRange) null else quickRange,

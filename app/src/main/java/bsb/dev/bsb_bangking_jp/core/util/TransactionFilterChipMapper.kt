@@ -1,14 +1,16 @@
 package bsb.dev.bsb_bangking_jp.core.util
 
 import bsb.dev.bsb_bangking_jp.core.component.FilterChipItem
-import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
+import bsb.dev.bsb_bangking_jp.core.filter.TransactionFilterPayload
 
-object ActivityFilterChipMapper {
+/**
+ * Reusable untuk Aktivitas & message (sebelumnya TransactionFilterPayload, khusus Aktivitas).
+ */
+object TransactionFilterChipMapper {
 
-    fun fromPayload(filter: ActivityFilterPayload?): List<FilterChipItem> {
+    fun fromPayload(filter: TransactionFilterPayload?): List<FilterChipItem> {
         if (filter == null) return emptyList()
 
-        // Default sistem -- jangan tampilkan chip apapun.
         if (filter.isDefaultDate && filter.isAllJenis && filter.isAllCategory && filter.quickRange == null) {
             return emptyList()
         }
@@ -36,7 +38,7 @@ object ActivityFilterChipMapper {
         return chips
     }
 
-    fun removeChip(filter: ActivityFilterPayload, key: String): ActivityFilterPayload = when {
+    fun removeChip(filter: TransactionFilterPayload, key: String): TransactionFilterPayload = when {
         key.startsWith("jenis:") -> {
             val value = key.substringAfter("jenis:")
             val updated = filter.jenis?.filterNot { it == value }

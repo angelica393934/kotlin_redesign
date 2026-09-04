@@ -56,16 +56,15 @@ import bsb.dev.bsb_bangking_jp.core.component.FilterChipBar
 import bsb.dev.bsb_bangking_jp.core.component.SaldoCardEmpty
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonList
 import bsb.dev.bsb_bangking_jp.core.skeleton.SkeletonSaldoCard
-import bsb.dev.bsb_bangking_jp.core.util.ActivityFilterChipMapper
 import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
 import bsb.dev.bsb_bangking_jp.core.util.DateFormatterUtil
 import bsb.dev.bsb_bangking_jp.core.util.groupByDateSortedDesc
-import bsb.dev.bsb_bangking_jp.feature.aktivitas.component.FilterTransaksiModal
+import bsb.dev.bsb_bangking_jp.core.filter.FilterTransaksiModal
+import bsb.dev.bsb_bangking_jp.core.filter.TransactionFilterPayload
+import bsb.dev.bsb_bangking_jp.core.util.TransactionFilterChipMapper
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.data.HistoryItem
-import bsb.dev.bsb_bangking_jp.feature.aktivitas.domain.ActivityFilterPayload
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.presentation.ActivityHistoryViewModel
 import bsb.dev.bsb_bangking_jp.feature.aktivitas.section.SaldoCardSelector
-import bsb.dev.bsb_bangking_jp.feature.beranda.presentation.BerandaViewModel
 import bsb.dev.bsb_bangking_jp.shared.rekening_lainnya.presentation.RekeningLainnyaViewModel
 import org.koin.compose.koinInject
 import kotlin.math.roundToInt
@@ -123,7 +122,7 @@ fun AktivitasPage(
 
     val grouped = remember(activityState.items) { groupByDateSortedDesc(activityState.items) }
     val chips = remember(activityState.activeFilter) {
-        ActivityFilterChipMapper.fromPayload(activityState.activeFilter)
+        TransactionFilterChipMapper.fromPayload(activityState.activeFilter)
     }
 
     Column(
@@ -201,7 +200,7 @@ fun AktivitasPage(
             },
             onRemove = { chip ->
                 val current = activityState.activeFilter ?: return@FilterChipBar
-                val updated = ActivityFilterChipMapper.removeChip(current, chip.key)
+                val updated = TransactionFilterChipMapper.removeChip(current, chip.key)
                 activityViewModel.applyFilter(updated)
             },
         )
@@ -303,9 +302,9 @@ fun AktivitasPage(
         Spacer(modifier = Modifier.height(80.dp))
     }
 
-    if (showFilterModal) {io
+    if (showFilterModal) {
         FilterTransaksiModal(
-            currentFilter = activityState.activeFilter ?: ActivityFilterPayload.initial(),
+            currentFilter = activityState.activeFilter ?:TransactionFilterPayload.initial(),
             onDismiss = { showFilterModal = false },
             onApply = { updated -> activityViewModel.applyFilter(updated) },
         )

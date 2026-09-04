@@ -1,6 +1,7 @@
-package bsb.dev.bsb_bangking_jp.feature.pesan.section
+package bsb.dev.bsb_bangking_jp.feature.message.section
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,49 +31,66 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import bsb.dev.bsb_bangking_jp.core.dummy.DummyPesan
+import bsb.dev.bsb_bangking_jp.core.util.RupiahFormat
+import bsb.dev.bsb_bangking_jp.feature.message.domain.MessageItem
 
 /**
- * Padanan dari Pages/pesan/section/PesanItem.dart (PesanSectionTanggal + PesanItem).
+ * Padanan dari Pages/message/section/messageItem.dart (messageSectionTanggal + messageItem).
+ * Sekarang terhubung ke data asli dari getmessage (MessageItem), bukan dummy lagi.
  *
- * BELUM terhubung ke MessageHistoryBloc/mapper apa pun -- item pesan
- * dikirim sebagai DummyPesan yang field-nya (title/subtitle/amount/status)
- * sudah dalam bentuk siap tampil, persis seperti hasil
- * mapTitle/mapSubtitle/MoneyFormatter/mapStatus di Dart.
+ * title/subtitle/status di bawah masih pemetaan sementara dari field getmessage
+ * (jenisTransaksi/note/status) -- sesuaikan lagi kalau field yang lebih pas
+ * ternyata datang dari respons getmessagebyid.
  */
 @Composable
-fun PesanSectionTanggal(
+fun MessageSectionTanggal(
     tanggal: String,
-    items: List<DummyPesan>,
+    items: List<MessageItem>,
     modifier: Modifier = Modifier,
+    onItemClick: (MessageItem) -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                // TODO: sesuaikan dengan token AppTheme.blue8
                 .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 24.dp, vertical = 8.dp),
         ) {
             Text(
                 text = tanggal,
                 style = MaterialTheme.typography.titleMedium,
-                // TODO: sesuaikan dengan token AppTheme.gray300
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        items.forEach { pesan ->
-            PesanItemRow(pesan = pesan)
+        items.forEach { message ->
+            MessageItemRow(
+                message = message,
+                onClick = { onItemClick(message) },
+            )
         }
     }
 }
 
+/** Dibuka (bukan private) supaya bisa dipakai langsung dari MessagePage kalau perlu. */
 @Composable
-private fun PesanItemRow(pesan: DummyPesan, modifier: Modifier = Modifier) {
-    val icon = getPesanIcon(pesan.title)
-    val statusColor = getStatusColor(pesan.status)
+fun MessageItemRow(
+    message: MessageItem,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+) {
+    val title = message.jenisTransaksi.ifBlank { message.type.ifBlank { "Transaksi" } }
+    val subtitle = message.note.ifBlank { "-" }
+    val amountText = RupiahFormat(message.totalAmount.toInt())
+    val displayAmount = if (message.totalAmount < 0) amountText else "- $amountText"
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    val icon = getMessageIcon(title)
+    val statusColor = getStatusColor(message.status)
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,18 +101,16 @@ private fun PesanItemRow(pesan: DummyPesan, modifier: Modifier = Modifier) {
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                // TODO: sesuaikan dengan token AppTheme.blue2
                 tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = pesan.title, style = MaterialTheme.typography.titleSmall)
+                Text(text = title, style = MaterialTheme.typography.titleSmall)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = pesan.subtitle,
+                    text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    // TODO: sesuaikan dengan token AppTheme.gray400
                     color = MaterialTheme.colorScheme.outline,
                 )
             }
@@ -103,7 +119,7 @@ private fun PesanItemRow(pesan: DummyPesan, modifier: Modifier = Modifier) {
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = pesan.amount,
+                    text = displayAmount,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -115,7 +131,7 @@ private fun PesanItemRow(pesan: DummyPesan, modifier: Modifier = Modifier) {
                         .padding(horizontal = 8.dp, vertical = 2.dp),
                 ) {
                     Text(
-                        text = pesan.status,
+                        text = message.status.ifBlank { "-" },
                         color = MaterialTheme.colorScheme.background,
                         fontSize = 12.sp,
                     )
@@ -124,15 +140,14 @@ private fun PesanItemRow(pesan: DummyPesan, modifier: Modifier = Modifier) {
         }
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 24.dp),
-            // TODO: sesuaikan dengan token AppTheme.gray100
             color = MaterialTheme.colorScheme.surfaceVariant,
             thickness = 1.dp,
         )
     }
 }
 
-/** Padanan dari _getIcon() di Dart -- deteksi ikon otomatis berdasarkan title. */
-private fun getPesanIcon(title: String): ImageVector {
+/** Padanan dari _getIcon() di Dart -- deteksi ikon otomatis berdasarkan title/jenis. */
+private fun getMessageIcon(title: String): ImageVector {
     val t = title.lowercase()
     return when {
         t.contains("transfer") -> Icons.Filled.CompareArrows
@@ -146,10 +161,8 @@ private fun getPesanIcon(title: String): ImageVector {
 /** Padanan dari _getStatusColor() di Dart -- warna badge status otomatis. */
 @Composable
 private fun getStatusColor(status: String): Color = when (status.lowercase()) {
-    "berhasil" -> Color(0xFF4CAF50) // padanan Colors.green
-    "gagal" -> Color(0xFFF44336) // padanan Colors.red
-    // TODO: sesuaikan dengan token AppTheme.gray400
+    "berhasil" -> Color(0xFF4CAF50)
+    "gagal" -> Color(0xFFF44336)
     "pending" -> MaterialTheme.colorScheme.outline
-    // TODO: sesuaikan dengan token AppTheme.gray300
     else -> MaterialTheme.colorScheme.onSurfaceVariant
 }
